@@ -1,0 +1,2 @@
+- [ ] MoneyRecord Class
+- [ ] Database with CURD test case
