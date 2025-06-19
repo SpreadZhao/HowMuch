@@ -1,2 +1,2 @@
 # HowMuch
-How much did you cost on everything?
+How much did you cost on each thing?
