@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "HowMuchAndroid"
 include(":app")
 include(":debug")
+include(":ui")
