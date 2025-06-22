@@ -20,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
 import com.spread.db.service.Money
+import com.spread.migrate.MigrateButton
 import com.spread.ui.InlineDatePicker
 import com.spread.ui.SelectionDropdownMenu
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +30,7 @@ import java.math.BigDecimal
 private const val ROUTE_DEBUG_MAIN = "debug_main"
 private const val ROUTE_DEBUG_ALL = "debug_all"
 private const val ROUTE_DEBUG_CURR_MONTH = "debug_curr_month"
+private const val ROUTE_DEBUG_MIGRATE = "debug_migrate"
 
 @Composable
 fun DebugSurface() {
@@ -41,6 +43,7 @@ fun DebugSurface() {
         composable(ROUTE_DEBUG_MAIN) { DebugMain(navController) }
         composable(ROUTE_DEBUG_ALL) { DebugAll() }
         composable(ROUTE_DEBUG_CURR_MONTH) { DebugCurrMonth() }
+        composable(ROUTE_DEBUG_MIGRATE) { DebugMigrate() }
     }
 }
 
@@ -65,6 +68,15 @@ fun DebugMain(
                 }
             ) {
                 Text("Current Month")
+            }
+        }
+        item {
+            Button(
+                onClick = {
+                    navController.navigate(ROUTE_DEBUG_MIGRATE)
+                }
+            ) {
+                Text("Migrate")
             }
         }
     }
@@ -142,4 +154,9 @@ fun DebugCurrMonth() {
             }
         }
     }
+}
+
+@Composable
+fun DebugMigrate() {
+    MigrateButton()
 }
