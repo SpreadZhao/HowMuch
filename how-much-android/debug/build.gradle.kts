@@ -37,7 +37,8 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation.compose)
     implementation(project(":ui"))
     implementation(project(":db"))
 }
