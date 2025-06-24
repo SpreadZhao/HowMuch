@@ -3,3 +3,4 @@
 - [ ] Using coroutine to utilize database services
 - [ ] Current month records data layer
 - [ ] Import plain json text
+- [ ] Migrate: boundary & exception check

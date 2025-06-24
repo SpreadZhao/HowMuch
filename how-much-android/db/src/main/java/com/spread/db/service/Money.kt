@@ -4,7 +4,9 @@ import androidx.room.Room
 import com.spread.common.HowMuch
 import com.spread.db.money.MoneyDatabase
 import com.spread.db.money.MoneyRecord
+import com.spread.db.money.MoneyType
 import kotlinx.coroutines.flow.Flow
+import java.math.BigDecimal
 import java.util.Calendar
 import java.util.Date
 
@@ -16,12 +18,35 @@ object Money {
         "money-database"
     ).build()
 
+    // TODO: all default values must be non-null and non-empty
+    class MoneyRecordBuilder {
+        var date = System.currentTimeMillis()
+        var category = ""
+        var type = MoneyType.Expense
+        var value = 0.0
+    }
+
+    inline fun buildMoneyRecord(action: MoneyRecordBuilder.() -> Unit): MoneyRecord {
+        val builder = MoneyRecordBuilder()
+        builder.action()
+        return MoneyRecord(
+            date = builder.date,
+            category = builder.category,
+            type = builder.type,
+            value = BigDecimal.valueOf(builder.value)
+        )
+    }
+
     suspend fun getAllRecords(): List<MoneyRecord> {
         return database.moneyDao().getAllRecords()
     }
 
     fun listenAllRecords(): Flow<List<MoneyRecord>> {
         return database.moneyDao().listenAllRecords()
+    }
+
+    suspend fun insertRecord(record: MoneyRecord) {
+        database.moneyDao().insertRecord(record)
     }
 
     suspend fun insertRecords(vararg records: MoneyRecord) {

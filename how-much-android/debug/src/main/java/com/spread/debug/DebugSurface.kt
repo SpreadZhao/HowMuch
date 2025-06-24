@@ -17,7 +17,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
 import com.spread.db.service.Money
 import com.spread.migrate.MigrateButton
@@ -25,7 +24,6 @@ import com.spread.ui.InlineDatePicker
 import com.spread.ui.SelectionDropdownMenu
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 
 private const val ROUTE_DEBUG_MAIN = "debug_main"
 private const val ROUTE_DEBUG_ALL = "debug_all"
@@ -112,12 +110,12 @@ fun DebugAll() {
             )
             Button(onClick = {
                 scope.launch(Dispatchers.IO) {
-                    val record = MoneyRecord(
-                        date = System.currentTimeMillis(),
-                        category = categoryInput,
-                        type = typeInput,
-                        value = BigDecimal(valueInput)
-                    )
+                    val record = Money.buildMoneyRecord {
+                        date = System.currentTimeMillis()
+                        category = categoryInput
+                        type = typeInput
+                        value = valueInput.toDouble()
+                    }
                     Money.insertRecords(record)
                 }
             }) {

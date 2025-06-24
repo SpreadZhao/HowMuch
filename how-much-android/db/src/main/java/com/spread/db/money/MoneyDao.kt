@@ -15,6 +15,9 @@ interface MoneyDao {
     fun listenAllRecords(): Flow<List<MoneyRecord>>
 
     @Insert
+    suspend fun insertRecord(record: MoneyRecord)
+
+    @Insert
     suspend fun insertRecords(vararg records: MoneyRecord)
 
     @Query("SELECT * FROM ${MoneyConst.TABLE_NAME_MONEY_RECORD} WHERE date BETWEEN :startTime AND :endTime ORDER BY date ASC")
