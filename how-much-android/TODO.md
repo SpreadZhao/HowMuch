@@ -4,3 +4,5 @@
 - [ ] Current month records data layer
 - [ ] Import plain json text
 - [ ] Migrate: boundary & exception check
+- [ ] MoneyExt in Money service
+- [ ] TrackNode: https://chatgpt.com/share/6814fe62-1a64-800f-b75b-c532972cd62d

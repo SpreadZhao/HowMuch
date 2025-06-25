@@ -9,7 +9,7 @@ import java.util.Date
 
 @Entity(tableName = MoneyConst.TABLE_NAME_MONEY_RECORD)
 @Serializable
-data class MoneyRecord(
+data class MoneyRecord internal constructor(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     @ColumnInfo(name = "date") val date: Long,
     @ColumnInfo(name = "category") val category: String,

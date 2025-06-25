@@ -27,7 +27,7 @@ object Money {
         var value = 0.0
     }
 
-    inline fun buildMoneyRecord(action: MoneyRecordBuilder.() -> Unit): MoneyRecord {
+    fun buildMoneyRecord(action: MoneyRecordBuilder.() -> Unit): MoneyRecord {
         val builder = MoneyRecordBuilder()
         builder.action()
         return MoneyRecord(
