@@ -23,6 +23,7 @@ object Money {
         var date = System.currentTimeMillis()
         var category = ""
         var type = MoneyType.Expense
+        var remark = ""
         var value = 0.0
     }
 
@@ -33,6 +34,7 @@ object Money {
             date = builder.date,
             category = builder.category,
             type = builder.type,
+            remark = builder.remark,
             value = BigDecimal.valueOf(builder.value)
         )
     }

@@ -61,6 +61,7 @@ private fun parseMoneyRecord(obj: JsonObject): MoneyRecord? {
     val date = dateStrToDate(obj.optString("date"), Migrate.QJ.FORMAT_DATE)
     val category = obj.optString("category")
     val type = obj.optString("type")
+    val remark = obj.optString("remark")
     val money = obj.optDouble("money")
 
     if (date == null || category.isNullOrEmpty() || type.isNullOrEmpty() || money <= 0) {
@@ -70,6 +71,7 @@ private fun parseMoneyRecord(obj: JsonObject): MoneyRecord? {
         this.date = date.time
         this.category = category
         this.type = if (type == "收入") MoneyType.Income else MoneyType.Expense
+        this.remark = remark ?: ""
         this.value = money
     }
 }

@@ -2,7 +2,6 @@ package com.spread.db.money
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
@@ -12,8 +11,6 @@ import kotlinx.serialization.json.JsonEncoder
 import kotlinx.serialization.json.JsonUnquotedLiteral
 import kotlinx.serialization.json.jsonPrimitive
 import java.math.BigDecimal
-
-typealias BigDecimalJson = @Serializable(with = BigDecimalSerializer::class) BigDecimal
 
 class BigDecimalSerializer() : KSerializer<BigDecimal> {
 

@@ -5,13 +5,12 @@ plugins {
 }
 
 android {
-    namespace = "com.spread.debug"
+    namespace = "com.spread.business"
     compileSdk = 35
 
     defaultConfig {
         minSdk = 24
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
 
@@ -37,10 +36,12 @@ android {
 }
 
 dependencies {
+
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.navigation.compose)
+    implementation(libs.material)
     implementation(project(":ui"))
     implementation(project(":db"))
-    implementation(project(":migrate"))
-    implementation(project(":business"))
+    implementation(project(":common"))
 }

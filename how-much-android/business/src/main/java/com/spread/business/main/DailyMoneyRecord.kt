@@ -1,0 +1,74 @@
+package com.spread.business.main
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.spread.common.DATE_FORMAT_MONTH_DAY_STR
+import com.spread.common.dateStr
+import com.spread.db.money.MoneyRecord
+import com.spread.db.money.MoneyType
+import java.util.Date
+
+@Composable
+fun MoneyRecordCardForOneDay(
+    modifier: Modifier = Modifier,
+    records: List<MoneyRecord>
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        horizontalAlignment = Alignment.Start
+    ) {
+        Text(
+            text = Date(records.first().date).dateStr(DATE_FORMAT_MONTH_DAY_STR),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
+        for (record in records) {
+            RecordItem(modifier = Modifier.padding(10.dp), record = record)
+        }
+    }
+}
+
+@Composable
+fun RecordItem(
+    modifier: Modifier = Modifier,
+    record: MoneyRecord
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            modifier = Modifier.wrapContentSize()
+        ) {
+            Text(
+                text = record.category,
+                fontSize = 18.sp
+            )
+            Text(
+                text = record.remark,
+                fontSize = 12.sp
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Text(
+            text = "${if (record.type == MoneyType.Expense) "-" else "+"}${record.value}",
+            fontSize = 20.sp
+        )
+    }
+}

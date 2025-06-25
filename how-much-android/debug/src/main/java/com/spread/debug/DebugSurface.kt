@@ -2,7 +2,6 @@ package com.spread.debug
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -17,6 +16,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.spread.business.main.CurrMonthSurface
 import com.spread.db.money.MoneyType
 import com.spread.db.service.Money
 import com.spread.migrate.MigrateButton
@@ -141,17 +141,7 @@ fun DebugAll() {
 
 @Composable
 fun DebugCurrMonth() {
-    val scope = rememberCoroutineScope()
-    val viewModel: DebugViewModel = viewModel()
-    val currMonthRecords by viewModel.currMonthMoneyRecordsFlow.collectAsState()
-    LazyColumn {
-        for (record in currMonthRecords) {
-            item {
-                Text(record.toString())
-                HorizontalDivider()
-            }
-        }
-    }
+    CurrMonthSurface()
 }
 
 @Composable

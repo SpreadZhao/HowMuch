@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
+import java.math.BigDecimal
 import java.util.Date
 
 @Entity(tableName = MoneyConst.TABLE_NAME_MONEY_RECORD)
@@ -13,7 +14,8 @@ data class MoneyRecord(
     @ColumnInfo(name = "date") val date: Long,
     @ColumnInfo(name = "category") val category: String,
     @ColumnInfo(name = "type") val type: MoneyType,
-    @ColumnInfo(name = "value") val value: BigDecimalJson,
+    @ColumnInfo(name = "remark") val remark: String,
+    @ColumnInfo(name = "value") val value: @Serializable(with = BigDecimalSerializer::class) BigDecimal,
 ) {
     override fun toString(): String {
         return "MoneyRecord(id=$id, date=${Date(date)}, category='$category', type=${type.name}, value=$value)"
