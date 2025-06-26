@@ -3,21 +3,72 @@ package com.spread.business.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.spread.db.service.Money
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import java.util.Calendar
 
 class CurrMonthViewModel : ViewModel() {
 
-    private val calendar = Calendar.getInstance()
+    companion object {
+        private val calendar = Calendar.getInstance()
+        private fun getMonthStartTime(time: Long): Long {
+            return calendar.apply {
+                timeInMillis = time
+                set(Calendar.DAY_OF_MONTH, 1)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.timeInMillis
+        }
+    }
 
-    val currMonthMoneyRecordsFlow = Money.listenRecordsOfMonth(calendar.timeInMillis)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
+    private val selectedMonthTime = MutableStateFlow(getMonthStartTime(calendar.timeInMillis))
 
-    val currMonth: Int
-        get() = calendar.get(Calendar.MONTH)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val moneyRecordsFlow = selectedMonthTime
+        .flatMapLatest { time ->
+            Money.listenRecordsOfMonth(time)
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    val maxDayOfCurrMonth: Int
-        get() = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+    val selectedMonthFlow: StateFlow<Int> = selectedMonthTime
+        .map { timeInMillis ->
+            calendar.apply {
+                this.timeInMillis = timeInMillis
+            }.get(Calendar.MONTH)
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            Calendar.getInstance().get(Calendar.MONTH)
+        )
+
+    val maxDayOfSelectedMonthFlow: StateFlow<Int> = selectedMonthTime
+        .map { timeInMillis ->
+            calendar.apply {
+                this.timeInMillis = timeInMillis
+            }.getActualMaximum(Calendar.DAY_OF_MONTH)
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH)
+        )
+
+    fun select(year: Int, month: Int) {
+        val cal = Calendar.getInstance().apply {
+            clear()
+            set(Calendar.YEAR, year)
+            set(Calendar.MONTH, month)
+            set(Calendar.DAY_OF_MONTH, 1)
+        }
+        selectedMonthTime.value = cal.timeInMillis
+    }
 
 }
