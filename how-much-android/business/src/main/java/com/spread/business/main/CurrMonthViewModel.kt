@@ -37,6 +37,18 @@ class CurrMonthViewModel : ViewModel() {
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
+    val selectedYearFlow: StateFlow<Int> = selectedMonthTime
+        .map { timeInMillis ->
+            calendar.apply {
+                this.timeInMillis = timeInMillis
+            }.get(Calendar.YEAR)
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            calendar.get(Calendar.YEAR)
+        )
+
     val selectedMonthFlow: StateFlow<Int> = selectedMonthTime
         .map { timeInMillis ->
             calendar.apply {
@@ -46,7 +58,7 @@ class CurrMonthViewModel : ViewModel() {
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(),
-            Calendar.getInstance().get(Calendar.MONTH)
+            calendar.get(Calendar.MONTH)
         )
 
     val maxDayOfSelectedMonthFlow: StateFlow<Int> = selectedMonthTime
@@ -58,7 +70,7 @@ class CurrMonthViewModel : ViewModel() {
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(),
-            Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH)
+            calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
         )
 
     fun select(year: Int, month: Int) {
