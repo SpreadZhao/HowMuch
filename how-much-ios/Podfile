@@ -7,5 +7,7 @@ target 'howmuch' do
 
   pod 'IGListKit'
   # Pods for howmuch
+  pod 'SnapKit'
+  pod 'LookinServer'
 
 end
