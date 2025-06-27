@@ -1,6 +1,0 @@
-framework module Pods_howmuch {
-  umbrella header "Pods-howmuch-umbrella.h"
-
-  export *
-  module * { export * }
-}

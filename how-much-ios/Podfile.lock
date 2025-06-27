@@ -1,3 +1,20 @@
-PODFILE CHECKSUM: 5fa5b6770b0a58448d10e011d3ac659e3f5e88ce
+PODS:
+  - IGListDiffKit (5.0.0)
+  - IGListKit (5.0.0):
+    - IGListDiffKit (= 5.0.0)
+
+DEPENDENCIES:
+  - IGListKit
+
+SPEC REPOS:
+  trunk:
+    - IGListDiffKit
+    - IGListKit
+
+SPEC CHECKSUMS:
+  IGListDiffKit: 02d937d7e714d6f558771f284ed80668d483b522
+  IGListKit: baf7e87b4c2262cd569c380e46ca5667a4a82c82
+
+PODFILE CHECKSUM: 3cd6379c8cd1c48b3d12ab0af7583cdb4866fac0
 
 COCOAPODS: 1.16.2
