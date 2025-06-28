@@ -16,6 +16,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.spread.business.main.CategorySurface
 import com.spread.business.main.CurrMonthSurface
 import com.spread.db.money.MoneyType
 import com.spread.db.service.Money
@@ -29,6 +30,7 @@ private const val ROUTE_DEBUG_MAIN = "debug_main"
 private const val ROUTE_DEBUG_ALL = "debug_all"
 private const val ROUTE_DEBUG_CURR_MONTH = "debug_curr_month"
 private const val ROUTE_DEBUG_MIGRATE = "debug_migrate"
+private const val ROUTE_DEBUG_CATEGORY = "debug_category"
 
 @Composable
 fun DebugSurface() {
@@ -42,6 +44,7 @@ fun DebugSurface() {
         composable(ROUTE_DEBUG_ALL) { DebugAll() }
         composable(ROUTE_DEBUG_CURR_MONTH) { DebugCurrMonth() }
         composable(ROUTE_DEBUG_MIGRATE) { DebugMigrate() }
+        composable(ROUTE_DEBUG_CATEGORY) { DebugCategory() }
     }
 }
 
@@ -75,6 +78,15 @@ fun DebugMain(
                 }
             ) {
                 Text("Migrate")
+            }
+        }
+        item {
+            Button(
+                onClick = {
+                    navController.navigate(ROUTE_DEBUG_CATEGORY)
+                }
+            ) {
+                Text("Category")
             }
         }
     }
@@ -147,4 +159,9 @@ fun DebugCurrMonth() {
 @Composable
 fun DebugMigrate() {
     MigrateButton()
+}
+
+@Composable
+fun DebugCategory() {
+    CategorySurface()
 }
