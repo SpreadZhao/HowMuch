@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 class CategoryViewModel(
     private val fileRepo: CategoryRepository
-): ViewModel() {
+) : ViewModel() {
 
     companion object {
         private const val TAG = "CategoryViewModel"

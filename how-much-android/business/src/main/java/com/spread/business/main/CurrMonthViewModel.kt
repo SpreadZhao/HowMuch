@@ -28,16 +28,16 @@ class CurrMonthViewModel : ViewModel() {
         }
     }
 
-    private val selectedMonthTime = MutableStateFlow(getMonthStartTime(calendar.timeInMillis))
+    private val selectedTimeFlow = MutableStateFlow(getMonthStartTime(calendar.timeInMillis))
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val moneyRecordsFlow = selectedMonthTime
+    val moneyRecordsFlow = selectedTimeFlow
         .flatMapLatest { time ->
             Money.listenRecordsOfMonth(time)
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    val selectedYearFlow: StateFlow<Int> = selectedMonthTime
+    val selectedYearFlow: StateFlow<Int> = selectedTimeFlow
         .map { timeInMillis ->
             calendar.apply {
                 this.timeInMillis = timeInMillis
@@ -49,7 +49,7 @@ class CurrMonthViewModel : ViewModel() {
             calendar.get(Calendar.YEAR)
         )
 
-    val selectedMonthFlow: StateFlow<Int> = selectedMonthTime
+    val selectedMonthFlow: StateFlow<Int> = selectedTimeFlow
         .map { timeInMillis ->
             calendar.apply {
                 this.timeInMillis = timeInMillis
@@ -61,7 +61,7 @@ class CurrMonthViewModel : ViewModel() {
             calendar.get(Calendar.MONTH)
         )
 
-    val maxDayOfSelectedMonthFlow: StateFlow<Int> = selectedMonthTime
+    val maxDayOfSelectedMonthFlow: StateFlow<Int> = selectedTimeFlow
         .map { timeInMillis ->
             calendar.apply {
                 this.timeInMillis = timeInMillis
@@ -80,7 +80,7 @@ class CurrMonthViewModel : ViewModel() {
             set(Calendar.MONTH, month)
             set(Calendar.DAY_OF_MONTH, 1)
         }
-        selectedMonthTime.value = cal.timeInMillis
+        selectedTimeFlow.value = cal.timeInMillis
     }
 
 }
