@@ -3,6 +3,7 @@ package com.spread.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
@@ -13,14 +14,19 @@ import androidx.compose.ui.Modifier
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InlineDatePicker(
+    displayMode: DisplayMode,
+    showToggleMode: Boolean,
     onDateSelected: (Long) -> Unit
 ) {
-    val datePickerState = rememberDatePickerState()
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = System.currentTimeMillis(),
+        initialDisplayMode = displayMode
+    )
 
     Box {
         DatePicker(
             state = datePickerState,
-            showModeToggle = false
+            showModeToggle = showToggleMode
         )
         Button(
             modifier = Modifier.align(Alignment.TopEnd),

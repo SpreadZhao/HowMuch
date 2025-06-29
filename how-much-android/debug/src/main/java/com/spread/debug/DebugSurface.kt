@@ -2,6 +2,8 @@ package com.spread.debug
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
+import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -92,6 +94,7 @@ fun DebugMain(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DebugAll() {
 
@@ -138,6 +141,8 @@ fun DebugAll() {
 
         item {
             InlineDatePicker(
+                displayMode = DisplayMode.Picker,
+                showToggleMode = false,
                 onDateSelected = {
                     scope.launch {
                         val records = Money.getRecordsOfDay(it)

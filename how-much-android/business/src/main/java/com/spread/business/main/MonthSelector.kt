@@ -1,9 +1,5 @@
 package com.spread.business.main
 
-import android.graphics.RenderEffect
-import android.graphics.Shader
-import android.os.Build
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -26,7 +23,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,29 +34,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asComposeRenderEffect
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.spread.common.performHapticFeedback
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
 @Composable
 fun MonthSelector(
+    modifier: Modifier = Modifier,
     year: Int,
     month: Int,
     onMonthChange: (Int, Int) -> Unit,
 ) {
     var showPicker by remember { mutableStateOf(false) }
 
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = {
             // 上一月
             val cal = Calendar.getInstance().apply {
@@ -96,7 +92,21 @@ fun MonthSelector(
     if (showPicker) {
         AlertDialog(
             onDismissRequest = { showPicker = false },
-            title = { Text("选择年月") },
+            title = {
+                Row {
+                    Text("选择年月")
+                    Spacer(modifier = Modifier.weight(1f))
+                    Button(
+                        onClick = {
+                            val cal = Calendar.getInstance()
+                            onMonthChange(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH))
+                            showPicker = false
+                        }
+                    ) {
+                        Text(text = "Today")
+                    }
+                }
+            },
             text = {
                 YearMonthPicker(
                     year = year,
@@ -203,7 +213,7 @@ fun PickerList(
         launch {
             snapshotFlow { state.isScrollInProgress }
                 .distinctUntilChanged()
-                .filter { !it }
+                .filterNot { it }
                 .collect {
                     val targetIndex = scrollTargetIndex(state, density, itemHeight)
                     launch {
@@ -227,58 +237,20 @@ fun PickerList(
             items(items) { item ->
                 Text(
                     text = "$item $label",
-                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1,
                     modifier = Modifier
                         .height(itemHeight)
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center
+                        .fillMaxWidth()
+                        .wrapContentHeight(align = Alignment.CenterVertically),
+                    textAlign = TextAlign.Center,
+                    textDecoration = if (item == currentSelected) TextDecoration.Underline else TextDecoration.None
                 )
             }
         }
 
-        // 顶部模糊遮罩
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .fillMaxWidth()
-                    .height(itemHeight)
-                    .graphicsLayer {
-                        renderEffect = RenderEffect
-                            .createBlurEffect(20f, 20f, Shader.TileMode.CLAMP)
-                            .asComposeRenderEffect()
-                    }
-            )
-        }
-
-        // 底部模糊遮罩
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .height(itemHeight)
-                    .graphicsLayer {
-                        renderEffect = RenderEffect
-                            .createBlurEffect(20f, 20f, Shader.TileMode.CLAMP)
-                            .asComposeRenderEffect()
-                    }
-            )
-        }
-
-        // 中间选中边框
-        Box(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .width(100.dp)
-                .height(itemHeight)
-                .border(
-                    1.dp,
-                    MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                )
-        )
     }
 }
+
 
 private fun scrollTargetIndex(
     state: LazyListState,
