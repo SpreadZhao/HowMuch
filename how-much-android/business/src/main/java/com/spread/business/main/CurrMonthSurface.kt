@@ -43,7 +43,6 @@ fun CurrMonthSurface() {
     val selectedYear by viewModel.selectedYearFlow.collectAsState()
     val listState = rememberLazyListState()
     val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxSize()) {
         Column(

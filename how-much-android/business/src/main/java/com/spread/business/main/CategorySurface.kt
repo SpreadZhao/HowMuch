@@ -42,7 +42,7 @@ fun CategorySurface() {
     Column {
         Text(text = "Category Surface")
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 80.dp)
+            columns = GridCells.Adaptive(minSize = 100.dp)
         ) {
             category?.itemList?.withIndex()?.forEach { (index, categoryItem) ->
                 item {
@@ -61,11 +61,8 @@ fun CategorySurface() {
                     ) {
                         Row(
                         ) {
-//                        Image() {
-//
-//                        }
                             Text(
-                                text = categoryItem.text,
+                                text = "${categoryItem.icon} ${categoryItem.text}",
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )

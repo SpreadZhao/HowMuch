@@ -1,6 +1,5 @@
 package com.spread.ui
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -233,7 +232,6 @@ fun PickerList(
             snapshotFlow { state.firstVisibleItemIndex }
                 .filterNot { isInScrollAnim }
                 .collect {
-                    Log.d("Spread", "first index: ${state.firstVisibleItemIndex}")
                     val targetIndex = state.firstVisibleItemIndex
                     select(false, targetIndex)
                 }
@@ -244,7 +242,6 @@ fun PickerList(
                 .filterNot { it || isInScrollAnim }
                 .collect {
                     val index = items.indexOf(currentSelected)
-                    Log.d("Spread", "scroll to $currentSelected")
                     state.animateScrollToItem(index)
                 }
         }

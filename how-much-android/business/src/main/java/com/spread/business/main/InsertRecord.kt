@@ -6,16 +6,20 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SegmentedButtonDefaults.IconSize
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -39,6 +43,7 @@ import com.spread.business.R
 import com.spread.common.DATE_FORMAT_YEAR_MONTH_DAY_STR
 import com.spread.common.nowCalendar
 import com.spread.common.timeInMillisToDateStr
+import com.spread.db.money.MoneyType
 import com.spread.ui.YearMonthDayPicker
 import com.spread.ui.bottomBorder
 import java.util.Calendar
@@ -46,8 +51,12 @@ import java.util.Calendar
 @Composable
 fun InsertRecord() {
     val typeState = rememberSegmentedButtonState(
-        options = listOf("Income", "Expense")
+        options = listOf(
+            MoneyType.Expense to R.drawable.ic_expense,
+            MoneyType.Income to R.drawable.ic_income
+        )
     )
+    val calendar by remember { mutableStateOf(nowCalendar) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -58,7 +67,8 @@ fun InsertRecord() {
         Date(
             modifier = Modifier
                 .wrapContentSize()
-                .align(alignment = Alignment.CenterHorizontally)
+                .align(alignment = Alignment.CenterHorizontally),
+            calendar = calendar
         )
         Category(
             modifier = Modifier
@@ -69,16 +79,25 @@ fun InsertRecord() {
 }
 
 @Composable
-fun Date(modifier: Modifier) {
-    val calendar by remember { mutableStateOf(nowCalendar) }
+fun Date(modifier: Modifier, calendar: Calendar) {
     var showPicker by remember { mutableStateOf(false) }
-    TextButton(
-        modifier = modifier,
-        onClick = {
-            showPicker = true
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            imageVector = Icons.Default.DateRange,
+            contentDescription = "Date",
+        )
+        TextButton(
+            onClick = {
+                showPicker = true
+            }
+        ) {
+            Text(
+                text = timeInMillisToDateStr(
+                    calendar.timeInMillis,
+                    DATE_FORMAT_YEAR_MONTH_DAY_STR
+                )
+            )
         }
-    ) {
-        Text(text = timeInMillisToDateStr(calendar.timeInMillis, DATE_FORMAT_YEAR_MONTH_DAY_STR))
     }
     if (showPicker) {
         AlertDialog(
@@ -86,7 +105,47 @@ fun Date(modifier: Modifier) {
                 showPicker = false
             },
             title = {
-                Text(text = "Select Date")
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = "Select Date")
+                    Spacer(modifier = Modifier.weight(1f))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        TextButton(
+                            onClick = {
+                                calendar.apply {
+                                    clear()
+                                    timeInMillis = nowCalendar.timeInMillis
+                                    add(Calendar.DAY_OF_MONTH, -2)
+                                }
+                                showPicker = false
+                            }
+                        ) {
+                            Text(text = "前天")
+                        }
+                        TextButton(
+                            onClick = {
+                                calendar.apply {
+                                    clear()
+                                    timeInMillis = nowCalendar.timeInMillis
+                                    add(Calendar.DAY_OF_MONTH, -1)
+                                }
+                                showPicker = false
+                            }
+                        ) {
+                            Text(text = "昨天")
+                        }
+                        TextButton(
+                            onClick = {
+                                calendar.apply {
+                                    clear()
+                                    timeInMillis = nowCalendar.timeInMillis
+                                }
+                                showPicker = false
+                            }
+                        ) {
+                            Text(text = "今天")
+                        }
+                    }
+                }
             },
             text = {
                 YearMonthDayPicker(
@@ -108,7 +167,9 @@ fun Date(modifier: Modifier) {
 fun Category(modifier: Modifier, state: CategoryState) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         Icon(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .size(24.dp)
+                .padding(end = 4.dp),
             painter = painterResource(id = R.drawable.ic_categories),
             contentDescription = null,
         )
@@ -139,7 +200,7 @@ fun Category(modifier: Modifier, state: CategoryState) {
 
 @Composable
 fun rememberSegmentedButtonState(
-    options: List<String>
+    options: List<Pair<MoneyType, Int>>
 ): CategoryState {
     return rememberSaveable(saver = CategoryState.Saver) {
         CategoryState(options)
@@ -147,7 +208,7 @@ fun rememberSegmentedButtonState(
 }
 
 class CategoryState(
-    val options: List<String>,
+    val options: List<Pair<MoneyType, Int>>,
     selectedIndex: Int = 0,
     categoryInputText: String = ""
 ) {
@@ -159,7 +220,7 @@ class CategoryState(
             save = { listOf(it.options, it.selectedIndex, it.categoryInputText) },
             restore = {
                 @Suppress("UNCHECKED_CAST")
-                CategoryState(it[0] as List<String>, it[1] as Int, it[2] as String)
+                CategoryState(it[0] as List<Pair<MoneyType, Int>>, it[1] as Int, it[2] as String)
             }
         )
     }
@@ -171,16 +232,24 @@ fun SingleChoiceSegmentedButton(
     state: CategoryState
 ) {
     SingleChoiceSegmentedButtonRow(modifier = modifier) {
-        state.options.forEachIndexed { index, label ->
+        state.options.forEachIndexed { index, item ->
             SegmentedButton(
                 modifier = Modifier.wrapContentSize(),
                 shape = SegmentedButtonDefaults.itemShape(
                     index = index,
                     count = state.options.size
                 ),
+                icon = {
+                },
                 onClick = { state.selectedIndex = index },
                 selected = index == state.selectedIndex,
-                label = { Text(text = label, fontSize = 10.sp) }
+                label = {
+                    Icon(
+                        painter = painterResource(id = item.second),
+                        contentDescription = null,
+                        modifier = Modifier.size(IconSize)
+                    )
+                }
             )
         }
     }
