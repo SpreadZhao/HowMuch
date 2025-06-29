@@ -7,6 +7,6 @@
 
 import UIKit
 
-class HMTabBarController: UITabBarController {
+class TabBarController: UITabBarController {
     
 }

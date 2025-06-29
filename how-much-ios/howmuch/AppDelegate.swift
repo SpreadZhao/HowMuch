@@ -16,9 +16,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let frame = UIScreen.main.bounds
         window = UIWindow(frame: frame)
         
-        let tabBarController = HMTabBarController()
-        let vc1 = UINavigationController(rootViewController: HMHomeViewController())
-        let vc2 = UINavigationController(rootViewController: HMMineViewController())
+        let tabBarController = TabBarController()
+        let vc1 = UINavigationController(rootViewController: HomeViewController())
+        let vc2 = UINavigationController(rootViewController: MineViewController())
         tabBarController.viewControllers = [vc1, vc2]
         
         window?.rootViewController = tabBarController

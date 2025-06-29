@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum HMTabBarItemType: Int {
+enum TabBarItemType: Int {
     case home
     case mine
 }
