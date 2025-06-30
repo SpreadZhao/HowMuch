@@ -210,7 +210,7 @@ fun PickerList(
           index ->
             items.getOrNull(index)?.let { target ->
                 if (target != currentSelected) {
-                    if (currentSelected != -1) {
+                    if (!scrollAnim && currentSelected != -1) {
                         performHapticFeedback(context)
                     }
                     currentSelected = target
