@@ -1,22 +1,32 @@
 package com.spread.business.main
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SegmentedButtonDefaults.IconSize
@@ -35,8 +45,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.spread.business.R
@@ -44,24 +56,27 @@ import com.spread.common.DATE_FORMAT_YEAR_MONTH_DAY_STR
 import com.spread.common.nowCalendar
 import com.spread.common.timeInMillisToDateStr
 import com.spread.db.money.MoneyType
+import com.spread.ui.MoneyInput
 import com.spread.ui.YearMonthDayPicker
 import com.spread.ui.bottomBorder
 import java.util.Calendar
 
 @Composable
-fun InsertRecord() {
+fun InsertRecord(
+    onSave: () -> Unit,
+    onCancel: () -> Unit
+) {
+    val calendar by remember { mutableStateOf(nowCalendar) }
     val typeState = rememberSegmentedButtonState(
         options = listOf(
             MoneyType.Expense to R.drawable.ic_expense,
             MoneyType.Income to R.drawable.ic_income
         )
     )
-    val calendar by remember { mutableStateOf(nowCalendar) }
+    var remarkInputText by remember { mutableStateOf("") }
+    var valueInputText by remember { mutableStateOf("") }
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(horizontal = 10.dp, vertical = 5.dp),
+        modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
         horizontalAlignment = Alignment.Start
     ) {
         Date(
@@ -75,8 +90,92 @@ fun InsertRecord() {
                 .fillMaxWidth()
                 .wrapContentHeight(), state = typeState
         )
+        RemarkAndMoney(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            remarkInputText = remarkInputText,
+            valueInputText = valueInputText,
+            onRemarkInputTextChange = { remarkInputText = it },
+            onValueInputTextChange = { valueInputText = it }
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            FilledTonalButton(
+                onClick = onCancel
+            ) {
+                Text(text = "取消")
+            }
+            FilledTonalButton(
+                onClick = onSave
+            ) {
+                Text(text = "保存")
+            }
+        }
     }
 }
+
+@Composable
+fun RemarkAndMoney(
+    modifier: Modifier = Modifier,
+    remarkInputText: String,
+    valueInputText: String,
+    onRemarkInputTextChange: (String) -> Unit,
+    onValueInputTextChange: (String) -> Unit
+) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val minMoneyWidth = screenWidth / 3
+    val maxMoneyWidth = screenWidth * 2 / 3
+
+    // 用于测量金额内容宽度
+    val textMeasurer = rememberTextMeasurer()
+    val measuredTextWidth = remember(valueInputText) {
+        textMeasurer.measure(
+            text = valueInputText.ifBlank { "0" }, // 防止测量空字符串宽度为0
+            style = TextStyle(fontSize = 16.sp) // 与 TextField 中的字体一致
+        ).size.width.dp
+    }
+
+    // 设置最终宽度：介于 minMoneyWidth ~ maxMoneyWidth，取内容所需宽度 + padding
+    val moneyFieldWidth = remember(measuredTextWidth) {
+        val target = measuredTextWidth + 40.dp // 40dp 预留 padding + label
+        target.coerceIn(minMoneyWidth, maxMoneyWidth)
+    }
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // 备注输入框：剩余空间
+        OutlinedTextField(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 5.dp)
+                .fillMaxHeight(),
+            value = remarkInputText,
+            onValueChange = onRemarkInputTextChange,
+            label = { Text("备注") },
+            singleLine = true
+        )
+
+        // 金额输入框：内容驱动宽度
+        MoneyInput(
+            modifier = Modifier
+                .width(moneyFieldWidth)
+                .fillMaxHeight(),
+            value = valueInputText,
+            onValueChange = onValueInputTextChange,
+            label = { Text("金额") }
+        )
+    }
+}
+
 
 @Composable
 fun Date(modifier: Modifier, calendar: Calendar) {
@@ -105,45 +204,45 @@ fun Date(modifier: Modifier, calendar: Calendar) {
                 showPicker = false
             },
             title = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "Select Date")
-                    Spacer(modifier = Modifier.weight(1f))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        TextButton(
-                            onClick = {
-                                calendar.apply {
-                                    clear()
-                                    timeInMillis = nowCalendar.timeInMillis
-                                    add(Calendar.DAY_OF_MONTH, -2)
-                                }
-                                showPicker = false
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    TextButton(
+                        onClick = {
+                            calendar.apply {
+                                clear()
+                                timeInMillis = nowCalendar.timeInMillis
+                                add(Calendar.DAY_OF_MONTH, -2)
                             }
-                        ) {
-                            Text(text = "前天")
+                            showPicker = false
                         }
-                        TextButton(
-                            onClick = {
-                                calendar.apply {
-                                    clear()
-                                    timeInMillis = nowCalendar.timeInMillis
-                                    add(Calendar.DAY_OF_MONTH, -1)
-                                }
-                                showPicker = false
+                    ) {
+                        Text(text = "前天")
+                    }
+                    TextButton(
+                        onClick = {
+                            calendar.apply {
+                                clear()
+                                timeInMillis = nowCalendar.timeInMillis
+                                add(Calendar.DAY_OF_MONTH, -1)
                             }
-                        ) {
-                            Text(text = "昨天")
+                            showPicker = false
                         }
-                        TextButton(
-                            onClick = {
-                                calendar.apply {
-                                    clear()
-                                    timeInMillis = nowCalendar.timeInMillis
-                                }
-                                showPicker = false
+                    ) {
+                        Text(text = "昨天")
+                    }
+                    TextButton(
+                        onClick = {
+                            calendar.apply {
+                                clear()
+                                timeInMillis = nowCalendar.timeInMillis
                             }
-                        ) {
-                            Text(text = "今天")
+                            showPicker = false
                         }
+                    ) {
+                        Text(text = "今天")
                     }
                 }
             },
@@ -165,36 +264,42 @@ fun Date(modifier: Modifier, calendar: Calendar) {
 
 @Composable
 fun Category(modifier: Modifier, state: CategoryState) {
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            modifier = Modifier
-                .size(24.dp)
-                .padding(end = 4.dp),
-            painter = painterResource(id = R.drawable.ic_categories),
-            contentDescription = null,
-        )
-        BasicTextField(
-            modifier = Modifier.weight(2f),
-            value = state.categoryInputText,
-            textStyle = TextStyle(fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface),
-            onValueChange = { state.categoryInputText = it },
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-            singleLine = true,
-            decorationBox = {
-                Box(
-                    modifier = Modifier
-                        .bottomBorder(
-                            strokeWidth = 1.dp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        .padding(2.dp)
-                ) {
-                    it()
+    Column(modifier = modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                modifier = Modifier
+                    .size(24.dp)
+                    .padding(end = 4.dp),
+                painter = painterResource(id = R.drawable.ic_categories),
+                contentDescription = null,
+            )
+            BasicTextField(
+                modifier = Modifier.weight(2f),
+                value = state.categoryInputText,
+                textStyle = LocalTextStyle.current.copy(
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                ),
+                onValueChange = { state.categoryInputText = it },
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                singleLine = true,
+                decorationBox = {
+                    Box(
+                        modifier = Modifier
+                            .bottomBorder(
+                                strokeWidth = 1.dp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            .padding(2.dp)
+                    ) {
+                        it()
+                    }
                 }
-            }
-        )
-        Spacer(modifier = Modifier.width(10.dp))
-        SingleChoiceSegmentedButton(modifier = Modifier.wrapContentWidth(), state = state)
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            SingleChoiceSegmentedButton(modifier = Modifier.wrapContentWidth(), state = state)
+        }
+        CategorySurface()
     }
 }
 
