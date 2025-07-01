@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 import java.math.BigDecimal
 import java.util.Date
 
+@ConsistentCopyVisibility
 @Entity(tableName = MoneyConst.TABLE_NAME_MONEY_RECORD)
 @Serializable
 data class MoneyRecord internal constructor(
