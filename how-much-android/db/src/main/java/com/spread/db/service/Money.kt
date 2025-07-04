@@ -24,7 +24,7 @@ object Money {
         var category = ""
         var type = MoneyType.Expense
         var remark = ""
-        var value = 0.0
+        var value = ""
     }
 
     fun buildMoneyRecord(action: MoneyRecordBuilder.() -> Unit): MoneyRecord {
@@ -35,7 +35,7 @@ object Money {
             category = builder.category,
             type = builder.type,
             remark = builder.remark,
-            value = BigDecimal.valueOf(builder.value)
+            value = BigDecimal(builder.value)
         )
     }
 

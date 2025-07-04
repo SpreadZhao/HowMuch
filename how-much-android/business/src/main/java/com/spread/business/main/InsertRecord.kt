@@ -19,7 +19,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -44,7 +43,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,7 +65,7 @@ fun InsertRecord(
     onCancel: () -> Unit
 ) {
     val calendar by remember { mutableStateOf(nowCalendar) }
-    val typeState = rememberSegmentedButtonState(
+    val categoryState = rememberCategoryState(
         options = listOf(
             MoneyType.Expense to R.drawable.ic_expense,
             MoneyType.Income to R.drawable.ic_income
@@ -81,50 +79,30 @@ fun InsertRecord(
     ) {
         Date(
             modifier = Modifier
-                .wrapContentSize()
+                .fillMaxWidth()
+                .wrapContentHeight()
                 .align(alignment = Alignment.CenterHorizontally),
-            calendar = calendar
+            calendar = calendar,
+            categoryState = categoryState,
+            remarkInputText = remarkInputText,
+            valueInputText = valueInputText,
+            onSave = onSave,
+            onCancel = onCancel,
         )
         Category(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(), state = typeState
+                .wrapContentHeight(), state = categoryState
         )
         RemarkAndMoney(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
             remarkInputText = remarkInputText,
-            valueInputText = valueInputText,
             onRemarkInputTextChange = { remarkInputText = it },
-            onValueInputTextChange = { valueInputText = it }
+            valueInput = valueInputText,
+            onNewValue = { valueInputText = it }
         )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            FilledTonalButton(
-                onClick = onCancel
-            ) {
-                Text(text = "取消")
-            }
-            FilledTonalButton(
-                onClick = {
-                    val moneyRecord = Money.buildMoneyRecord {
-                        date = calendar.timeInMillis
-                        type = typeState.selectedOption.first
-                        remark = remarkInputText
-                        value = valueInputText.toDoubleOrNull() ?: 0.0
-                        category = "test"
-                    }
-                    onSave(moneyRecord)
-                }
-            ) {
-                Text(text = "保存")
-            }
-        }
     }
 }
 
@@ -132,9 +110,9 @@ fun InsertRecord(
 fun RemarkAndMoney(
     modifier: Modifier = Modifier,
     remarkInputText: String,
-    valueInputText: String,
     onRemarkInputTextChange: (String) -> Unit,
-    onValueInputTextChange: (String) -> Unit
+    valueInput: String,
+    onNewValue: (String) -> Unit
 ) {
     val screenWidth = LocalWindowInfo.current.containerSize.width
     val minMoneyWidth = screenWidth / 3
@@ -142,16 +120,21 @@ fun RemarkAndMoney(
 
     // 用于测量金额内容宽度
     val textMeasurer = rememberTextMeasurer()
-    val measuredTextWidth = remember(valueInputText) {
+    val textStyle = LocalTextStyle.current
+    val originTextWidth = textMeasurer.measure(
+        text = "0.00",
+        style = textStyle
+    ).size.width
+    val measuredTextWidth = remember(valueInput) {
         textMeasurer.measure(
-            text = valueInputText.ifBlank { "0" }, // 防止测量空字符串宽度为0
-            style = TextStyle(fontSize = 16.sp) // 与 TextField 中的字体一致
+            text = valueInput.ifBlank { "0" }, // 防止测量空字符串宽度为0
+            style = textStyle
         ).size.width
     }
 
     // 设置最终宽度：介于 minMoneyWidth ~ maxMoneyWidth，取内容所需宽度 + padding
     val moneyFieldWidth = remember(measuredTextWidth) {
-        val target = measuredTextWidth + 40.dp.value.toInt() // 40dp 预留 padding + label
+        val target = measuredTextWidth + minMoneyWidth - originTextWidth
         target.coerceIn(minMoneyWidth, maxMoneyWidth)
     }
 
@@ -178,8 +161,7 @@ fun RemarkAndMoney(
             modifier = Modifier
                 .width(moneyFieldWidth.toDp())
                 .fillMaxHeight(),
-            value = valueInputText,
-            onValueChange = onValueInputTextChange,
+            onNewValue = onNewValue,
             label = { Text("金额") }
         )
     }
@@ -187,24 +169,61 @@ fun RemarkAndMoney(
 
 
 @Composable
-fun Date(modifier: Modifier, calendar: Calendar) {
+fun Date(
+    modifier: Modifier,
+    calendar: Calendar,
+    categoryState: CategoryState,
+    remarkInputText: String,
+    valueInputText: String,
+    onSave: (MoneyRecord) -> Unit,
+    onCancel: () -> Unit,
+) {
     var showPicker by remember { mutableStateOf(false) }
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            imageVector = Icons.Default.DateRange,
-            contentDescription = "Date",
-        )
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+
+        TextButton(
+            onClick = onCancel
+        ) {
+            Text(text = "取消")
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Default.DateRange,
+                contentDescription = "Date",
+            )
+            TextButton(
+                onClick = {
+                    showPicker = true
+                }
+            ) {
+                Text(
+                    text = timeInMillisToDateStr(
+                        calendar.timeInMillis,
+                        DATE_FORMAT_YEAR_MONTH_DAY_STR
+                    )
+                )
+            }
+        }
+
         TextButton(
             onClick = {
-                showPicker = true
+                val moneyRecord = Money.buildMoneyRecord {
+                    date = calendar.timeInMillis
+                    type = categoryState.selectedOption.first
+                    remark = remarkInputText
+                    value = valueInputText
+                    category = categoryState.categoryInputText
+                }
+                // TODO: close after save successfully
+                onSave(moneyRecord)
             }
         ) {
-            Text(
-                text = timeInMillisToDateStr(
-                    calendar.timeInMillis,
-                    DATE_FORMAT_YEAR_MONTH_DAY_STR
-                )
-            )
+            Text(text = "保存")
         }
     }
     if (showPicker) {
@@ -313,7 +332,7 @@ fun Category(modifier: Modifier, state: CategoryState) {
 }
 
 @Composable
-fun rememberSegmentedButtonState(
+fun rememberCategoryState(
     options: List<Pair<MoneyType, Int>>
 ): CategoryState {
     return rememberSaveable(saver = CategoryState.Saver) {

@@ -72,6 +72,6 @@ private fun parseMoneyRecord(obj: JsonObject): MoneyRecord? {
         this.category = category
         this.type = if (type == "收入") MoneyType.Income else MoneyType.Expense
         this.remark = remark ?: ""
-        this.value = money
+        this.value = money.toString()
     }
 }

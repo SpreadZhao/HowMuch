@@ -2,32 +2,64 @@ package com.spread.ui
 
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.core.text.isDigitsOnly
+import java.math.BigDecimal
 import java.text.DecimalFormat
 import kotlin.math.max
 
-// TODO: use BigDecimal as input type, remember it with state
+private const val numberOfDecimals = 2
+
 @Composable
 fun MoneyInput(
     modifier: Modifier,
-    value: String,
-    onValueChange: (String) -> Unit,
+    onNewValue: (String) -> Unit,
     label: @Composable (() -> Unit)? = null
 ) {
+    var valueText by remember { mutableStateOf("") }
     OutlinedTextField(
         modifier = modifier.navigationBarsPadding(),
-        value = value,
-        onValueChange = onValueChange,
+        value = valueText,
+        trailingIcon = {
+            IconButton(
+                onClick = {
+                    valueText = ""
+                    onNewValue("")
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = "Clear"
+                )
+            }
+        },
+        onValueChange = {
+            if (it.isDigitsOnly()) {
+                valueText = it
+                val str = it.ifBlank { "0" }
+                val value = BigDecimal(str).movePointLeft(numberOfDecimals)
+                onNewValue(value.toString())
+            }
+        },
         label = label,
         visualTransformation = CurrencyAmountInputVisualTransformation(
-            fixedCursorAtTheEnd = true
+            fixedCursorAtTheEnd = true,
+            numberOfDecimals = numberOfDecimals
         ),
         singleLine = true,
         keyboardOptions = KeyboardOptions(
@@ -38,7 +70,7 @@ fun MoneyInput(
 
 class CurrencyAmountInputVisualTransformation(
     private val fixedCursorAtTheEnd: Boolean = true,
-    private val numberOfDecimals: Int = 2
+    private val numberOfDecimals: Int
 ) : VisualTransformation {
 
     private val symbols = DecimalFormat().decimalFormatSymbols

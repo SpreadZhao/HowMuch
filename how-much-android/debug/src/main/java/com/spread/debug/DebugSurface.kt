@@ -129,7 +129,7 @@ fun DebugAll() {
                         date = System.currentTimeMillis()
                         category = categoryInput
                         type = typeInput
-                        value = valueInput.toDouble()
+                        value = valueInput
                     }
                     Money.insertRecords(record)
                 }
