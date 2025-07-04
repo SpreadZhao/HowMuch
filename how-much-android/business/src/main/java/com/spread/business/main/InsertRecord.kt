@@ -42,7 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -52,15 +52,18 @@ import com.spread.business.R
 import com.spread.common.DATE_FORMAT_YEAR_MONTH_DAY_STR
 import com.spread.common.nowCalendar
 import com.spread.common.timeInMillisToDateStr
+import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
+import com.spread.db.service.Money
 import com.spread.ui.MoneyInput
 import com.spread.ui.YearMonthDayPicker
 import com.spread.ui.bottomBorder
+import com.spread.ui.toDp
 import java.util.Calendar
 
 @Composable
 fun InsertRecord(
-    onSave: () -> Unit,
+    onSave: (MoneyRecord) -> Unit,
     onCancel: () -> Unit
 ) {
     val calendar by remember { mutableStateOf(nowCalendar) }
@@ -108,7 +111,16 @@ fun InsertRecord(
                 Text(text = "取消")
             }
             FilledTonalButton(
-                onClick = onSave
+                onClick = {
+                    val moneyRecord = Money.buildMoneyRecord {
+                        date = calendar.timeInMillis
+                        type = typeState.selectedOption.first
+                        remark = remarkInputText
+                        value = valueInputText.toDoubleOrNull() ?: 0.0
+                        category = "test"
+                    }
+                    onSave(moneyRecord)
+                }
             ) {
                 Text(text = "保存")
             }
@@ -124,7 +136,7 @@ fun RemarkAndMoney(
     onRemarkInputTextChange: (String) -> Unit,
     onValueInputTextChange: (String) -> Unit
 ) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val screenWidth = LocalWindowInfo.current.containerSize.width
     val minMoneyWidth = screenWidth / 3
     val maxMoneyWidth = screenWidth * 2 / 3
 
@@ -134,12 +146,12 @@ fun RemarkAndMoney(
         textMeasurer.measure(
             text = valueInputText.ifBlank { "0" }, // 防止测量空字符串宽度为0
             style = TextStyle(fontSize = 16.sp) // 与 TextField 中的字体一致
-        ).size.width.dp
+        ).size.width
     }
 
     // 设置最终宽度：介于 minMoneyWidth ~ maxMoneyWidth，取内容所需宽度 + padding
     val moneyFieldWidth = remember(measuredTextWidth) {
-        val target = measuredTextWidth + 40.dp // 40dp 预留 padding + label
+        val target = measuredTextWidth + 40.dp.value.toInt() // 40dp 预留 padding + label
         target.coerceIn(minMoneyWidth, maxMoneyWidth)
     }
 
@@ -164,7 +176,7 @@ fun RemarkAndMoney(
         // 金额输入框：内容驱动宽度
         MoneyInput(
             modifier = Modifier
-                .width(moneyFieldWidth)
+                .width(moneyFieldWidth.toDp())
                 .fillMaxHeight(),
             value = valueInputText,
             onValueChange = onValueInputTextChange,
@@ -316,6 +328,8 @@ class CategoryState(
 ) {
     var selectedIndex by mutableIntStateOf(selectedIndex)
     var categoryInputText by mutableStateOf(categoryInputText)
+    val selectedOption: Pair<MoneyType, Int>
+        get() = options[selectedIndex]
 
     companion object {
         val Saver: Saver<CategoryState, *> = listSaver(
