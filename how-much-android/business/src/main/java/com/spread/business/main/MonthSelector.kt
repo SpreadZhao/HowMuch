@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.spread.ui.TextConstants
 import com.spread.ui.YearMonthPicker
 import java.util.Calendar
 
@@ -49,7 +50,8 @@ fun MonthSelector(
             text = "${year}年${month + 1}月",
             modifier = Modifier
                 .clickable { showPicker = true }
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp),
+            fontSize = TextConstants.FONT_SIZE_H1
         )
 
         IconButton(onClick = {

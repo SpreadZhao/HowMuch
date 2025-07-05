@@ -34,5 +34,4 @@ class BigDecimalSerializer() : KSerializer<BigDecimal> {
         }
     }
 
-
 }

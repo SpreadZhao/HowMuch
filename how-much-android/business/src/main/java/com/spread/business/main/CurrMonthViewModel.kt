@@ -35,7 +35,11 @@ class CurrMonthViewModel : ViewModel() {
         .flatMapLatest { time ->
             Money.listenRecordsOfMonth(time)
         }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            emptyList()
+        )
 
     val selectedYearFlow: StateFlow<Int> = selectedTimeFlow
         .map { timeInMillis ->
