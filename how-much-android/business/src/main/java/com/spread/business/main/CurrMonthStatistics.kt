@@ -38,17 +38,17 @@ fun CurrMonthStatistics(
         MonthlyStatisticItem(
             iconId = R.drawable.ic_expense,
             description = "Current Month Expense",
-            text = "+$monthlyIncome"
+            text = "-$monthlyExpense"
         )
         MonthlyStatisticItem(
             iconId = R.drawable.ic_income,
             description = "Current Month Income",
-            text = "-$monthlyExpense"
+            text = "+$monthlyIncome"
         )
         MonthlyStatisticItem(
             iconId = R.drawable.ic_balance,
             description = "Current Month Balance",
-            text = balance(monthlyIncome, monthlyExpense)
+            text = balance(income = monthlyIncome, expense = monthlyExpense)
         )
     }
 }
