@@ -154,7 +154,11 @@ fun CurrMonthSurface() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-private fun SheetState.dismiss(scope: CoroutineScope, record: MoneyRecord? = null, afterDismiss: () -> Unit) {
+private fun SheetState.dismiss(
+    scope: CoroutineScope,
+    record: MoneyRecord? = null,
+    afterDismiss: () -> Unit
+) {
     scope.launch {
         hide()
         if (record != null && !isVisible) {

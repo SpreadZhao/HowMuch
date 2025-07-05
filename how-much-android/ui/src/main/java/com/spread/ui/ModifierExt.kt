@@ -8,11 +8,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 
-fun Modifier.bottomBorder(strokeWidth: Dp, color: Color) = composed(
+fun Modifier.underline(strokeWidth: Dp, color: Color) = composed(
     factory = {
-        val density = LocalDensity.current
-        val strokeWidthPx = density.run { strokeWidth.toPx() }
-
+        val strokeWidthPx = with(LocalDensity.current) { strokeWidth.toPx() }
         Modifier.drawBehind {
             val width = size.width
             val height = size.height - strokeWidthPx / 2

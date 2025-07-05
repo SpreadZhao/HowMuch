@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,6 +19,7 @@ import com.spread.common.DATE_FORMAT_MONTH_DAY_STR
 import com.spread.common.dateStr
 import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
+import com.spread.ui.underline
 import java.util.Date
 
 @Composable
@@ -50,7 +52,11 @@ fun RecordItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .wrapContentHeight(),
+            .wrapContentHeight()
+            .underline(
+                strokeWidth = 0.5.dp,
+                color = MaterialTheme.colorScheme.onSurface
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
@@ -60,10 +66,12 @@ fun RecordItem(
                 text = record.category,
                 fontSize = 18.sp
             )
-            Text(
-                text = record.remark,
-                fontSize = 12.sp
-            )
+            record.remark.takeIf { it.isNotBlank() }?.let {
+                Text(
+                    text = it,
+                    fontSize = 12.sp
+                )
+            }
         }
         Spacer(modifier = Modifier.weight(1f))
         Text(

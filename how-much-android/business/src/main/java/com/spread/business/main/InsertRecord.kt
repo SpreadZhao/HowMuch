@@ -55,8 +55,8 @@ import com.spread.db.money.MoneyType
 import com.spread.db.service.Money
 import com.spread.ui.MoneyInput
 import com.spread.ui.YearMonthDayPicker
-import com.spread.ui.bottomBorder
 import com.spread.ui.toDp
+import com.spread.ui.underline
 import java.util.Calendar
 
 @Composable
@@ -118,7 +118,6 @@ fun RemarkAndMoney(
     val minMoneyWidth = screenWidth / 3
     val maxMoneyWidth = screenWidth * 2 / 3
 
-    // 用于测量金额内容宽度
     val textMeasurer = rememberTextMeasurer()
     val textStyle = LocalTextStyle.current
     val originTextWidth = textMeasurer.measure(
@@ -127,12 +126,11 @@ fun RemarkAndMoney(
     ).size.width
     val measuredTextWidth = remember(valueInput) {
         textMeasurer.measure(
-            text = valueInput.ifBlank { "0" }, // 防止测量空字符串宽度为0
+            text = valueInput.ifBlank { "0" },
             style = textStyle
         ).size.width
     }
 
-    // 设置最终宽度：介于 minMoneyWidth ~ maxMoneyWidth，取内容所需宽度 + padding
     val moneyFieldWidth = remember(measuredTextWidth) {
         val target = measuredTextWidth + minMoneyWidth - originTextWidth
         target.coerceIn(minMoneyWidth, maxMoneyWidth)
@@ -144,7 +142,6 @@ fun RemarkAndMoney(
             .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // 备注输入框：剩余空间
         OutlinedTextField(
             modifier = Modifier
                 .weight(1f)
@@ -156,7 +153,6 @@ fun RemarkAndMoney(
             singleLine = true
         )
 
-        // 金额输入框：内容驱动宽度
         MoneyInput(
             modifier = Modifier
                 .width(moneyFieldWidth.toDp())
@@ -314,7 +310,7 @@ fun Category(modifier: Modifier, state: CategoryState) {
                 decorationBox = {
                     Box(
                         modifier = Modifier
-                            .bottomBorder(
+                            .underline(
                                 strokeWidth = 1.dp,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
