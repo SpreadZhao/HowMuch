@@ -19,6 +19,7 @@ import com.spread.common.DATE_FORMAT_MONTH_DAY_STR
 import com.spread.common.dateStr
 import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
+import com.spread.ui.TextConstants
 import com.spread.ui.underline
 import java.util.Date
 
@@ -64,19 +65,19 @@ fun RecordItem(
         ) {
             Text(
                 text = record.category,
-                fontSize = 18.sp
+                fontSize = TextConstants.FONT_SIZE_H3
             )
             record.remark.takeIf { it.isNotBlank() }?.let {
                 Text(
                     text = it,
-                    fontSize = 12.sp
+                    fontSize = TextConstants.FONT_SIZE_H5
                 )
             }
         }
         Spacer(modifier = Modifier.weight(1f))
         Text(
             text = "${if (record.type == MoneyType.Expense) "-" else "+"}${record.value}",
-            fontSize = 20.sp
+            fontSize = TextConstants.FONT_SIZE_H2
         )
     }
 }

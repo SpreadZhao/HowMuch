@@ -10,3 +10,4 @@
 - [ ] Categories preset when inserting record
 - [ ] Money value input enhance
 - [ ] Hint tag after date select when insert record, which contains: [Today, Yesterday]
+- [ ] App color scheme
