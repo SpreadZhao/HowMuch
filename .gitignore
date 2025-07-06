@@ -1,1 +1,3 @@
 how-much-ios/Pods
+how-much-ios/*.xcworkspace/xcuserdata/
+how-much-ios/*.xcodeproj/xcuserdata/
