@@ -1,4 +1,4 @@
-package com.spread.business.main
+package com.spread.business.statistics
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

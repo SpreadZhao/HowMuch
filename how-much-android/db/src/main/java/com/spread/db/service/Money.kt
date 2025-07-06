@@ -47,12 +47,12 @@ object Money {
         return database.moneyDao().listenAllRecords()
     }
 
-    suspend fun insertRecord(record: MoneyRecord) {
-        database.moneyDao().insertRecord(record)
-    }
-
     suspend fun insertRecords(vararg records: MoneyRecord) {
         database.moneyDao().insertRecords(*records)
+    }
+
+    suspend fun deleteRecords(vararg records: MoneyRecord) {
+        database.moneyDao().deleteRecords(*records)
     }
 
     suspend fun getTodayRecords() = getRecordsOfDay(System.currentTimeMillis())

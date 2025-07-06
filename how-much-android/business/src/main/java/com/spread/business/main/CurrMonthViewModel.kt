@@ -31,7 +31,7 @@ class CurrMonthViewModel : ViewModel() {
     private val selectedTimeFlow = MutableStateFlow(getMonthStartTime(calendar.timeInMillis))
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val moneyRecordsFlow = selectedTimeFlow
+    val currMonthMoneyRecordsFlow = selectedTimeFlow
         .flatMapLatest { time ->
             Money.listenRecordsOfMonth(time)
         }
@@ -40,6 +40,7 @@ class CurrMonthViewModel : ViewModel() {
             SharingStarted.WhileSubscribed(),
             emptyList()
         )
+
 
     val selectedYearFlow: StateFlow<Int> = selectedTimeFlow
         .map { timeInMillis ->

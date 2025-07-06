@@ -1,6 +1,7 @@
 package com.spread.business.main
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -8,6 +9,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,18 +39,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.spread.business.statistics.CurrMonthStatistics
+import com.spread.business.statistics.StatisticsScreen
 import com.spread.db.money.MoneyRecord
 import com.spread.db.service.Money
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
+private enum class ViewType {
+    CurrMonthRecords,
+    Statistics
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurrMonthSurface() {
     val scope = rememberCoroutineScope()
     val viewModel: CurrMonthViewModel = viewModel()
-    val currMonthRecords by viewModel.moneyRecordsFlow.collectAsState()
+    val currMonthRecords by viewModel.currMonthMoneyRecordsFlow.collectAsState()
     val selectedMonth by viewModel.selectedMonthFlow.collectAsState()
     val selectedYear by viewModel.selectedYearFlow.collectAsState()
     val listState = rememberLazyListState()
@@ -56,6 +65,7 @@ fun CurrMonthSurface() {
         skipPartiallyExpanded = true
     )
     var showBottomSheet by remember { mutableStateOf(false) }
+    var viewType by remember { mutableStateOf(ViewType.CurrMonthRecords) }
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -77,34 +87,61 @@ fun CurrMonthSurface() {
                     .padding(
                         horizontal = 20.dp,
                         vertical = 10.dp
-                    ),
+                    )
+                    .clickable {
+                        viewType = if (viewType == ViewType.CurrMonthRecords) {
+                            ViewType.Statistics
+                        } else {
+                            ViewType.CurrMonthRecords
+                        }
+                    },
                 currMonthRecords = currMonthRecords
             )
-            LazyColumn(modifier = Modifier.padding(horizontal = 20.dp), state = listState) {
-                currMonthRecords.groupBy {
-                    Calendar.getInstance().run {
-                        timeInMillis = it.date
-                        get(Calendar.DAY_OF_MONTH)
+            Crossfade(
+                targetState = viewType,
+                label = "ViewType"
+            ) {
+                val modifier = Modifier.padding(horizontal = 20.dp)
+                when (it) {
+                    ViewType.CurrMonthRecords -> {
+                        LazyColumn(
+                            modifier = modifier,
+                            state = listState
+                        ) {
+                            currMonthRecords.groupBy {
+                                Calendar.getInstance().run {
+                                    timeInMillis = it.date
+                                    get(Calendar.DAY_OF_MONTH)
+                                }
+                            }.values.toList().asReversed().forEach { dailyRecords ->
+                                item(key = dailyRecords.hashCode()) {
+                                    MoneyRecordCardForOneDay(
+                                        modifier = Modifier.animateItem(
+                                            fadeInSpec = tween(durationMillis = 250),
+                                            fadeOutSpec = tween(durationMillis = 100),
+                                            placementSpec = spring(
+                                                stiffness = Spring.StiffnessLow,
+                                                dampingRatio = Spring.DampingRatioMediumBouncy
+                                            )
+                                        ),
+                                        records = dailyRecords
+                                    )
+                                }
+                            }
+                        }
                     }
-                }.values.toList().asReversed().forEach { dailyRecords ->
-                    item(key = dailyRecords.hashCode()) {
-                        MoneyRecordCardForOneDay(
-                            modifier = Modifier.animateItem(
-                                fadeInSpec = tween(durationMillis = 250),
-                                fadeOutSpec = tween(durationMillis = 100),
-                                placementSpec = spring(
-                                    stiffness = Spring.StiffnessLow,
-                                    dampingRatio = Spring.DampingRatioMediumBouncy
-                                )
-                            ),
-                            records = dailyRecords
+
+                    ViewType.Statistics -> {
+                        StatisticsScreen(
+                            modifier = modifier,
+                            records = currMonthRecords
                         )
                     }
                 }
             }
         }
         AnimatedVisibility(
-            visible = !listState.isScrollInProgress && !showBottomSheet,
+            visible = !listState.isScrollInProgress && !showBottomSheet && viewType == ViewType.CurrMonthRecords,
             enter = scaleIn() + fadeIn(),
             exit = scaleOut() + fadeOut(),
             modifier = Modifier
@@ -162,7 +199,7 @@ private fun SheetState.dismiss(
     scope.launch {
         hide()
         if (record != null && !isVisible) {
-            Money.insertRecord(record)
+            Money.insertRecords(record)
         }
     }.invokeOnCompletion {
         if (!isVisible) {

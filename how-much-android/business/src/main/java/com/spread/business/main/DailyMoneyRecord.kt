@@ -1,5 +1,6 @@
 package com.spread.business.main
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,8 +11,10 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -19,8 +22,10 @@ import com.spread.common.DATE_FORMAT_MONTH_DAY_STR
 import com.spread.common.dateStr
 import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
+import com.spread.db.service.Money
 import com.spread.ui.TextConstants
 import com.spread.ui.underline
+import kotlinx.coroutines.launch
 import java.util.Date
 
 @Composable
@@ -50,6 +55,7 @@ fun RecordItem(
     modifier: Modifier = Modifier,
     record: MoneyRecord
 ) {
+    val scope = rememberCoroutineScope()
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -57,7 +63,16 @@ fun RecordItem(
             .underline(
                 strokeWidth = 0.5.dp,
                 color = MaterialTheme.colorScheme.onSurface
-            ),
+            )
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = {
+                        scope.launch {
+                            Money.deleteRecords(record)
+                        }
+                    }
+                )
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(

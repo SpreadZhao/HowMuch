@@ -40,7 +40,7 @@ fun MigrateButton() {
                     for (jsonObject in jsonArray) {
                         if (jsonObject is JsonObject) {
                             val record = parseMoneyRecord(jsonObject) ?: continue
-                            Money.insertRecord(record)
+                            Money.insertRecords(record)
                         }
                     }
                 }
