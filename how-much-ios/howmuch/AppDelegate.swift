@@ -19,7 +19,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let tabBarController = TabBarController()
         let vc1 = UINavigationController(rootViewController: HomeViewController())
         let vc2 = UINavigationController(rootViewController: MineViewController())
-        tabBarController.viewControllers = [vc1, vc2]
+        let vc3 = UINavigationController(rootViewController: EveryDayViewController())
+        tabBarController.viewControllers = [vc1, vc2, vc3]
         
         window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()

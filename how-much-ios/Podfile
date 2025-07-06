@@ -9,5 +9,5 @@ target 'howmuch' do
   # Pods for howmuch
   pod 'SnapKit'
   pod 'LookinServer', :configurations => ['Debug']
-
+  
 end
