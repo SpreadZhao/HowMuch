@@ -6,12 +6,10 @@
 //
 
 import IGListKit
-import Combine
 
 final class EveryDayCell: UICollectionViewCell, ListBindable {
     
     private var viewModel: EveryDayCellViewModel?
-    private var cancellables = Set<AnyCancellable>()
     
     private lazy var titleLabel = {
         let label = UILabel(frame: .zero)
@@ -48,24 +46,9 @@ final class EveryDayCell: UICollectionViewCell, ListBindable {
     
     // MARK: - Private
     func bind(viewModel: EveryDayCellViewModel) {
-        viewModel.$title
-            .receive(on: RunLoop.main)
-            .sink(receiveValue: { [weak self] in
-                self?.titleLabel.text = $0
-            })
-            .store(in: &cancellables)
-        viewModel.$description
-            .receive(on: RunLoop.main)
-            .sink(receiveValue: { [weak self] in
-                self?.descriptionLabel.text = $0
-            })
-            .store(in: &cancellables)
-        viewModel.$amount
-            .receive(on: RunLoop.main)
-            .sink(receiveValue: { [weak self] in
-                self?.amountLabel.text = String($0)
-            })
-            .store(in: &cancellables)
+        self.titleLabel.text = viewModel.title
+        self.descriptionLabel.text = viewModel.description
+        self.amountLabel.text = String(viewModel.amount)
     }
     
     func setupSubviews() {

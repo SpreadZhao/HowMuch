@@ -8,9 +8,9 @@
 import IGListKit
 
 final class MineSettingItemCellViewModel {
-    @Published var title: String
+    var title: String
     
-    @Published var iconName = "gear"
+    var iconName = "gear"
     
     init(title: String) {
         self.title = title

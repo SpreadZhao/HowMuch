@@ -8,12 +8,10 @@
 import UIKit
 import SnapKit
 import IGListKit
-import Combine
 
 final class MineSettingItemCell: UICollectionViewCell {
     
     private var viewModel: MineSettingItemCellViewModel?
-    private var cancellables = [AnyCancellable]()
     
     private var itemLabel: UILabel = {
         return UILabel()
@@ -35,7 +33,6 @@ final class MineSettingItemCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        cancellables.removeAll()
     }
     
     // MARK: - Private
@@ -71,16 +68,7 @@ extension MineSettingItemCell: ListBindable {
     }
     
     func bind(viewModel: MineSettingItemCellViewModel) {
-        viewModel.$title.receive(on: RunLoop.main)
-            .sink(receiveValue: { [weak self] in
-                self?.itemLabel.text = $0
-            })
-            .store(in: &cancellables)
-        
-        viewModel.$iconName.receive(on: RunLoop.main)
-            .sink(receiveValue: { [weak self] in
-                self?.iconImageView.image = UIImage(systemName: $0)
-            })
-            .store(in: &cancellables)
+        itemLabel.text = viewModel.title
+        iconImageView.image = UIImage(systemName: viewModel.iconName)
     }
 }

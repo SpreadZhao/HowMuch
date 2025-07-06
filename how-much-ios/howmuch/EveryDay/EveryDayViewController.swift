@@ -47,12 +47,39 @@ final class EveryDayViewController: UIViewController {
 extension EveryDayViewController: ListAdapterDataSource {
     func objects(for listAdapter: ListAdapter) -> [any ListDiffable] {
         var models = [ListDiffable]()
-        var transactions = [TransactionModel]()
-        let transaction0 = TransactionModel(id: UUID().uuidString, title: "lijiaxin", description: "123", amount: 1, date: .now, type: .income)
-        let transaction1 = TransactionModel(id: UUID().uuidString, title: "liumeijing", description: "456", amount: 2, date: .now, type: .income)
-        transactions.append(contentsOf: [transaction0, transaction1])
-        let model = EveryDaySectionViewModel(date: .now, transactions: transactions)
-        models.append(model)
+        let calendar = Calendar.current
+        let titles = ["午饭", "晚饭", "饮料", "交通", "零食", "书籍", "工资", "奖励", "娱乐", "购物"]
+        let descriptions = ["美团外卖", "肯德基", "地铁", "星巴克", "Swift进阶", "年终奖", "红包", "网购", "日常支出", "其它"]
+        let types: [TransactionType] = [.income, .expense]
+
+        for dayOffset in 0..<30 {
+            guard let date = calendar.date(byAdding: .day, value: -dayOffset, to: Date()) else { continue }
+
+            var transactions = [TransactionModel]()
+
+            // 每天 3 到 5 条
+            let count = Int.random(in: 3...5)
+            for _ in 0..<count {
+                let title = titles.randomElement()!
+                let description = descriptions.randomElement()!
+                let amount = Double.random(in: 5...500).rounded()
+                let type = types.randomElement()!
+
+                let transaction = TransactionModel(
+                    id: UUID().uuidString,
+                    title: title,
+                    description: description,
+                    amount: amount,
+                    date: date,
+                    type: type
+                )
+                transactions.append(transaction)
+            }
+
+            let model = EveryDaySectionViewModel(date: date, transactions: transactions)
+            models.append(model)
+        }
+
         return models
     }
     

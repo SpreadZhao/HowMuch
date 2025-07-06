@@ -6,14 +6,13 @@
 //
 
 import IGListKit
-import Combine
 
 class EveryDayCellViewModel: ListDiffable {
     
     var id: String
-    @Published var title: String
-    @Published var description: String
-    @Published var amount: Double
+    var title: String
+    var description: String
+    var amount: Double
     
     init(id: String, title: String, description: String, amount: Double) {
         self.id = id

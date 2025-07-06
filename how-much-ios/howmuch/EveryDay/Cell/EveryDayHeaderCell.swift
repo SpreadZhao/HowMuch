@@ -6,12 +6,10 @@
 //
 
 import IGListKit
-import Combine
 
 final class EveryDayHeaderCell: UICollectionViewCell, ListBindable {
     
     private var viewModel: EveryDayHeaderCellViewModel?
-    private var cancellables = [AnyCancellable]()
     
     private lazy var dateLabel = {
         return UILabel(frame: .zero)
@@ -29,7 +27,6 @@ final class EveryDayHeaderCell: UICollectionViewCell, ListBindable {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        cancellables.removeAll()
     }
     
     func bindViewModel(_ viewModel: Any) {
@@ -41,11 +38,7 @@ final class EveryDayHeaderCell: UICollectionViewCell, ListBindable {
     }
     
     func bind(viewModel: EveryDayHeaderCellViewModel) {
-        viewModel.$dateString.receive(on: RunLoop.main)
-            .sink(receiveValue: { [weak self] in
-                self?.dateLabel.text = $0
-            })
-            .store(in: &cancellables)
+        dateLabel.text = viewModel.dateString
     }
     
     func setupSubviews() {

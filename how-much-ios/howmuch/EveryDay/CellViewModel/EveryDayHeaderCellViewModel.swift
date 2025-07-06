@@ -8,7 +8,7 @@
 import IGListKit
 
 class EveryDayHeaderCellViewModel: ListDiffable {
-    @Published var dateString: String
+    var dateString: String
     
     init(dateString: String) {
         self.dateString = dateString
