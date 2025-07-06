@@ -6,8 +6,12 @@
 //
 
 import IGListKit
+import Combine
 
 final class MineImportItemCell: UICollectionViewCell {
+    
+    private var viewModel: MineImportItemCellViewModel?
+    private var cancellables = Set<AnyCancellable>()
     
     private var title: String?
     private var imageName: String?
@@ -24,6 +28,11 @@ final class MineImportItemCell: UICollectionViewCell {
         super.init(frame: frame)
         setupSubviews()
         setupLayouts()
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        cancellables.removeAll()
     }
 
     required init?(coder: NSCoder) {
@@ -58,12 +67,22 @@ extension MineImportItemCell: ListBindable {
         guard let viewModel = viewModel as? MineImportItemCellViewModel else {
             return
         }
-        self.title = viewModel.title
-        self.imageName = viewModel.iconName
-        self.itemLabel.text = self.title
-        if let imageName = self.imageName {
-            self.iconImageView.image = UIImage(systemName: imageName)
-        }
+        self.viewModel = viewModel
+        bind(viewModel: viewModel)
+    }
+    
+    func bind(viewModel: MineImportItemCellViewModel) {
+        viewModel.$title.receive(on: RunLoop.main)
+            .sink(receiveValue: { [weak self] in
+                self?.itemLabel.text = $0
+            })
+            .store(in: &cancellables)
+        
+        viewModel.$iconName.receive(on: RunLoop.main)
+            .sink(receiveValue: { [weak self] in
+                self?.iconImageView.image = UIImage(systemName: $0)
+            })
+            .store(in: &cancellables)
     }
     
 }

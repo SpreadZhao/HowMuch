@@ -6,11 +6,12 @@
 //
 
 import IGListKit
+import Combine
 
 final class MineImportItemCellViewModel: ListDiffable {
-    var title: String
+    @Published var title: String
     
-    let iconName = "arrow.down.doc"
+    @Published var iconName = "arrow.down.doc"
     
     init(title: String) {
         self.title = title
