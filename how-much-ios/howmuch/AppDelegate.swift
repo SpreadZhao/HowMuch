@@ -17,10 +17,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: frame)
         
         let tabBarController = TabBarController()
-        let vc1 = UINavigationController(rootViewController: HomeViewController())
-        let vc2 = UINavigationController(rootViewController: MineViewController())
-        let vc3 = UINavigationController(rootViewController: EveryDayViewController())
-        tabBarController.viewControllers = [vc1, vc2, vc3]
+        let homeVC = UINavigationController(rootViewController: HomeViewController())
+        let mineVC = UINavigationController(rootViewController: MineViewController())
+        let everyDayVC = UINavigationController(rootViewController: EveryDayViewController())
+        tabBarController.viewControllers = [homeVC, everyDayVC, mineVC]
+        tabBarController.selectedIndex = tabBarController.viewControllers?.firstIndex(of: everyDayVC) ?? 0
         
         window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()
