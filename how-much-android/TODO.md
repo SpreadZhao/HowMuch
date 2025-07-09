@@ -2,7 +2,8 @@
 - [ ] Database with CURD test case
 - [ ] Using coroutine to utilize database services
 - [ ] Current month records data layer
-- [ ] Import plain json text
+- [x] Import plain json text
+- [ ] Migrate: UI
 - [ ] Migrate: boundary & exception check
 - [ ] MoneyExt in Money service
 - [ ] TrackNode: https://chatgpt.com/share/6814fe62-1a64-800f-b75b-c532972cd62d
@@ -11,3 +12,7 @@
 - [ ] Money value input enhance
 - [ ] Hint tag after date select when insert record, which contains: [Today, Yesterday]
 - [ ] App color scheme
+- [ ] App Settings Framework
+- [ ] (P1) Select time manually when inserting record
+- [ ] (P0) Move InsertRecord to a independent page, users can launch it directly from outside
+- [ ] (P1) Widget

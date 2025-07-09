@@ -7,6 +7,7 @@ import java.util.Locale
 
 const val DATE_FORMAT_MONTH_DAY_STR = "MMM dd"
 const val DATE_FORMAT_YEAR_MONTH_DAY_STR = "yyyy-MM-dd"
+const val DATE_FORMAT_YEAR_MONTH_DAY_TIME_STR = "yyyy-MM-dd HH:mm:ss"
 
 fun dateStrToDate(dateStr: String?, format: String): Date? {
     if (dateStr.isNullOrEmpty()) {

@@ -1,5 +1,6 @@
 package com.spread.business.main
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,21 +9,31 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.spread.common.DATE_FORMAT_MONTH_DAY_STR
+import com.spread.common.DATE_FORMAT_YEAR_MONTH_DAY_TIME_STR
 import com.spread.common.dateStr
+import com.spread.common.timeInMillisToDateStr
 import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
 import com.spread.db.service.Money
+import com.spread.ui.EasyTextField
 import com.spread.ui.TextConstants
 import com.spread.ui.underline
 import kotlinx.coroutines.launch
@@ -56,6 +67,7 @@ fun RecordItem(
     record: MoneyRecord
 ) {
     val scope = rememberCoroutineScope()
+    var showDetail by remember { mutableStateOf(false) }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -72,6 +84,9 @@ fun RecordItem(
                         }
                     }
                 )
+            }
+            .clickable {
+                showDetail = true
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -93,6 +108,84 @@ fun RecordItem(
         Text(
             text = "${if (record.type == MoneyType.Expense) "-" else "+"}${record.value}",
             fontSize = TextConstants.FONT_SIZE_H2
+        )
+    }
+    if (showDetail) {
+        RecordDetailDialog(record = record, onDismissRequest = { showDetail = false })
+    }
+}
+
+@Composable
+fun RecordDetailDialog(
+    record: MoneyRecord,
+    onDismissRequest: () -> Unit
+) {
+    var inputCategory by remember { mutableStateOf(record.category) }
+    var inputRemark by remember { mutableStateOf(record.remark) }
+    var inputValue by remember { mutableStateOf(record.value.toString()) }
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
+                RecordMemberItem(
+                    modifier = Modifier.fillMaxWidth(),
+                    key = "Date",
+                    value = timeInMillisToDateStr(record.date, DATE_FORMAT_YEAR_MONTH_DAY_TIME_STR),
+                    onValueChange = {}
+                )
+                RecordMemberItem(
+                    modifier = Modifier.fillMaxWidth(),
+                    key = "Category",
+                    value = inputCategory,
+                    onValueChange = { inputCategory = it }
+                )
+                RecordMemberItem(
+                    modifier = Modifier.fillMaxWidth(),
+                    key = "Remark",
+                    value = inputRemark,
+                    onValueChange = { inputRemark = it }
+                )
+                RecordMemberItem(
+                    modifier = Modifier.fillMaxWidth(),
+                    key = "Value",
+                    value = inputValue,
+                    onValueChange = { inputValue = it }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun RecordMemberItem(
+    modifier: Modifier,
+    key: String,
+    value: String,
+    onValueChange: (String) -> Unit
+) {
+    if (key.isBlank() || value.isBlank()) {
+        return
+    }
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = "$key: ")
+        EasyTextField(
+            modifier = Modifier.wrapContentSize(),
+            value = value,
+            onValueChange = onValueChange,
+            enabled = false
         )
     }
 }

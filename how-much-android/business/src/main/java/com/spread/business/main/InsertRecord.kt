@@ -1,7 +1,6 @@
 package com.spread.business.main
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -15,13 +14,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -40,12 +37,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.spread.business.R
 import com.spread.common.DATE_FORMAT_YEAR_MONTH_DAY_STR
 import com.spread.common.nowCalendar
@@ -53,10 +48,10 @@ import com.spread.common.timeInMillisToDateStr
 import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
 import com.spread.db.service.Money
+import com.spread.ui.EasyTextField
 import com.spread.ui.MoneyInput
 import com.spread.ui.YearMonthDayPicker
 import com.spread.ui.toDp
-import com.spread.ui.underline
 import java.util.Calendar
 
 @Composable
@@ -297,27 +292,11 @@ fun Category(modifier: Modifier, state: CategoryState) {
                 painter = painterResource(id = R.drawable.ic_categories),
                 contentDescription = null,
             )
-            BasicTextField(
+            EasyTextField(
                 modifier = Modifier.weight(2f),
                 value = state.categoryInputText,
-                textStyle = LocalTextStyle.current.copy(
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurface
-                ),
-                onValueChange = { state.categoryInputText = it },
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                singleLine = true,
-                decorationBox = {
-                    Box(
-                        modifier = Modifier
-                            .underline(
-                                strokeWidth = 1.dp,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            .padding(2.dp)
-                    ) {
-                        it()
-                    }
+                onValueChange = {
+                    state.categoryInputText = it
                 }
             )
             Spacer(modifier = Modifier.width(10.dp))
