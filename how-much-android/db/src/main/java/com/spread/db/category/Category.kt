@@ -8,7 +8,7 @@ data class Category(
 )
 
 @Serializable
-class CategoryItem(
+data class CategoryItem(
     val text: String,
     val icon: String
 )

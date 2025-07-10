@@ -1,4 +1,4 @@
-package com.spread.business.main
+package com.spread.business.main.category
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -18,16 +18,21 @@ class CategoryViewModel(
         private const val TAG = "CategoryViewModel"
     }
 
-    private val _categoryState = MutableStateFlow<Category?>(null)
-    val categoryState: StateFlow<Category?> = _categoryState
+    private var _category: Category? = null
 
-    private val _selectedItem = MutableStateFlow<Int?>(null)
-    val selectedItem: StateFlow<Int?> = _selectedItem
+    private val _categoryState = MutableStateFlow<CategoryModel?>(null)
+    val categoryState: StateFlow<CategoryModel?> = _categoryState
+
+    private val _selectedIdx = MutableStateFlow<Int?>(null)
+    val selectedIdx: StateFlow<Int?> = _selectedIdx
 
     fun loadCategory() {
         viewModelScope.launch(Dispatchers.IO) {
             fileRepo.readFromJsonFileAsync()
-                .onSuccess { _categoryState.value = it }
+                .onSuccess {
+                    _category = it
+                    _categoryState.emit(it.toCategoryModel())
+                }
                 .onFailure { Log.e(TAG, "Load failed", it) }
         }
     }
@@ -37,16 +42,31 @@ class CategoryViewModel(
             fileRepo.writeToJsonFileAsync(category)
                 .onSuccess {
                     Log.i(TAG, "Saved successfully")
-                    _categoryState.emit(category)
+                    _category = category
+                    _categoryState.emit(category.toCategoryModel())
                 }
                 .onFailure { Log.e(TAG, "Save failed", it) }
         }
     }
 
-    fun selectItem(index: Int) {
+    /**
+     * 选择一个分类项
+     * @param index 分类项的索引
+     */
+    fun select(index: Int) {
         if (index < 0 || index >= (categoryState.value?.itemList?.size ?: 0)) {
             return
         }
-        _selectedItem.value = index
+        _selectedIdx.value = index
+    }
+
+    /**
+     * 获取选中的分类项
+     * @return 选中的分类项，如果没有选中任何项，则返回null
+     */
+    fun getSelected(): CategoryItemModel? {
+        return selectedIdx.value?.let {
+            categoryState.value?.itemList?.get(it)
+        }
     }
 }
