@@ -36,7 +36,7 @@ fun CategoryModel.toCategory(): Category {
             text = itemModel.text.value,
             icon = itemModel.icon.value
         )
-    }
+    }.toMutableList()
 
     return Category(itemList = dataItems)
 }

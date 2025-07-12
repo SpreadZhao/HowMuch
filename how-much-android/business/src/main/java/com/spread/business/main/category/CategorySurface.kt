@@ -1,6 +1,8 @@
 package com.spread.business.main.category
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -12,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,12 +50,15 @@ fun CategorySurface(onViewModelReady: ((CategoryViewModel) -> Unit)? = null) {
 
     Column {
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 100.dp)
+            columns = GridCells.Adaptive(minSize = 80.dp),
+            contentPadding = PaddingValues(horizontal = 5.dp, vertical = 5.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             category?.itemList?.withIndex()?.forEach { (index, categoryItem) ->
                 item(key = index) {
-                    val isActive = remember {
-                        mutableStateOf(selectedIdx == index)
+                    val isActive = remember(selectedIdx) {
+                        derivedStateOf { selectedIdx == index }
                     }
                     CategoryTag(categoryItem, isActive) {
                         viewModel.select(index)
@@ -74,9 +80,12 @@ fun CategoryTag(item: CategoryItemModel, isActive: State<Boolean>, onClickAction
             } else {
                 Color.LightGray
             }
-        )
+        ),
+        contentPadding = PaddingValues(0.dp)
     ) {
-        Row {
+        Row(
+            modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
+        ) {
             Text(
                 text = "${item.icon.value} ${item.text.value}",
                 fontWeight = FontWeight.Bold,
@@ -88,6 +97,38 @@ fun CategoryTag(item: CategoryItemModel, isActive: State<Boolean>, onClickAction
 
 
 @Composable
-fun highFrequencyTags() {
-
+fun TopNCategorySurface(n: Int, onViewModelReady: ((TopNCategoryViewModel) -> Unit)? = null) {
+    val context = LocalContext.current
+    val fileRepo = remember {
+        CategoryRepository(context.applicationContext).apply {
+            initSync()
+        }
+    }
+    val viewModel: TopNCategoryViewModel = viewModel(
+        factory = TopNCategoryViewModelFactory(fileRepo, n)
+    )
+    val category by viewModel.categoryState.collectAsState()
+    val selectedIdx by viewModel.selectedIdx.collectAsState(-1)
+    LaunchedEffect(Unit) {
+        viewModel.loadCategory()
+    }
+    LaunchedEffect(viewModel) {
+        onViewModelReady?.invoke(viewModel)
+    }
+    Column {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 100.dp)
+        ) {
+            category?.itemList?.withIndex()?.forEach { (index, categoryItem) ->
+                item(key = index) {
+                    val isActive = remember(selectedIdx) {
+                        derivedStateOf { selectedIdx == index }
+                    }
+                    CategoryTag(categoryItem, isActive) {
+                        viewModel.select(index)
+                    }
+                }
+            }
+        }
+    }
 }

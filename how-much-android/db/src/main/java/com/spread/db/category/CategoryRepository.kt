@@ -15,7 +15,7 @@ class CategoryRepository(val context: Context) {
 
         // 预设分类
         private val defaultCategories = Category(
-            itemList = listOf(
+            itemList = mutableListOf(
                 CategoryItem("餐饮", "🍔"),
                 CategoryItem("购物", "🛒"),
                 CategoryItem("交通", "🚕"),

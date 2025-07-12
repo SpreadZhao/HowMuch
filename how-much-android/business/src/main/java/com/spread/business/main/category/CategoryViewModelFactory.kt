@@ -16,3 +16,16 @@ class CategoryViewModelFactory(
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+
+class TopNCategoryViewModelFactory(
+    private val fileRepo: CategoryRepository,
+    private val n: Int
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(TopNCategoryViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return TopNCategoryViewModel(fileRepo, n) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
