@@ -2,6 +2,7 @@ package com.spread.business.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.spread.db.money.MoneyRecord
 import com.spread.db.service.Money
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +12,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import java.util.Calendar
+
+sealed interface EditRecordDialogState {
+    class Show(val record: MoneyRecord? = null) : EditRecordDialogState
+    data object Hide : EditRecordDialogState
+}
 
 class CurrMonthViewModel : ViewModel() {
 
@@ -29,6 +35,10 @@ class CurrMonthViewModel : ViewModel() {
     }
 
     private val selectedTimeFlow = MutableStateFlow(getMonthStartTime(calendar.timeInMillis))
+
+    private var _showEditRecordDialogFlow =
+        MutableStateFlow<EditRecordDialogState>(EditRecordDialogState.Hide)
+    val showEditRecordDialogFlow: StateFlow<EditRecordDialogState> = _showEditRecordDialogFlow
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val currMonthMoneyRecordsFlow = selectedTimeFlow
@@ -87,5 +97,16 @@ class CurrMonthViewModel : ViewModel() {
         }
         selectedTimeFlow.value = cal.timeInMillis
     }
+
+    fun showEditRecordDialog(record: MoneyRecord? = null) {
+        _showEditRecordDialogFlow.value = EditRecordDialogState.Show(record)
+    }
+
+    fun hideEditRecordDialog() {
+        _showEditRecordDialogFlow.value = EditRecordDialogState.Hide
+    }
+
+    val isEditRecordDialogShowing: Boolean
+        get() = _showEditRecordDialogFlow.value is EditRecordDialogState.Show
 
 }

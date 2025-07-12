@@ -10,7 +10,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.spread.common.DATE_FORMAT_MONTH_DAY_STR
 import com.spread.common.DATE_FORMAT_YEAR_MONTH_DAY_TIME_STR
 import com.spread.common.dateStr
@@ -123,44 +128,63 @@ fun RecordDetailDialog(
     var inputCategory by remember { mutableStateOf(record.category) }
     var inputRemark by remember { mutableStateOf(record.remark) }
     var inputValue by remember { mutableStateOf(record.value.toString()) }
+    val viewModel: CurrMonthViewModel = viewModel()
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
             modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(16.dp),
+                .wrapContentSize(),
             shape = RoundedCornerShape(16.dp),
         ) {
-            Column(
+            Row(
                 modifier = Modifier
                     .wrapContentSize()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.Start
             ) {
-                RecordMemberItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    key = "Date",
-                    value = timeInMillisToDateStr(record.date, DATE_FORMAT_YEAR_MONTH_DAY_TIME_STR),
-                    onValueChange = {}
-                )
-                RecordMemberItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    key = "Category",
-                    value = inputCategory,
-                    onValueChange = { inputCategory = it }
-                )
-                RecordMemberItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    key = "Remark",
-                    value = inputRemark,
-                    onValueChange = { inputRemark = it }
-                )
-                RecordMemberItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    key = "Value",
-                    value = inputValue,
-                    onValueChange = { inputValue = it }
-                )
+                Column(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    RecordMemberItem(
+                        modifier = Modifier.wrapContentSize(),
+                        key = "Date",
+                        value = timeInMillisToDateStr(
+                            record.date,
+                            DATE_FORMAT_YEAR_MONTH_DAY_TIME_STR
+                        ),
+                        onValueChange = {}
+                    )
+                    RecordMemberItem(
+                        modifier = Modifier.wrapContentSize(),
+                        key = "Category",
+                        value = inputCategory,
+                        onValueChange = { inputCategory = it }
+                    )
+                    RecordMemberItem(
+                        modifier = Modifier.wrapContentSize(),
+                        key = "Remark",
+                        value = inputRemark,
+                        onValueChange = { inputRemark = it }
+                    )
+                    RecordMemberItem(
+                        modifier = Modifier.wrapContentSize(),
+                        key = "Value",
+                        value = inputValue,
+                        onValueChange = { inputValue = it }
+                    )
+                }
+                IconButton(
+                    modifier = Modifier.padding(top = 10.dp, end = 10.dp),
+                    onClick = {
+                        onDismissRequest()
+                        viewModel.showEditRecordDialog(record)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit Record"
+                    )
+                }
             }
         }
     }

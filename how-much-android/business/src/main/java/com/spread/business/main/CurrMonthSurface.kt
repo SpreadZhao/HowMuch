@@ -26,7 +26,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -41,9 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.spread.business.statistics.CurrMonthStatistics
 import com.spread.business.statistics.StatisticsScreen
-import com.spread.db.money.MoneyRecord
 import com.spread.db.service.Money
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -64,7 +61,7 @@ fun CurrMonthSurface() {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
-    var showBottomSheet by remember { mutableStateOf(false) }
+    val editRecordDialogState by viewModel.showEditRecordDialogFlow.collectAsState()
     var viewType by remember { mutableStateOf(ViewType.CurrMonthRecords) }
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -141,7 +138,7 @@ fun CurrMonthSurface() {
             }
         }
         AnimatedVisibility(
-            visible = !listState.isScrollInProgress && !showBottomSheet && viewType == ViewType.CurrMonthRecords,
+            visible = !listState.isScrollInProgress && editRecordDialogState !is EditRecordDialogState.Show && viewType == ViewType.CurrMonthRecords,
             enter = scaleIn() + fadeIn(),
             exit = scaleOut() + fadeOut(),
             modifier = Modifier
@@ -150,7 +147,7 @@ fun CurrMonthSurface() {
         ) {
             FloatingActionButton(
                 onClick = {
-                    showBottomSheet = true
+                    viewModel.showEditRecordDialog()
                 },
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 contentColor = MaterialTheme.colorScheme.secondary
@@ -161,7 +158,7 @@ fun CurrMonthSurface() {
                 )
             }
         }
-        if (showBottomSheet) {
+        if (editRecordDialogState is EditRecordDialogState.Show) {
             ModalBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -169,41 +166,37 @@ fun CurrMonthSurface() {
                     .imePadding(),
 //                    .imeNestedScroll(),
                 onDismissRequest = {
-                    showBottomSheet = false
+                    viewModel.hideEditRecordDialog()
                 },
                 sheetState = sheetState
             ) {
-                InsertRecord(
-                    onSave = {
-                        sheetState.dismiss(scope, it) {
-                            showBottomSheet = false
+                RecordEdit(
+                    record = (editRecordDialogState as? EditRecordDialogState.Show)?.record,
+                    onSave = { record, insert ->
+                        scope.launch {
+                            sheetState.hide()
+                            if (insert && !sheetState.isVisible) {
+                                Money.insertRecords(record)
+                            } else if (!insert && !sheetState.isVisible) {
+                                Money.updateRecords(record)
+                            }
+                        }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                viewModel.hideEditRecordDialog()
+                            }
                         }
                     },
                     onCancel = {
-                        sheetState.dismiss(scope) {
-                            showBottomSheet = false
+                        scope.launch {
+                            sheetState.hide()
+                        }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                viewModel.hideEditRecordDialog()
+                            }
                         }
                     }
                 )
             }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-private fun SheetState.dismiss(
-    scope: CoroutineScope,
-    record: MoneyRecord? = null,
-    afterDismiss: () -> Unit
-) {
-    scope.launch {
-        hide()
-        if (record != null && !isVisible) {
-            Money.insertRecords(record)
-        }
-    }.invokeOnCompletion {
-        if (!isVisible) {
-            afterDismiss()
         }
     }
 }

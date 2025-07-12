@@ -43,6 +43,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import com.spread.business.R
 import com.spread.common.DATE_FORMAT_YEAR_MONTH_DAY_STR
+import com.spread.common.calendar
 import com.spread.common.nowCalendar
 import com.spread.common.timeInMillisToDateStr
 import com.spread.db.money.MoneyRecord
@@ -55,29 +56,37 @@ import com.spread.ui.toDp
 import java.util.Calendar
 
 @Composable
-fun InsertRecord(
-    onSave: (MoneyRecord) -> Unit,
+fun RecordEdit(
+    record: MoneyRecord? = null,
+    onSave: (MoneyRecord, Boolean) -> Unit,
     onCancel: () -> Unit
 ) {
-    val calendar by remember { mutableStateOf(nowCalendar) }
+    val calendar by remember {
+        mutableStateOf(
+            record?.date?.let(::calendar)
+                ?: nowCalendar
+        )
+    }
     val categoryState = rememberCategoryState(
         options = listOf(
             MoneyType.Expense to R.drawable.ic_expense,
             MoneyType.Income to R.drawable.ic_income
-        )
+        ),
+        categoryInputText = record?.category ?: ""
     )
-    var remarkInputText by remember { mutableStateOf("") }
-    var valueInputText by remember { mutableStateOf("") }
+    var remarkInputText by remember { mutableStateOf(record?.remark ?: "") }
+    var valueInputText by remember { mutableStateOf(record?.value?.toString() ?: "") }
     Column(
         modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
         horizontalAlignment = Alignment.Start
     ) {
-        Date(
+        Header(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .align(alignment = Alignment.CenterHorizontally),
             calendar = calendar,
+            record = record,
             categoryState = categoryState,
             remarkInputText = remarkInputText,
             valueInputText = valueInputText,
@@ -152,6 +161,7 @@ fun RemarkAndMoney(
             modifier = Modifier
                 .width(moneyFieldWidth.toDp())
                 .fillMaxHeight(),
+            initialValue = valueInput,
             onNewValue = onNewValue,
             label = { Text("金额") }
         )
@@ -160,13 +170,14 @@ fun RemarkAndMoney(
 
 
 @Composable
-fun Date(
+fun Header(
     modifier: Modifier,
     calendar: Calendar,
+    record: MoneyRecord? = null,
     categoryState: CategoryState,
     remarkInputText: String,
     valueInputText: String,
-    onSave: (MoneyRecord) -> Unit,
+    onSave: (MoneyRecord, Boolean) -> Unit,
     onCancel: () -> Unit,
 ) {
     var showPicker by remember { mutableStateOf(false) }
@@ -203,15 +214,14 @@ fun Date(
 
         TextButton(
             onClick = {
-                val moneyRecord = Money.buildMoneyRecord {
+                val moneyRecord = Money.buildMoneyRecord(record) {
                     date = calendar.timeInMillis
                     type = categoryState.selectedOption.first
                     remark = remarkInputText
                     value = valueInputText
                     category = categoryState.categoryInputText
                 }
-                // TODO: close after save successfully
-                onSave(moneyRecord)
+                onSave(moneyRecord, record == null)
             }
         ) {
             Text(text = "保存")
@@ -308,10 +318,11 @@ fun Category(modifier: Modifier, state: CategoryState) {
 
 @Composable
 fun rememberCategoryState(
-    options: List<Pair<MoneyType, Int>>
+    options: List<Pair<MoneyType, Int>>,
+    categoryInputText: String
 ): CategoryState {
     return rememberSaveable(saver = CategoryState.Saver) {
-        CategoryState(options)
+        CategoryState(options = options, categoryInputText = categoryInputText)
     }
 }
 

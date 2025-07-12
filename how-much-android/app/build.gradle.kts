@@ -55,4 +55,5 @@ dependencies {
     implementation(project(":ui"))
     implementation(project(":common"))
     implementation(project(":business"))
+    implementation(project(":debug"))
 }
