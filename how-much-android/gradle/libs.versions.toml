@@ -18,6 +18,7 @@ roomRuntime = "2.7.2"
 uiToolingPreviewAndroid = "1.8.3"
 uiUnitAndroid = "1.8.3"
 runtimeAndroid = "1.8.3"
+coilCompose = "2.4.0"
 
 # @keep
 compileSdk = "36"
@@ -51,6 +52,7 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 androidx-ui-tooling-preview-android = { group = "androidx.compose.ui", name = "ui-tooling-preview-android", version.ref = "uiToolingPreviewAndroid" }
 androidx-ui-unit-android = { group = "androidx.compose.ui", name = "ui-unit-android", version.ref = "uiUnitAndroid" }
 androidx-runtime-android = { group = "androidx.compose.runtime", name = "runtime-android", version.ref = "runtimeAndroid" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
