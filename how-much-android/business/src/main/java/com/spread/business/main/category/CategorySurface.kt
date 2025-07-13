@@ -141,7 +141,8 @@ fun CategoryTag(item: CategoryItemModel, isActive: State<Boolean>, onClickAction
             Text(
                 text = item.text.value,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = Color.White,
+                maxLines = 1
             )
         }
     }
