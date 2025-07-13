@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.core.text.isDigitsOnly
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.text.DecimalFormat
 import kotlin.math.max
 
@@ -28,10 +29,11 @@ private const val numberOfDecimals = 2
 @Composable
 fun MoneyInput(
     modifier: Modifier,
+    initialValue: String = "",
     onNewValue: (String) -> Unit,
     label: @Composable (() -> Unit)? = null
 ) {
-    var valueText by remember { mutableStateOf("") }
+    var valueText by remember { mutableStateOf(initialValue.safeToRawInputString()) }
     OutlinedTextField(
         modifier = modifier.navigationBarsPadding(),
         value = valueText,
@@ -174,4 +176,13 @@ class CurrencyAmountInputVisualTransformation(
             return maskOffsetCount
         }
     }
+}
+
+fun String.safeToRawInputString(): String {
+    return this.toBigDecimalOrNull()
+        ?.setScale(numberOfDecimals, RoundingMode.DOWN)
+        ?.movePointRight(numberOfDecimals)
+        ?.toBigInteger()
+        ?.toString()
+        ?: ""
 }

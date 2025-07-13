@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -20,6 +21,9 @@ interface MoneyDao {
 
     @Delete
     suspend fun deleteRecords(vararg records: MoneyRecord)
+
+    @Update
+    suspend fun updateRecords(vararg records: MoneyRecord)
 
     @Query("SELECT * FROM ${MoneyConst.TABLE_NAME_MONEY_RECORD} WHERE date BETWEEN :startTime AND :endTime ORDER BY date ASC")
     suspend fun getRecordsByDateRange(startTime: Long, endTime: Long): List<MoneyRecord>

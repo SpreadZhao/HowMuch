@@ -27,10 +27,14 @@ object Money {
         var value = ""
     }
 
-    fun buildMoneyRecord(action: MoneyRecordBuilder.() -> Unit): MoneyRecord {
+    fun buildMoneyRecord(
+        from: MoneyRecord? = null,
+        action: MoneyRecordBuilder.() -> Unit
+    ): MoneyRecord {
         val builder = MoneyRecordBuilder()
         builder.action()
         return MoneyRecord(
+            id = from?.id ?: 0L,
             date = builder.date,
             category = builder.category,
             type = builder.type,
@@ -53,6 +57,10 @@ object Money {
 
     suspend fun deleteRecords(vararg records: MoneyRecord) {
         database.moneyDao().deleteRecords(*records)
+    }
+
+    suspend fun updateRecords(vararg records: MoneyRecord) {
+        database.moneyDao().updateRecords(*records)
     }
 
     suspend fun getTodayRecords() = getRecordsOfDay(System.currentTimeMillis())

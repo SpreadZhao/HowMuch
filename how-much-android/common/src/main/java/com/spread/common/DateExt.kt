@@ -33,3 +33,9 @@ fun timeInMillisToDateStr(timeInMillis: Long, format: String): String {
 
 val nowCalendar: Calendar
     get() = Calendar.getInstance()
+
+fun calendar(timeInMillis: Long): Calendar {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = timeInMillis
+    return calendar
+}

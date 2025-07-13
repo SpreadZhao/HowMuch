@@ -13,6 +13,8 @@
 - [ ] Hint tag after date select when insert record, which contains: [Today, Yesterday]
 - [ ] App color scheme
 - [ ] App Settings Framework
-- [ ] (P1) Select time manually when inserting record
-- [ ] (P0) Move InsertRecord to a independent page, users can launch it directly from outside
-- [ ] (P1) Widget
+- [ ] (P1) Select time(not only date) manually when inserting record
+- [ ] (P0) Opt: Move InsertRecord to a independent page, users can launch it directly from outside
+- [ ] (P1) Feature: Widget
+- [ ] (P2) Feature: Custom date range statistics and records
+- [ ] (P2) Feature: Remark hint
