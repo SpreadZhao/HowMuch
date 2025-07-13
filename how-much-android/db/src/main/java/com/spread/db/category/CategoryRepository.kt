@@ -16,18 +16,18 @@ class CategoryRepository(val context: Context) {
         // 预设分类
         private val defaultCategories = Category(
             itemList = mutableListOf(
-                CategoryItem("餐饮", "🍔"),
-                CategoryItem("购物", "🛒"),
-                CategoryItem("交通", "🚕"),
-                CategoryItem("住房", "🏠"),
-                CategoryItem("娱乐", "🎮"),
-                CategoryItem("医疗", "🏥"),
-                CategoryItem("教育", "📚"),
-                CategoryItem("旅行", "✈️"),
-                CategoryItem("人情", "🎁"),
-                CategoryItem("工资", "💰"),
-                CategoryItem("奖金", "🎯"),
-                CategoryItem("投资", "📈")
+                CategoryItem("餐饮", "ic_food"),
+                CategoryItem("购物", "ic_shopping"),
+                CategoryItem("交通", "ic_transport"),
+                CategoryItem("住房", "ic_housing"),
+                CategoryItem("娱乐", "ic_entertainment"),
+                CategoryItem("医疗", "ic_medical"),
+                CategoryItem("教育", "ic_education"),
+                CategoryItem("旅行", "ic_transport"),
+                CategoryItem("人情", "ic_gift"),
+                CategoryItem("工资", "ic_salary"),
+                CategoryItem("奖金", "ic_bonus"),
+                CategoryItem("投资", "ic_investment")
             )
         )
     }
