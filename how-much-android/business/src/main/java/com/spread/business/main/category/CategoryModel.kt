@@ -7,7 +7,7 @@ import androidx.compose.runtime.toMutableStateList
 import com.spread.db.category.Category
 import com.spread.db.category.CategoryItem
 
-data class CategoryModel (
+data class CategoryModel(
     val itemList: SnapshotStateList<CategoryItemModel>
 )
 
