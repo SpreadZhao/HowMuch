@@ -34,7 +34,10 @@ import com.spread.db.category.CategoryRepository
 import java.io.File
 
 @Composable
-fun CategorySurface(onViewModelReady: ((CategoryViewModel) -> Unit)? = null) {
+fun CategorySurface(
+    onCategorySelected: (categoryItem: CategoryItemModel) -> Unit,
+    onViewModelReady: ((CategoryViewModel) -> Unit)? = null
+) {
     val context = LocalContext.current
     val fileRepo = remember {
         CategoryRepository(context.applicationContext).apply {
@@ -53,6 +56,10 @@ fun CategorySurface(onViewModelReady: ((CategoryViewModel) -> Unit)? = null) {
 
     LaunchedEffect(viewModel) {
         onViewModelReady?.invoke(viewModel)
+    }
+
+    LaunchedEffect(selectedIdx) {
+        viewModel.getSelected()?.let(onCategorySelected)
     }
 
     Column {

@@ -313,7 +313,11 @@ fun Category(modifier: Modifier, state: CategoryState) {
             Spacer(modifier = Modifier.width(10.dp))
             SingleChoiceSegmentedButton(modifier = Modifier.wrapContentWidth(), state = state)
         }
-        CategorySurface()
+        CategorySurface(
+            onCategorySelected = {
+                state.categoryInputText = it.text.value
+            }
+        )
     }
 }
 

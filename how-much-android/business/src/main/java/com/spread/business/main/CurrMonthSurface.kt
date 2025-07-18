@@ -1,6 +1,5 @@
 package com.spread.business.main
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
@@ -54,7 +53,6 @@ private enum class ViewType {
     Statistics
 }
 
-@SuppressLint("RememberReturnType")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurrMonthSurface() {

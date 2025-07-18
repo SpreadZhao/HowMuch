@@ -168,5 +168,5 @@ fun DebugMigrate() {
 
 @Composable
 fun DebugCategory() {
-    CategorySurface()
+    CategorySurface({})
 }
