@@ -74,6 +74,9 @@ fun RecordEdit(
             MoneyType.Expense to R.drawable.ic_expense,
             MoneyType.Income to R.drawable.ic_income
         ),
+        initialOptionIndex = if (record != null) {
+            if (record.type == MoneyType.Expense) 0 else 1
+        } else 0,
         categoryInputText = record?.category ?: ""
     )
     var remarkInputText by remember { mutableStateOf(record?.remark ?: "") }
@@ -326,10 +329,11 @@ fun Category(modifier: Modifier, state: CategoryState) {
 @Composable
 fun rememberCategoryState(
     options: List<Pair<MoneyType, Int>>,
-    categoryInputText: String
+    initialOptionIndex: Int,
+    categoryInputText: String,
 ): CategoryState {
     return rememberSaveable(saver = CategoryState.Saver) {
-        CategoryState(options = options, categoryInputText = categoryInputText)
+        CategoryState(options = options, selectedIndex = initialOptionIndex, categoryInputText = categoryInputText)
     }
 }
 
