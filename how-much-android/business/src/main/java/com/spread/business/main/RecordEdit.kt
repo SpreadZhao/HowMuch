@@ -58,6 +58,7 @@ import java.util.Calendar
 
 @Composable
 fun RecordEdit(
+    modifier: Modifier = Modifier,
     record: MoneyRecord? = null,
     onSave: (MoneyRecord, Boolean) -> Unit,
     onCancel: () -> Unit
@@ -78,7 +79,7 @@ fun RecordEdit(
     var remarkInputText by remember { mutableStateOf(record?.remark ?: "") }
     var valueInputText by remember { mutableStateOf(record?.value?.toString() ?: "") }
     Column(
-        modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
+        modifier = modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
         horizontalAlignment = Alignment.Start
     ) {
         Header(
@@ -222,6 +223,7 @@ fun Header(
                     value = valueInputText
                     category = categoryState.categoryInputText
                 }
+                // TODO: need more precise check whether record is new or not
                 onSave(moneyRecord, record == null)
             }
         ) {

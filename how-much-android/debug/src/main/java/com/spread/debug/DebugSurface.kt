@@ -15,11 +15,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.activity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.spread.business.main.CurrMonthSurface
 import com.spread.business.main.category.CategorySurface
+import com.spread.business.outside.QuickAddRecordActivity
 import com.spread.db.money.MoneyType
 import com.spread.db.service.Money
 import com.spread.migrate.MigrateButton
@@ -33,6 +35,7 @@ private const val ROUTE_DEBUG_ALL = "debug_all"
 private const val ROUTE_DEBUG_CURR_MONTH = "debug_curr_month"
 private const val ROUTE_DEBUG_MIGRATE = "debug_migrate"
 private const val ROUTE_DEBUG_CATEGORY = "debug_category"
+private const val ROUTE_DEBUG_ADD_RECORD = "debug_add_record"
 
 @Composable
 fun DebugSurface() {
@@ -47,6 +50,9 @@ fun DebugSurface() {
         composable(ROUTE_DEBUG_CURR_MONTH) { DebugCurrMonth() }
         composable(ROUTE_DEBUG_MIGRATE) { DebugMigrate() }
         composable(ROUTE_DEBUG_CATEGORY) { DebugCategory() }
+        activity(ROUTE_DEBUG_ADD_RECORD) {
+            activityClass = QuickAddRecordActivity::class
+        }
     }
 }
 
@@ -89,6 +95,15 @@ fun DebugMain(
                 }
             ) {
                 Text("Category")
+            }
+        }
+        item {
+            Button(
+                onClick = {
+                    navController.navigate(ROUTE_DEBUG_ADD_RECORD)
+                }
+            ) {
+                Text("Add Record")
             }
         }
     }
