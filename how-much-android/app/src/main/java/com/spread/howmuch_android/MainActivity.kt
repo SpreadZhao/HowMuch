@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.ExperimentalMaterial3Api
-import com.spread.howmuch_android.ui.theme.HowMuchAndroidTheme
+import com.spread.ui.theme.HowMuchAndroidTheme
 
 class MainActivity : ComponentActivity() {
 

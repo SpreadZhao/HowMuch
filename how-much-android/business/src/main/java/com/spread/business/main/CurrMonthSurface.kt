@@ -10,6 +10,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +33,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -98,7 +102,27 @@ fun CurrMonthSurface() {
                 targetState = viewType,
                 label = "ViewType"
             ) {
-                val modifier = Modifier.padding(horizontal = 20.dp)
+                var offset by remember { mutableFloatStateOf(0f) }
+                val modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp)
+                    .draggable(
+                        state = rememberDraggableState { o ->
+                            offset += o
+                        },
+                        onDragStarted = {
+                            offset = 0f
+                        },
+                        onDragStopped = {
+                            if (offset < -100f) {
+                                viewModel.selectMonthDelta(-1)
+                            } else if (offset > 100f) {
+                                viewModel.selectMonthDelta(1)
+                            }
+                        },
+                        reverseDirection = true,
+                        orientation = Orientation.Horizontal
+                    )
                 when (it) {
                     ViewType.CurrMonthRecords -> {
                         LazyColumn(

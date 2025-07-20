@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -22,7 +24,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,7 +41,10 @@ import com.spread.db.category.CategoryRepository
 import java.io.File
 
 @Composable
-fun CategorySurface(onViewModelReady: ((CategoryViewModel) -> Unit)? = null) {
+fun CategorySurface(
+    onCategorySelected: (categoryItem: CategoryItemModel) -> Unit,
+    onViewModelReady: ((CategoryViewModel) -> Unit)? = null
+) {
     val context = LocalContext.current
     val fileRepo = remember {
         CategoryRepository(context.applicationContext).apply {
@@ -59,6 +63,10 @@ fun CategorySurface(onViewModelReady: ((CategoryViewModel) -> Unit)? = null) {
 
     LaunchedEffect(viewModel) {
         onViewModelReady?.invoke(viewModel)
+    }
+
+    LaunchedEffect(selectedIdx) {
+        viewModel.getSelected()?.let(onCategorySelected)
     }
 
     Column {

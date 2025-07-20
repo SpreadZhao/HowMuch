@@ -1,4 +1,4 @@
-package com.spread.howmuch_android.ui.theme
+package com.spread.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

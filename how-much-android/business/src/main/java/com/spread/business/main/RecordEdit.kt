@@ -58,6 +58,7 @@ import java.util.Calendar
 
 @Composable
 fun RecordEdit(
+    modifier: Modifier = Modifier,
     record: MoneyRecord? = null,
     onSave: (MoneyRecord, Boolean) -> Unit,
     onCancel: () -> Unit
@@ -73,12 +74,15 @@ fun RecordEdit(
             MoneyType.Expense to R.drawable.ic_expense,
             MoneyType.Income to R.drawable.ic_income
         ),
+        initialOptionIndex = if (record != null) {
+            if (record.type == MoneyType.Expense) 0 else 1
+        } else 0,
         categoryInputText = record?.category ?: ""
     )
     var remarkInputText by remember { mutableStateOf(record?.remark ?: "") }
     var valueInputText by remember { mutableStateOf(record?.value?.toString() ?: "") }
     Column(
-        modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
+        modifier = modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
         horizontalAlignment = Alignment.Start
     ) {
         Header(
@@ -222,6 +226,7 @@ fun Header(
                     value = valueInputText
                     category = categoryState.categoryInputText
                 }
+                // TODO: need more precise check whether record is new or not
                 onSave(moneyRecord, record == null)
             }
         ) {
@@ -313,17 +318,22 @@ fun Category(modifier: Modifier, state: CategoryState) {
             Spacer(modifier = Modifier.width(10.dp))
             SingleChoiceSegmentedButton(modifier = Modifier.wrapContentWidth(), state = state)
         }
-        CategorySurface()
+        CategorySurface(
+            onCategorySelected = {
+                state.categoryInputText = it.text.value
+            }
+        )
     }
 }
 
 @Composable
 fun rememberCategoryState(
     options: List<Pair<MoneyType, Int>>,
-    categoryInputText: String
+    initialOptionIndex: Int,
+    categoryInputText: String,
 ): CategoryState {
     return rememberSaveable(saver = CategoryState.Saver) {
-        CategoryState(options = options, categoryInputText = categoryInputText)
+        CategoryState(options = options, selectedIndex = initialOptionIndex, categoryInputText = categoryInputText)
     }
 }
 

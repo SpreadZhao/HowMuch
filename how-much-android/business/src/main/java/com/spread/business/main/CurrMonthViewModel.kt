@@ -98,6 +98,14 @@ class CurrMonthViewModel : ViewModel() {
         selectedTimeFlow.value = cal.timeInMillis
     }
 
+    fun selectMonthDelta(delta: Int) {
+        val cal = Calendar.getInstance().apply {
+            timeInMillis = selectedTimeFlow.value
+            add(Calendar.MONTH, delta)
+        }
+        selectedTimeFlow.value = cal.timeInMillis
+    }
+
     fun showEditRecordDialog(record: MoneyRecord? = null) {
         _showEditRecordDialogFlow.value = EditRecordDialogState.Show(record)
     }
@@ -105,8 +113,5 @@ class CurrMonthViewModel : ViewModel() {
     fun hideEditRecordDialog() {
         _showEditRecordDialogFlow.value = EditRecordDialogState.Hide
     }
-
-    val isEditRecordDialogShowing: Boolean
-        get() = _showEditRecordDialogFlow.value is EditRecordDialogState.Show
 
 }

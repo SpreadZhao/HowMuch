@@ -1,7 +1,6 @@
 package com.spread.business.main.category
 
 import android.util.Log
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.spread.db.category.Category
@@ -90,7 +89,7 @@ class CategoryViewModel(
      * @param index 分类项的索引
      */
     fun setTop(index: Int) {
-        if (index < 0 || index >= (categoryState.value?.itemList?.size?: 0)) {
+        if (index < 0 || index >= (categoryState.value?.itemList?.size ?: 0)) {
             return
         }
         val category = _category ?: return
@@ -114,10 +113,10 @@ class CategoryViewModel(
      * @param index 分类项的索引
      */
     fun cancelTop(index: Int) {
-        if (index < 0 || index >= (categoryState.value?.itemList?.size?: 0)) {
+        if (index < 0 || index >= (categoryState.value?.itemList?.size ?: 0)) {
             return
         }
-        val category = _category?: return
+        val category = _category ?: return
         val item = category.itemList[index]
         item.setTopTS = 0L
         // calculate the index of the item by usage count
@@ -147,7 +146,7 @@ class CategoryViewModel(
      * @param icon 分类项的图标
      */
     fun add(text: String, icon: String) {
-        val category = _category?: return
+        val category = _category ?: return
         category.itemList.add(CategoryItem(text, icon))
         viewModelScope.launch {
             _categoryState.emit(category.toCategoryModel())
@@ -160,10 +159,10 @@ class CategoryViewModel(
      * @return 删除的分类项，如果没有删除任何项，则返回null
      */
     fun remove(index: Int): CategoryItem? {
-        if (index < 0 || index >= (categoryState.value?.itemList?.size?: 0)) {
+        if (index < 0 || index >= (categoryState.value?.itemList?.size ?: 0)) {
             return null
         }
-        val category = _category?: return null
+        val category = _category ?: return null
         val item = category.itemList.removeAt(index)
         viewModelScope.launch {
             saveCategory(category)
@@ -179,10 +178,10 @@ class CategoryViewModel(
      * @param index 分类项的索引
      */
     fun increaseUsageCount(index: Int) {
-        if (index < 0 || index >= (categoryState.value?.itemList?.size?: 0)) {
+        if (index < 0 || index >= (categoryState.value?.itemList?.size ?: 0)) {
             return
         }
-        val category = _category?: return
+        val category = _category ?: return
         val item = category.itemList[index]
         item.usageCount++
         viewModelScope.launch {
@@ -196,7 +195,7 @@ class CategoryViewModel(
      * @return 前n个使用次数最多的分类项，如果没有分类项，则返回空列表
      */
     fun getTopN(n: Int): List<CategoryItem> {
-        val category = _category?: return emptyList()
+        val category = _category ?: return emptyList()
         sortCategory(category)
         return category.itemList.take(n)
     }
@@ -205,7 +204,7 @@ class CategoryViewModel(
 class TopNCategoryViewModel(
     private val fileRepo: CategoryRepository,
     private val n: Int
-): ViewModel() {
+) : ViewModel() {
     // 仿照上面CategoryViewModel的写法
     // 但是没有保存到文件中，而是直接从CategoryViewModel中获取
     // 这样可以避免重复加载文件
@@ -229,7 +228,7 @@ class TopNCategoryViewModel(
     }
 
     fun select(index: Int) {
-        if (index < 0 || index >= (categoryState.value?.itemList?.size?: 0)) {
+        if (index < 0 || index >= (categoryState.value?.itemList?.size ?: 0)) {
             return
         }
         _selectedIdx.value = index

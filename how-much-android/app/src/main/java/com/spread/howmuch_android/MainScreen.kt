@@ -11,10 +11,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.navigation.activity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.spread.business.main.CurrMonthSurface
+import com.spread.business.outside.QuickAddRecordActivity
 import com.spread.debug.DebugSurface
 import kotlinx.serialization.Serializable
 
@@ -28,6 +30,9 @@ sealed interface Route {
 
     @Serializable
     data object Debug : Route
+
+    @Serializable
+    data object QuickAddRecord : Route
 }
 
 
@@ -57,6 +62,9 @@ fun MainScreen() {
             ) {
                 composable<Route.Monthly> { CurrMonthSurface() }
                 composable<Route.Debug> { DebugSurface() }
+                activity<Route.QuickAddRecord> {
+                    activityClass = QuickAddRecordActivity::class
+                }
             }
         }
     }
