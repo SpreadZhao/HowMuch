@@ -2,20 +2,20 @@ package com.spread.business.main.category
 
 import android.content.Context
 import androidx.compose.foundation.Image
-import com.spread.business.R
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -27,9 +27,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -62,9 +64,9 @@ fun CategorySurface(onViewModelReady: ((CategoryViewModel) -> Unit)? = null) {
     Column {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 80.dp),
-            contentPadding = PaddingValues(horizontal = 5.dp, vertical = 5.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-            horizontalArrangement = Arrangement.spacedBy(2.dp)
+            contentPadding = PaddingValues(0.dp),
+            verticalArrangement = Arrangement.spacedBy(0.dp),
+            horizontalArrangement = Arrangement.spacedBy(0.dp)
         ) {
             category?.itemList?.withIndex()?.forEach { (index, categoryItem) ->
                 item(key = index) {
@@ -102,7 +104,8 @@ fun TopNCategorySurface(n: Int, onViewModelReady: ((TopNCategoryViewModel) -> Un
     }
     Column {
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 100.dp)
+            columns = GridCells.Adaptive(minSize = 100.dp),
+            contentPadding = PaddingValues(0.dp)
         ) {
             category?.itemList?.withIndex()?.forEach { (index, categoryItem) ->
                 item(key = index) {
@@ -120,36 +123,42 @@ fun TopNCategorySurface(n: Int, onViewModelReady: ((TopNCategoryViewModel) -> Un
 
 @Composable
 fun CategoryTag(item: CategoryItemModel, isActive: State<Boolean>, onClickAction: () -> Unit) {
-    Button(
-        modifier = Modifier.padding(0.dp),
-        onClick = onClickAction,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = if (isActive.value) {
-                Color.Blue
-            } else {
-                Color.LightGray
-            }
-        ),
-        contentPadding = PaddingValues(0.dp)
+    val scheme = MaterialTheme.colorScheme
+    val interactionSource = remember { MutableInteractionSource() }
+    Box(
+        modifier = Modifier
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(),  // 点击时的水波效果
+                onClick = onClickAction,
+                enabled = true,
+                role = null
+            )
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp),
-            horizontalArrangement = Arrangement.spacedBy(5.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.fillMaxWidth().height(80.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically)
         ) {
-            CategoryItemIcon(item)
+            val color = if (isActive.value) {
+                scheme.primary
+            } else {
+                scheme.onSurface
+            }
+            CategoryItemIcon(item, color)
             Text(
                 text = item.text.value,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
-                maxLines = 1
+                color = color,
+                maxLines = 1,
+                textAlign = TextAlign.Center
             )
         }
     }
 }
 
 @Composable
-fun CategoryItemIcon(categoryItem: CategoryItemModel) {
+fun CategoryItemIcon(categoryItem: CategoryItemModel, color: Color) {
     val context = LocalContext.current
     val drawableResId = getDrawableResId(context, categoryItem.icon.value)
 
@@ -158,7 +167,8 @@ fun CategoryItemIcon(categoryItem: CategoryItemModel) {
         Image(
             painter = painterResource(id = drawableResId),
             contentDescription = categoryItem.text.value,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(24.dp),
+            colorFilter = ColorFilter.tint(color)
         )
     } else {
         // 使用导入到应用沙箱的图标
