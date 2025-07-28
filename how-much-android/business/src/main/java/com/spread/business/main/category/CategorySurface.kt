@@ -142,7 +142,9 @@ fun CategoryTag(item: CategoryItemModel, isActive: State<Boolean>, onClickAction
             )
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().height(80.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically)
         ) {

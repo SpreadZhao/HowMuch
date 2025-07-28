@@ -333,7 +333,11 @@ fun rememberCategoryState(
     categoryInputText: String,
 ): CategoryState {
     return rememberSaveable(saver = CategoryState.Saver) {
-        CategoryState(options = options, selectedIndex = initialOptionIndex, categoryInputText = categoryInputText)
+        CategoryState(
+            options = options,
+            selectedIndex = initialOptionIndex,
+            categoryInputText = categoryInputText
+        )
     }
 }
 

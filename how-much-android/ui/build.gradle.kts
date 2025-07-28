@@ -52,6 +52,7 @@ dependencies {
     api(libs.androidx.ui)
     api(libs.androidx.ui.graphics)
     api(libs.androidx.material3)
+    implementation(libs.vico.compose.m3)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(project(":common"))
     androidTestImplementation(platform(libs.androidx.compose.bom))
