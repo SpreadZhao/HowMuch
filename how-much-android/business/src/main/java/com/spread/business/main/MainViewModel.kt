@@ -18,7 +18,13 @@ sealed interface EditRecordDialogState {
     data object Hide : EditRecordDialogState
 }
 
-class CurrMonthViewModel : ViewModel() {
+enum class ViewType {
+    CurrMonthRecords,
+    MonthlyStatistics,
+    YearlyStatistics
+}
+
+class MainViewModel : ViewModel() {
 
     companion object {
         private val calendar = Calendar.getInstance()
@@ -40,6 +46,9 @@ class CurrMonthViewModel : ViewModel() {
         MutableStateFlow<EditRecordDialogState>(EditRecordDialogState.Hide)
     val showEditRecordDialogFlow: StateFlow<EditRecordDialogState> = _showEditRecordDialogFlow
 
+    private var _viewTypeFlow = MutableStateFlow<ViewType>(ViewType.CurrMonthRecords)
+    val viewTypeFlow: StateFlow<ViewType> = _viewTypeFlow
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val currMonthMoneyRecordsFlow = selectedTimeFlow
         .flatMapLatest { time ->
@@ -51,6 +60,16 @@ class CurrMonthViewModel : ViewModel() {
             emptyList()
         )
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val currYearMoneyRecordsFlow = selectedTimeFlow
+        .flatMapLatest { time ->
+            Money.listenRecordsOfYear(time)
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            emptyList()
+        )
 
     val selectedYearFlow: StateFlow<Int> = selectedTimeFlow
         .map { timeInMillis ->
@@ -89,21 +108,22 @@ class CurrMonthViewModel : ViewModel() {
         )
 
     fun select(year: Int, month: Int) {
-        val cal = Calendar.getInstance().apply {
+        selectedTimeFlow.value = calendar.run {
             clear()
             set(Calendar.YEAR, year)
             set(Calendar.MONTH, month)
             set(Calendar.DAY_OF_MONTH, 1)
+            timeInMillis
         }
-        selectedTimeFlow.value = cal.timeInMillis
     }
 
     fun selectMonthDelta(delta: Int) {
-        val cal = Calendar.getInstance().apply {
+        selectedTimeFlow.value = calendar.run {
+            clear()
             timeInMillis = selectedTimeFlow.value
             add(Calendar.MONTH, delta)
+            timeInMillis
         }
-        selectedTimeFlow.value = cal.timeInMillis
     }
 
     fun showEditRecordDialog(record: MoneyRecord? = null) {
@@ -112,6 +132,10 @@ class CurrMonthViewModel : ViewModel() {
 
     fun hideEditRecordDialog() {
         _showEditRecordDialogFlow.value = EditRecordDialogState.Hide
+    }
+
+    fun changeViewType(viewType: ViewType) {
+        _viewTypeFlow.value = viewType
     }
 
 }

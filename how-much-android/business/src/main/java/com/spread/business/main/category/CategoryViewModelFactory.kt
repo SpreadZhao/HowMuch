@@ -2,7 +2,6 @@ package com.spread.business.main.category
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.spread.business.main.category.CategoryViewModel
 import com.spread.db.category.CategoryRepository
 
 class CategoryViewModelFactory(

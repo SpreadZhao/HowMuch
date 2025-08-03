@@ -75,6 +75,25 @@ object Money {
         return database.moneyDao().listenRecordsByDateRange(start, end)
     }
 
+    fun listenRecordsOfYear(time: Long): Flow<List<MoneyRecord>> {
+        val (start, end) = getYearRangeFromTime(time)
+        return database.moneyDao().listenRecordsByDateRange(start, end)
+    }
+
+    private fun getYearRangeFromTime(time: Long): Pair<Long, Long> {
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = time
+        calendar.set(Calendar.DAY_OF_YEAR, 1)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        val startTime = calendar.timeInMillis
+        calendar.add(Calendar.YEAR, 1)
+        val endTime = calendar.timeInMillis - 1
+        return startTime to endTime
+    }
+
     private fun getMonthRangeFromTime(time: Long): Pair<Long, Long> {
         val calendar = Calendar.getInstance()
         calendar.time = Date(time)

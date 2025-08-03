@@ -128,7 +128,7 @@ fun RecordDetailDialog(
     var inputCategory by remember { mutableStateOf(record.category) }
     var inputRemark by remember { mutableStateOf(record.remark) }
     var inputValue by remember { mutableStateOf(record.value.toString()) }
-    val viewModel: CurrMonthViewModel = viewModel()
+    val viewModel: MainViewModel = viewModel()
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
             modifier = Modifier

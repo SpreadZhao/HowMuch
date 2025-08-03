@@ -19,7 +19,7 @@ import androidx.navigation.activity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.spread.business.main.CurrMonthSurface
+import com.spread.business.main.MainSurface
 import com.spread.business.main.category.CategorySurface
 import com.spread.business.outside.QuickAddRecordActivity
 import com.spread.db.money.MoneyType
@@ -173,7 +173,7 @@ fun DebugAll() {
 
 @Composable
 fun DebugCurrMonth() {
-    CurrMonthSurface()
+    MainSurface(viewModel())
 }
 
 @Composable
