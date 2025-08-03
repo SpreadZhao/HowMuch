@@ -1,6 +1,7 @@
 package com.spread.ui
 
 import android.graphics.Color
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -48,7 +49,7 @@ fun ColumnChart(modifier: Modifier = Modifier, color: Int = ChartConstant.DEFAUL
             rememberColumnCartesianLayer(
                 columnProvider = columnProvider,
                 dataLabel = TextComponent(
-                    color = Color.WHITE,
+                    color = if (isSystemInDarkTheme()) Color.WHITE else Color.BLACK,
                     textSizeSp = 14f
                 )
             ),
