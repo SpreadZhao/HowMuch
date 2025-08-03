@@ -1,8 +1,6 @@
 package com.spread.ui
 
 import android.graphics.Color
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
