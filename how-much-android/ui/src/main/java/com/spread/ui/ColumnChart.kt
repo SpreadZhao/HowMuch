@@ -21,7 +21,7 @@ import com.patrykandpatrick.vico.core.common.shape.Shape
 
 private class ChartConstant {
     companion object {
-        val DEFAULT_COLOR = Color.argb(255,   74,177, 74)
+        val DEFAULT_COLOR = Color.argb(255, 74, 177, 74)
     }
 }
 
