@@ -1,20 +1,21 @@
-- [ ] MoneyRecord Class
-- [ ] Database with CURD test case
-- [ ] Using coroutine to utilize database services
-- [ ] Current month records data layer
-- [x] Import plain json text
-- [ ] Migrate: UI
-- [ ] Migrate: boundary & exception check
-- [ ] MoneyExt in Money service
-- [ ] TrackNode: https://chatgpt.com/share/6814fe62-1a64-800f-b75b-c532972cd62d
-- [ ] Measure.sh
-- [ ] Categories preset when inserting record
-- [ ] Money value input enhance
-- [ ] Hint tag after date select when insert record, which contains: [Today, Yesterday]
-- [ ] App color scheme
-- [ ] App Settings Framework
+- [x] (P0) Feature: MoneyRecord Class
+- [x] (P1) Feature: Database with CURD test case
+- [ ] (P1) Opt: Using coroutine to utilize database services
+- [x] (P0) Feature: Current month records data layer
+- [x] (P0) Feature: Import plain json text
+- [ ] (P0) Feature: Migrate: UI
+- [ ] (P1) Bug: Migrate: boundary & exception check
+- [ ] (P2) Opt: MoneyExt in Money service
+- [ ] (P2) Opt: TrackNode: https://chatgpt.com/share/6814fe62-1a64-800f-b75b-c532972cd62d
+- [ ] (P2) Opt: Measure.sh
+- [ ] (P1) Feature: Categories preset when inserting record
+- [ ] (P1) Feature: Money value input enhance
+- [ ] (P2) Opt: Hint tag after date select when insert record, which contains: [Today, Yesterday]
+- [ ] (P0) Feature: App color scheme
 - [ ] (P1) Select time(not only date) manually when inserting record
 - [ ] (P0) Opt: Move InsertRecord to a independent page, users can launch it directly from outside
 - [ ] (P1) Feature: Widget
 - [ ] (P2) Feature: Custom date range statistics and records
 - [ ] (P2) Feature: Remark hint
+- [ ] (P0) Feature: Recent 7 days statistics chart
+- [ ] (P0) Feature: App Settings Framework
