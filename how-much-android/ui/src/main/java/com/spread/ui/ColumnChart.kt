@@ -1,6 +1,8 @@
 package com.spread.ui
 
 import android.graphics.Color
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -17,9 +19,16 @@ import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
 import com.patrykandpatrick.vico.core.common.Fill
 import com.patrykandpatrick.vico.core.common.component.TextComponent
+import com.patrykandpatrick.vico.core.common.shape.Shape
+
+private class ChartConstant {
+    companion object {
+        val DEFAULT_COLOR = Color.argb(255,   74,177, 74)
+    }
+}
 
 @Composable
-fun ColumnChart(modifier: Modifier = Modifier) {
+fun ColumnChart(modifier: Modifier = Modifier, color: Int = ChartConstant.DEFAULT_COLOR) {
     val producer = remember { CartesianChartModelProducer() }
     LaunchedEffect(Unit) {
         producer.runTransaction {
@@ -29,7 +38,11 @@ fun ColumnChart(modifier: Modifier = Modifier) {
         }
     }
     val columnProvider = ColumnCartesianLayer.ColumnProvider.series(
-        rememberLineComponent(fill = Fill(Color.BLUE), thickness = 2.dp)
+        rememberLineComponent(
+            fill = Fill(color),
+            thickness = 8.dp,
+            shape = Shape.Rectangle
+        )
     )
 
     CartesianChartHost(
@@ -37,8 +50,8 @@ fun ColumnChart(modifier: Modifier = Modifier) {
             rememberColumnCartesianLayer(
                 columnProvider = columnProvider,
                 dataLabel = TextComponent(
-                    color = android.graphics.Color.CYAN,
-                    textSizeSp = 7f
+                    color = Color.WHITE,
+                    textSizeSp = 14f
                 )
             ),
             bottomAxis = HorizontalAxis.rememberBottom()
