@@ -47,6 +47,7 @@ import java.util.Date
 @Composable
 fun MoneyRecordCardForOneDay(
     modifier: Modifier = Modifier,
+    viewModel: MainViewModel,
     records: List<MoneyRecord>
 ) {
     Column(
@@ -61,7 +62,7 @@ fun MoneyRecordCardForOneDay(
             fontWeight = FontWeight.Bold
         )
         for (record in records) {
-            RecordItem(modifier = Modifier.padding(10.dp), record = record)
+            RecordItem(modifier = Modifier.padding(10.dp), viewModel = viewModel, record = record)
         }
     }
 }
@@ -69,6 +70,7 @@ fun MoneyRecordCardForOneDay(
 @Composable
 fun RecordItem(
     modifier: Modifier = Modifier,
+    viewModel: MainViewModel,
     record: MoneyRecord
 ) {
     val scope = rememberCoroutineScope()
@@ -116,19 +118,19 @@ fun RecordItem(
         )
     }
     if (showDetail) {
-        RecordDetailDialog(record = record, onDismissRequest = { showDetail = false })
+        RecordDetailDialog(record = record, viewModel, onDismissRequest = { showDetail = false })
     }
 }
 
 @Composable
 fun RecordDetailDialog(
     record: MoneyRecord,
+    viewModel: MainViewModel,
     onDismissRequest: () -> Unit
 ) {
     var inputCategory by remember { mutableStateOf(record.category) }
     var inputRemark by remember { mutableStateOf(record.remark) }
     var inputValue by remember { mutableStateOf(record.value.toString()) }
-    val viewModel: MainViewModel = viewModel()
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
             modifier = Modifier

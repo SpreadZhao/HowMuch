@@ -98,7 +98,7 @@ fun MainSurface(viewModel: MainViewModel) {
             Crossfade(
                 targetState = viewType,
                 label = "ViewType"
-            ) {
+            ) { type ->
                 var offset by remember { mutableFloatStateOf(0f) }
                 val modifier = Modifier
                     .fillMaxSize()
@@ -120,7 +120,7 @@ fun MainSurface(viewModel: MainViewModel) {
                         reverseDirection = true,
                         orientation = Orientation.Horizontal
                     )
-                when (it) {
+                when (type) {
                     ViewType.CurrMonthRecords -> {
                         LazyColumn(
                             modifier = modifier,
@@ -142,6 +142,7 @@ fun MainSurface(viewModel: MainViewModel) {
                                                 dampingRatio = Spring.DampingRatioMediumBouncy
                                             )
                                         ),
+                                        viewModel = viewModel,
                                         records = dailyRecords
                                     )
                                 }

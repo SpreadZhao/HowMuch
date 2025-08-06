@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.stateIn
 import java.util.Calendar
 
 sealed interface EditRecordDialogState {
-    class Show(val record: MoneyRecord? = null) : EditRecordDialogState
+    data class Show(val record: MoneyRecord? = null) : EditRecordDialogState
     data object Hide : EditRecordDialogState
 }
 
