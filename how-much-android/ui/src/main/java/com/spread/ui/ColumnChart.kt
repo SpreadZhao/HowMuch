@@ -50,7 +50,7 @@ fun ColumnChart(modifier: Modifier = Modifier, color: Int = ChartConstant.DEFAUL
                 columnProvider = columnProvider,
                 dataLabel = TextComponent(
                     color = if (isSystemInDarkTheme()) Color.WHITE else Color.BLACK,
-                    textSizeSp = 14f
+                    textSizeSp = 7f
                 )
             ),
             bottomAxis = HorizontalAxis.rememberBottom()

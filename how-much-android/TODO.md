@@ -20,3 +20,5 @@
 - [ ] (P0) Feature: Recent 7 days statistics chart
 - [ ] (P0) Feature: App Settings Framework
 - [ ] (P0) Feature: Category synchronization on editing
+- [ ] (P0) Opt: Crash detection
+- [ ] (P1) Feature: Regret snackbar after deleting record

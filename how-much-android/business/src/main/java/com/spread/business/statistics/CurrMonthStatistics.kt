@@ -72,6 +72,7 @@ fun CurrMonthStatistics(
             modifier = Modifier
                 .wrapContentWidth()
                 .height(with(LocalDensity.current) { minHeight.toDp() })
+                .padding(start = 16.dp)
         )
     }
 }
@@ -93,7 +94,7 @@ fun MonthlyStatisticItem(
             modifier = Modifier.padding(start = 8.dp),
             text = text,
             style = LocalTextStyle.current.copy(
-                fontSize = TextConstants.FONT_SIZE_H2
+                fontSize = TextConstants.FONT_SIZE_H3
             )
         )
     }
