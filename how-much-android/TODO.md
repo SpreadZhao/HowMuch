@@ -19,3 +19,4 @@
 - [ ] (P2) Feature: Remark hint
 - [ ] (P0) Feature: Recent 7 days statistics chart
 - [ ] (P0) Feature: App Settings Framework
+- [ ] (P0) Feature: Category synchronization on editing

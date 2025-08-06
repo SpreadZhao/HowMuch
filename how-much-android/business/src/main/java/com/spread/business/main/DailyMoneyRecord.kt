@@ -30,7 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.spread.common.DATE_FORMAT_MONTH_DAY_STR
 import com.spread.common.DATE_FORMAT_YEAR_MONTH_DAY_TIME_STR
 import com.spread.common.dateStr
@@ -74,7 +73,7 @@ fun RecordItem(
     record: MoneyRecord
 ) {
     val scope = rememberCoroutineScope()
-    var showDetail by remember { mutableStateOf(false) }
+//    var showDetail by remember { mutableStateOf(false) }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -93,7 +92,8 @@ fun RecordItem(
                 )
             }
             .clickable {
-                showDetail = true
+//                showDetail = true
+                viewModel.showEditRecordDialog(record)
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -117,9 +117,9 @@ fun RecordItem(
             fontSize = TextConstants.FONT_SIZE_H2
         )
     }
-    if (showDetail) {
-        RecordDetailDialog(record = record, viewModel, onDismissRequest = { showDetail = false })
-    }
+//    if (showDetail) {
+//        RecordDetailDialog(record = record, viewModel, onDismissRequest = { showDetail = false })
+//    }
 }
 
 @Composable
@@ -206,7 +206,6 @@ fun RecordMemberItem(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "$key: ")
         EasyTextField(
             modifier = Modifier.wrapContentSize(),
             value = value,
