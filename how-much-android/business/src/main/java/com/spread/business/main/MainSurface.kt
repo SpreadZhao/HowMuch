@@ -52,6 +52,7 @@ import java.util.Calendar
 fun MainSurface(viewModel: MainViewModel) {
     val scope = rememberCoroutineScope()
     val currMonthRecords by viewModel.currMonthMoneyRecordsFlow.collectAsState()
+    val currYearRecords by viewModel.currYearMoneyRecordsFlow.collectAsState()
     val selectedMonth by viewModel.selectedMonthFlow.collectAsState()
     val selectedYear by viewModel.selectedYearFlow.collectAsState()
     val listState = rememberLazyListState()
@@ -66,14 +67,24 @@ fun MainSurface(viewModel: MainViewModel) {
                 .fillMaxWidth()
                 .wrapContentHeight()
         ) {
-            MonthSelector(
-                modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
-                year = selectedYear,
-                month = selectedMonth,
-                onMonthChange = { year, month ->
-                    viewModel.select(year, month)
-                }
-            )
+            if (viewType == ViewType.YearlyStatistics) {
+                YearSelector(
+                    modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
+                    year = selectedYear,
+                    onYearChange = { year ->
+                        viewModel.select(year, selectedMonth)
+                    }
+                )
+            } else {
+                MonthSelector(
+                    modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
+                    year = selectedYear,
+                    month = selectedMonth,
+                    onMonthChange = { year, month ->
+                        viewModel.select(year, month)
+                    }
+                )
+            }
             CurrMonthStatistics(
                 modifier = Modifier
                     .fillMaxWidth()

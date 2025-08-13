@@ -68,6 +68,48 @@ fun InlineDatePicker(
 }
 
 @Composable
+fun YearPicker(
+    year: Int,
+    onConfirm: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val years = (2000..2100).toList()
+
+    val yearState = rememberLazyListState(initialFirstVisibleItemIndex = years.indexOf(year))
+
+    var selectedYear by remember { mutableIntStateOf(year) }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            // 年选择器
+            PickerList(
+                items = years,
+                state = yearState,
+                label = "年",
+                onSelectedItemChanged = {
+                    selectedYear = it
+                }
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        Button(onClick = {
+            onConfirm(selectedYear)
+        }) {
+            Text("确定")
+        }
+    }
+
+}
+
+@Composable
 fun YearMonthPicker(
     year: Int,
     month: Int,

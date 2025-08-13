@@ -22,14 +22,88 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.spread.ui.TextConstants
 import com.spread.ui.YearMonthPicker
+import com.spread.ui.YearPicker
 import java.util.Calendar
+
+@Composable
+fun YearSelector(
+    modifier: Modifier = Modifier,
+    year: Int,
+    onYearChange: (Int) -> Unit
+) {
+    var showPicker by remember { mutableStateOf(false) }
+
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        IconButton(onClick = {
+            // 上一月
+            val cal = Calendar.getInstance().apply {
+                set(Calendar.YEAR, year)
+                add(Calendar.YEAR, -1)
+            }
+            onYearChange(cal.get(Calendar.YEAR))
+        }) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous Year")
+        }
+
+        Text(
+            text = "${year}年",
+            modifier = Modifier
+                .clickable { showPicker = true }
+                .padding(horizontal = 16.dp),
+            fontSize = TextConstants.FONT_SIZE_H1
+        )
+
+        IconButton(onClick = {
+            // 下一月
+            val cal = Calendar.getInstance().apply {
+                set(Calendar.YEAR, year)
+                add(Calendar.YEAR, 1)
+            }
+            onYearChange(cal.get(Calendar.YEAR))
+        }) {
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next Year")
+        }
+    }
+
+    if (showPicker) {
+        AlertDialog(
+            onDismissRequest = { showPicker = false },
+            title = {
+                Row {
+                    Text("选择年")
+                    Spacer(modifier = Modifier.weight(1f))
+                    TextButton(
+                        onClick = {
+                            val cal = Calendar.getInstance()
+                            onYearChange(cal.get(Calendar.YEAR))
+                            showPicker = false
+                        }
+                    ) {
+                        Text(text = "Today")
+                    }
+                }
+            },
+            text = {
+                YearPicker(
+                    year = year,
+                    onConfirm = { y ->
+                        onYearChange(y)
+                        showPicker = false
+                    }
+                )
+            },
+            confirmButton = {},
+            dismissButton = {}
+        )
+    }
+}
 
 @Composable
 fun MonthSelector(
     modifier: Modifier = Modifier,
     year: Int,
     month: Int,
-    onMonthChange: (Int, Int) -> Unit,
+    onMonthChange: (Int, Int) -> Unit
 ) {
     var showPicker by remember { mutableStateOf(false) }
 

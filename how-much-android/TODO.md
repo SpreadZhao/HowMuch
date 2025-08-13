@@ -13,7 +13,8 @@
 - [ ] (P2) Opt: Hint tag after date select when insert record, which contains: [Today, Yesterday]
 - [ ] (P0) Feature: App color scheme
 - [ ] (P1) Select time(not only date) manually when inserting record
-- [ ] (P0) Opt: Move InsertRecord to a independent page, users can launch it directly from outside
+- [ ] (P0) Feature: Move InsertRecord to a independent page, users can launch it directly from
+  outside
 - [ ] (P1) Feature: Widget
 - [ ] (P2) Feature: Custom date range statistics and records
 - [ ] (P2) Feature: Remark hint
@@ -22,3 +23,5 @@
 - [ ] (P0) Feature: Category synchronization on editing
 - [ ] (P0) Opt: Crash detection
 - [ ] (P1) Feature: Regret snackbar after deleting record
+- [ ] (P1) Opt: Scroll to top after inserting record
+- [ ] (P1) Opt: Split Month and Year Config, only load one in MainSurface
