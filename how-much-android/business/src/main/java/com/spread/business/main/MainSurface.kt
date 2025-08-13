@@ -12,6 +12,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
@@ -40,6 +41,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.spread.business.statistics.CurrMonthStatistics
 import com.spread.business.statistics.StatisticsScreen
@@ -61,7 +64,16 @@ fun MainSurface(viewModel: MainViewModel) {
     )
     val editRecordDialogState by viewModel.showEditRecordDialogFlow.collectAsState()
     val viewType by viewModel.viewTypeFlow.collectAsState()
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().pointerInput(Unit) {
+        // TODO: cannot zoom correctly because child detect touch event
+        detectTransformGestures { _, _, zoom, _ ->
+            if (zoom > 1f) {
+                viewModel.changeViewType(ViewType.MonthlyStatistics)
+            } else if (zoom < 1f) {
+                viewModel.changeViewType(ViewType.YearlyStatistics)
+            }
+        }
+    }) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
