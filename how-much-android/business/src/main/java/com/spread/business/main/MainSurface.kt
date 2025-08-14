@@ -11,10 +11,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,6 +49,7 @@ import com.spread.business.statistics.StatisticsScreen
 import com.spread.db.service.Money
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,13 +66,27 @@ fun MainSurface(viewModel: MainViewModel) {
     val editRecordDialogState by viewModel.showEditRecordDialogFlow.collectAsState()
     val viewType by viewModel.viewTypeFlow.collectAsState()
     Box(modifier = Modifier.fillMaxSize().pointerInput(Unit) {
-        // TODO: cannot zoom correctly because child detect touch event
-        detectTransformGestures { _, _, zoom, _ ->
-            if (zoom > 1f) {
-                viewModel.changeViewType(ViewType.MonthlyStatistics)
-            } else if (zoom < 1f) {
-                viewModel.changeViewType(ViewType.YearlyStatistics)
-            }
+        awaitEachGesture {
+            var initialZoom = 1f
+            awaitFirstDown()
+            do {
+                val event = awaitPointerEvent(PointerEventPass.Final)
+                val zoom = event.calculateZoom()
+                val ZOOM_THRESHOLD = 0.05f // 5% 缩放阈值
+                if (abs(zoom - 1f) > ZOOM_THRESHOLD) {
+                    // 处理缩放手势逻辑
+                    if (initialZoom * zoom > 1f) {
+                        viewModel.changeViewType(ViewType.MonthlyStatistics)
+                        initialZoom = 1f // 重置缩放状态
+                    } else if (initialZoom * zoom < 1f) {
+                        viewModel.changeViewType(ViewType.YearlyStatistics)
+                        initialZoom = 1f // 重置缩放状态
+                    } else {
+                        initialZoom *= zoom
+                    }
+                    event.changes.forEach { it.consume() }
+                }
+            } while (event.changes.any { it.pressed })
         }
     }) {
         Column(
@@ -126,23 +141,21 @@ fun MainSurface(viewModel: MainViewModel) {
                 val modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 20.dp)
-                    .draggable(
-                        state = rememberDraggableState { o ->
-                            offset += o
-                        },
-                        onDragStarted = {
-                            offset = 0f
-                        },
-                        onDragStopped = {
-                            if (offset < -100f) {
-                                viewModel.selectMonthDelta(-1)
-                            } else if (offset > 100f) {
-                                viewModel.selectMonthDelta(1)
+                    .pointerInput(type) {
+                        detectHorizontalDragGestures(
+                            onDragEnd = {
+                                if (offset > 100f) {
+                                    viewModel.selectMonthDelta(-1)
+                                } else if (offset < -100f) {
+                                    viewModel.selectMonthDelta(1)
+                                }
+                                offset = 0f
                             }
-                        },
-                        reverseDirection = true,
-                        orientation = Orientation.Horizontal
-                    )
+                        ) { change, dragAmount ->
+                            offset += dragAmount
+                            change.consume()
+                        }
+                    }
                 when (type) {
                     ViewType.CurrMonthRecords -> {
                         LazyColumn(
@@ -183,6 +196,7 @@ fun MainSurface(viewModel: MainViewModel) {
                     else -> {}
                 }
             }
+
         }
         AnimatedVisibility(
             visible = !listState.isScrollInProgress && editRecordDialogState !is EditRecordDialogState.Show && viewType == ViewType.CurrMonthRecords,
