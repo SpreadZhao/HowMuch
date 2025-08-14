@@ -1,6 +1,5 @@
 package com.spread.business.main
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
@@ -12,7 +11,6 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
@@ -49,7 +47,6 @@ import com.spread.business.statistics.StatisticsScreen
 import com.spread.db.service.Money
 import kotlinx.coroutines.launch
 import java.util.Calendar
-import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,30 +62,30 @@ fun MainSurface(viewModel: MainViewModel) {
     )
     val editRecordDialogState by viewModel.showEditRecordDialogFlow.collectAsState()
     val viewType by viewModel.viewTypeFlow.collectAsState()
-    Box(modifier = Modifier.fillMaxSize().pointerInput(Unit) {
-        awaitEachGesture {
-            var initialZoom = 1f
-            awaitFirstDown()
-            do {
-                val event = awaitPointerEvent(PointerEventPass.Final)
-                val zoom = event.calculateZoom()
-                val ZOOM_THRESHOLD = 0.05f // 5% 缩放阈值
-                if (abs(zoom - 1f) > ZOOM_THRESHOLD) {
-                    // 处理缩放手势逻辑
-                    if (initialZoom * zoom > 1f) {
-                        viewModel.changeViewType(ViewType.MonthlyStatistics)
-                        initialZoom = 1f // 重置缩放状态
-                    } else if (initialZoom * zoom < 1f) {
-                        viewModel.changeViewType(ViewType.YearlyStatistics)
-                        initialZoom = 1f // 重置缩放状态
-                    } else {
-                        initialZoom *= zoom
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                awaitEachGesture {
+                    var zoomViewType: ViewType? = null
+                    do {
+                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                        val zoom = event.calculateZoom()    // no zoom == 1f
+                        if (zoom > 1f) {
+                            zoomViewType = viewModel.prevZoomInViewType
+                            event.changes.forEach { it.consume() }
+                        } else if (zoom < 1f) {
+                            zoomViewType = ViewType.YearlyStatistics
+                            event.changes.forEach { it.consume() }
+                        }
+                        // exit when **all** finger lifted up, thus ensure
+                        // there's no event leaked to children
+                    } while (event.changes.any { it.pressed })
+                    if (zoomViewType != null) {
+                        viewModel.changeViewType(zoomViewType)
                     }
-                    event.changes.forEach { it.consume() }
                 }
-            } while (event.changes.any { it.pressed })
-        }
-    }) {
+            }) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -121,7 +118,6 @@ fun MainSurface(viewModel: MainViewModel) {
                         vertical = 10.dp
                     )
                     .clickable {
-                        Log.d("SpreaE", "viewModel: ${viewModel.hashCode()}")
                         if (viewType == ViewType.YearlyStatistics) {
                             return@clickable
                         }

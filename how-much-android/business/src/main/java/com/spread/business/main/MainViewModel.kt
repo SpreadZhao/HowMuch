@@ -49,6 +49,9 @@ class MainViewModel : ViewModel() {
     private var _viewTypeFlow = MutableStateFlow<ViewType>(ViewType.CurrMonthRecords)
     val viewTypeFlow: StateFlow<ViewType> = _viewTypeFlow
 
+    var prevZoomInViewType: ViewType = viewTypeFlow.value
+        private set
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val currMonthMoneyRecordsFlow = selectedTimeFlow
         .flatMapLatest { time ->
@@ -135,6 +138,8 @@ class MainViewModel : ViewModel() {
     }
 
     fun changeViewType(viewType: ViewType) {
+        viewTypeFlow.value.takeIf { it != ViewType.YearlyStatistics }
+            ?.let { prevZoomInViewType = it }
         _viewTypeFlow.value = viewType
     }
 

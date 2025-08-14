@@ -1,6 +1,6 @@
 package com.spread.business.main
 
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,7 +24,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -81,18 +80,16 @@ fun RecordItem(
                 strokeWidth = 0.5.dp,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            .pointerInput(record) {
-                detectTapGestures(
-                    onTap = {
-                        viewModel.showEditRecordDialog(record)
-                    },
-                    onLongPress = {
-                        scope.launch {
-                            Money.deleteRecords(record)
-                        }
+            .combinedClickable(
+                onClick = {
+                    viewModel.showEditRecordDialog(record)
+                },
+                onLongClick = {
+                    scope.launch {
+                        Money.deleteRecords(record)
                     }
-                )
-            },
+                }
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(

@@ -67,7 +67,7 @@ fun App() {
                             Log.d("SpreaE", "viewModel: ${viewModel.hashCode()}")
                             viewModel.changeViewType(
                                 if (viewType == ViewType.YearlyStatistics) {
-                                    ViewType.MonthlyStatistics
+                                    viewModel.prevZoomInViewType
                                 } else {
                                     ViewType.YearlyStatistics
                                 }
