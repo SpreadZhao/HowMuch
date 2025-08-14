@@ -129,6 +129,15 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    fun selectYearDelta(delta: Int) {
+        selectedTimeFlow.value = calendar.run {
+            clear()
+            timeInMillis = selectedTimeFlow.value
+            add(Calendar.YEAR, delta)
+            timeInMillis
+        }
+    }
+
     fun showEditRecordDialog(record: MoneyRecord? = null) {
         _showEditRecordDialogFlow.value = EditRecordDialogState.Show(record)
     }

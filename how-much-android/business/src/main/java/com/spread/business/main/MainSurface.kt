@@ -140,10 +140,15 @@ fun MainSurface(viewModel: MainViewModel) {
                     .pointerInput(type) {
                         detectHorizontalDragGestures(
                             onDragEnd = {
-                                if (offset > 100f) {
-                                    viewModel.selectMonthDelta(-1)
-                                } else if (offset < -100f) {
-                                    viewModel.selectMonthDelta(1)
+                                val step = when {
+                                    offset > 100f -> -1
+                                    offset < -100f -> 1
+                                    else -> return@detectHorizontalDragGestures
+                                }
+                                if (viewType == ViewType.YearlyStatistics) {
+                                    viewModel.selectYearDelta(step)
+                                } else {
+                                    viewModel.selectMonthDelta(step)
                                 }
                                 offset = 0f
                             }
@@ -189,7 +194,9 @@ fun MainSurface(viewModel: MainViewModel) {
                         )
                     }
 
-                    else -> {}
+                    ViewType.YearlyStatistics -> {
+                        Box(modifier = modifier)
+                    }
                 }
             }
 
