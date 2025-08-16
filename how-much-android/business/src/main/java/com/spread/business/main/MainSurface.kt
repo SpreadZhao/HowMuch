@@ -42,7 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import com.spread.business.statistics.CurrMonthStatistics
+import com.spread.business.statistics.StatisticsPanel
 import com.spread.business.statistics.StatisticsScreen
 import com.spread.db.service.Money
 import kotlinx.coroutines.launch
@@ -52,8 +52,11 @@ import java.util.Calendar
 @Composable
 fun MainSurface(viewModel: MainViewModel) {
     val scope = rememberCoroutineScope()
-    val currMonthRecords by viewModel.currMonthMoneyRecordsFlow.collectAsState()
-    val currYearRecords by viewModel.currYearMoneyRecordsFlow.collectAsState()
+    val viewType by viewModel.viewTypeFlow.collectAsState()
+    val records by when (viewType) {
+        ViewType.YearlyStatistics -> viewModel.currYearMoneyRecordsFlow.collectAsState()
+        else -> viewModel.currMonthMoneyRecordsFlow.collectAsState()
+    }
     val selectedMonth by viewModel.selectedMonthFlow.collectAsState()
     val selectedYear by viewModel.selectedYearFlow.collectAsState()
     val listState = rememberLazyListState()
@@ -61,7 +64,6 @@ fun MainSurface(viewModel: MainViewModel) {
         skipPartiallyExpanded = true
     )
     val editRecordDialogState by viewModel.showEditRecordDialogFlow.collectAsState()
-    val viewType by viewModel.viewTypeFlow.collectAsState()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -109,26 +111,28 @@ fun MainSurface(viewModel: MainViewModel) {
                     }
                 )
             }
-            CurrMonthStatistics(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(
-                        horizontal = 20.dp,
-                        vertical = 10.dp
-                    )
-                    .clickable {
-                        if (viewType == ViewType.YearlyStatistics) {
-                            return@clickable
-                        }
-                        if (viewType == ViewType.MonthlyStatistics) {
-                            viewModel.changeViewType(ViewType.CurrMonthRecords)
-                        } else {
-                            viewModel.changeViewType(ViewType.MonthlyStatistics)
-                        }
-                    },
-                currMonthRecords = currMonthRecords
-            )
+            if (records.isNotEmpty()) {
+                StatisticsPanel(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(
+                            horizontal = 20.dp,
+                            vertical = 10.dp
+                        )
+                        .clickable {
+                            if (viewType == ViewType.YearlyStatistics) {
+                                return@clickable
+                            }
+                            if (viewType == ViewType.MonthlyStatistics) {
+                                viewModel.changeViewType(ViewType.CurrMonthRecords)
+                            } else {
+                                viewModel.changeViewType(ViewType.MonthlyStatistics)
+                            }
+                        },
+                    records = records
+                )
+            }
             Crossfade(
                 targetState = viewType,
                 label = "ViewType"
@@ -163,7 +167,7 @@ fun MainSurface(viewModel: MainViewModel) {
                             modifier = modifier,
                             state = listState
                         ) {
-                            currMonthRecords.groupBy {
+                            records.groupBy {
                                 Calendar.getInstance().run {
                                     timeInMillis = it.date
                                     get(Calendar.DAY_OF_MONTH)
@@ -187,15 +191,11 @@ fun MainSurface(viewModel: MainViewModel) {
                         }
                     }
 
-                    ViewType.MonthlyStatistics -> {
+                    ViewType.MonthlyStatistics, ViewType.YearlyStatistics -> {
                         StatisticsScreen(
                             modifier = modifier,
-                            records = currMonthRecords
+                            records = records
                         )
-                    }
-
-                    ViewType.YearlyStatistics -> {
-                        Box(modifier = modifier)
                     }
                 }
             }

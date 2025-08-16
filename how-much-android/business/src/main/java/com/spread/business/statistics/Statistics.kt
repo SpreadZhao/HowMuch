@@ -2,11 +2,9 @@ package com.spread.business.statistics
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
@@ -18,28 +16,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.spread.business.R
 import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
-import com.spread.ui.ColumnChart
 import com.spread.ui.TextConstants
 import com.spread.ui.toDp
 import java.math.BigDecimal
 
 @Composable
-fun CurrMonthStatistics(
+fun StatisticsPanel(
     modifier: Modifier = Modifier,
-    currMonthRecords: List<MoneyRecord>
+    records: List<MoneyRecord>
 ) {
-    val monthlyExpense = currMonthRecords.filter {
+    val monthlyExpense = records.filter {
         it.type == MoneyType.Expense
     }.sumOf {
         it.value
     }
-    val monthlyIncome = currMonthRecords.filter {
+    val monthlyIncome = records.filter {
         it.type == MoneyType.Income
     }.sumOf {
         it.value
@@ -52,33 +48,33 @@ fun CurrMonthStatistics(
                 .onGloballyPositioned {
                     minHeight = it.size.height
                 }) {
-            MonthlyStatisticItem(
+            StatisticItem(
                 iconId = R.drawable.ic_expense,
                 description = "Current Month Expense",
                 text = "-$monthlyExpense"
             )
-            MonthlyStatisticItem(
+            StatisticItem(
                 iconId = R.drawable.ic_income,
                 description = "Current Month Income",
                 text = "+$monthlyIncome"
             )
-            MonthlyStatisticItem(
+            StatisticItem(
                 iconId = R.drawable.ic_balance,
                 description = "Current Month Balance",
                 text = balance(income = monthlyIncome, expense = monthlyExpense)
             )
         }
-        ColumnChart(
-            modifier = Modifier
-                .wrapContentWidth()
-                .height(with(LocalDensity.current) { minHeight.toDp() })
-                .padding(start = 16.dp)
-        )
+//        ColumnChart(
+//            modifier = Modifier
+//                .wrapContentWidth()
+//                .height(with(LocalDensity.current) { minHeight.toDp() })
+//                .padding(start = 16.dp)
+//        )
     }
 }
 
 @Composable
-fun MonthlyStatisticItem(
+fun StatisticItem(
     modifier: Modifier = Modifier,
     iconId: Int,
     description: String,
