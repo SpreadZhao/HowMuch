@@ -240,19 +240,20 @@ fun MainSurface(viewModel: MainViewModel) {
                                 null
                             }
                             if (id != null && id > 0) {
-                                val targetGroupIndex = withTimeoutOrNull(300L) {
-                                    snapshotFlow {
-                                        records.groupByDay().indexOfFirst { dailyRecords ->
-                                            dailyRecords.any { it.id == id }
-                                        }
-                                    }.first { it >= 0 }
-                                }
+                                val targetGroupIndex =
+                                    if (!insert) null else withTimeoutOrNull(300L) {
+                                        snapshotFlow {
+                                            records.groupByDay().indexOfFirst { dailyRecords ->
+                                                dailyRecords.any { it.id == id }
+                                            }
+                                        }.first { it >= 0 }
+                                    }
 
                                 if (targetGroupIndex != null) {
                                     recordsListState.animateScrollToItem(targetGroupIndex)
-                                    records.find { it.id == id }?.let {
-                                        viewModel.blinkRecord(it, 1000L)
-                                    }
+                                }
+                                records.find { it.id == id }?.let {
+                                    viewModel.blinkRecord(it, 1000L)
                                 }
                             }
                         }.invokeOnCompletion {
