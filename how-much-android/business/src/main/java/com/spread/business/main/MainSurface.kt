@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import com.spread.business.statistics.StatisticsPanel
 import com.spread.business.statistics.StatisticsScreen
@@ -218,17 +219,18 @@ fun MainSurface(viewModel: MainViewModel) {
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .imePadding(),
-//                    .imeNestedScroll(),
                 onDismissRequest = {
                     viewModel.hideEditRecordDialog()
                 },
                 sheetState = sheetState
             ) {
+                val keyboardController = LocalSoftwareKeyboardController.current
                 RecordEdit(
                     record = (editRecordDialogState as? EditRecordDialogState.Show)?.record,
                     onSave = { record, insert ->
                         scope.launch {
                             sheetState.hide()
+                            keyboardController?.hide()
                             val id = if (insert && !sheetState.isVisible) {
                                 Money.insertRecords(record).firstOrNull()
                             } else if (!insert && !sheetState.isVisible) {
@@ -262,6 +264,7 @@ fun MainSurface(viewModel: MainViewModel) {
                     onCancel = {
                         scope.launch {
                             sheetState.hide()
+                            keyboardController?.hide()
                         }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
                                 viewModel.hideEditRecordDialog()
