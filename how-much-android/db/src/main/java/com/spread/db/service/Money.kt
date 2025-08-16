@@ -132,3 +132,12 @@ object Money {
 
 
 }
+
+fun List<MoneyRecord>.groupByDay(): List<List<MoneyRecord>> {
+    return groupBy {
+        Calendar.getInstance().run {
+            timeInMillis = it.date
+            get(Calendar.DAY_OF_MONTH)
+        }
+    }.values.toList().asReversed()
+}

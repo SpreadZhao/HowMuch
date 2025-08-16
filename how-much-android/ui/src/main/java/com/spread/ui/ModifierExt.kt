@@ -1,10 +1,14 @@
 package com.spread.ui
 
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 
@@ -24,3 +28,25 @@ fun Modifier.underline(strokeWidth: Dp, color: Color) = composed(
         }
     }
 )
+
+fun Modifier.detectZoomGesture(
+    onZoomIn: () -> Unit,
+    onZoomOut: () -> Unit,
+): Modifier = pointerInput(Unit) {
+    awaitEachGesture {
+        var zoomAction: (() -> Unit)? = null
+        do {
+            val event = awaitPointerEvent(PointerEventPass.Initial)
+            val zoom = event.calculateZoom() // no zoom == 1f
+            if (zoom > 1f) {
+                zoomAction = onZoomIn
+                event.changes.forEach { it.consume() }
+            } else if (zoom < 1f) {
+                zoomAction = onZoomOut
+                event.changes.forEach { it.consume() }
+            }
+            // exit when all fingers lifted up
+        } while (event.changes.any { it.pressed })
+        zoomAction?.invoke()
+    }
+}

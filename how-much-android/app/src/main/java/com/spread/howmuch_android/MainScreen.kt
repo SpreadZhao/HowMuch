@@ -108,6 +108,7 @@ fun App() {
                     IconButton(
                         onClick = {
                             if (viewType == ViewType.YearlyStatistics) {
+                                viewModel.changeViewType(viewModel.prevZoomInViewType)
                                 return@IconButton
                             }
                             if (viewType == ViewType.MonthlyStatistics) {

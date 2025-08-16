@@ -1,11 +1,15 @@
 package com.spread.business.main
 
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.spread.db.money.MoneyRecord
 import com.spread.db.service.Money
+import com.spread.db.service.groupByDay
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,9 +19,13 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Calendar
 
 sealed interface EditRecordDialogState {
@@ -176,7 +184,7 @@ class MainViewModel : ViewModel() {
         _viewTypeFlow.value = viewType
     }
 
-    suspend fun blinkRecord(record: MoneyRecord, duration: Long) {
+    private suspend fun blinkRecord(record: MoneyRecord, duration: Long) {
         _blinkingRecord.value = record
         delay(duration)
         _blinkingRecord.value = null
@@ -198,6 +206,41 @@ class MainViewModel : ViewModel() {
                 onResult
             )
         )
+    }
+
+    fun handleRecordEdit(
+        insert: Boolean,
+        record: MoneyRecord,
+        records: List<MoneyRecord>,
+        recordsListState: LazyListState
+    ) {
+        viewModelScope.launch(Dispatchers.Main) {
+            val id = withContext(Dispatchers.IO) {
+                if (insert) {
+                    Money.insertRecords(record).firstOrNull()
+                } else {
+                    Money.updateRecords(record)
+                    record.id
+                }
+            }
+
+            val targetGroupIndex =
+                if (!insert || id == null || id <= 0) null
+                else withTimeoutOrNull(300L) {
+                    snapshotFlow {
+                        records.groupByDay()
+                            .indexOfFirst { dailyRecords -> dailyRecords.any { it.id == id } }
+                    }.first { it >= 0 }
+                }
+
+            if (targetGroupIndex != null) {
+                recordsListState.animateScrollToItem(targetGroupIndex)
+            }
+
+            records.find { it.id == id }?.let {
+                blinkRecord(it, 1000L)
+            }
+        }
     }
 
 }
