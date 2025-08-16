@@ -16,6 +16,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -97,6 +98,20 @@ fun RecordItem(
                 onLongClick = {
                     scope.launch {
                         Money.deleteRecords(record)
+                        viewModel.showSnackbar(
+                            message = "Delete successfully",
+                            actionLabel = "Undo",
+                            withDismissAction = true
+                        ) { result ->
+                            if (result == SnackbarResult.ActionPerformed) {
+                                // TODO: why this not work?
+                                // scope.launch {
+                                //     Money.insertRecords(record)
+                                // }
+                                // Now I have to make this lambda suspend
+                                Money.insertRecords(record)
+                            }
+                        }
                     }
                 }
             ),

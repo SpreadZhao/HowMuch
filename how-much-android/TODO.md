@@ -22,7 +22,7 @@
 - [ ] (P0) Feature: App Settings Framework
 - [ ] (P0) Feature: Category synchronization on editing
 - [ ] (P0) Opt: Crash detection
-- [ ] (P1) Feature: Regret snackbar after deleting record
+- [x] (P1) Feature: Regret snackbar after deleting record
 - [x] (P1) Opt: Scroll to top after inserting record
 - [x] (P1) Opt: Split Month and Year Config, only load one in MainSurface
 - [ ] (P1) Feature: No rounded corner!!!

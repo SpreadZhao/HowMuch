@@ -1,14 +1,19 @@
 package com.spread.business.main
 
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.spread.db.money.MoneyRecord
 import com.spread.db.service.Money
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -18,6 +23,16 @@ import java.util.Calendar
 sealed interface EditRecordDialogState {
     data class Show(val record: MoneyRecord? = null) : EditRecordDialogState
     data object Hide : EditRecordDialogState
+}
+
+sealed interface UIEvent {
+    data class ShowSnackbar(
+        val message: String,
+        val actionLabel: String? = null,
+        val withDismissAction: Boolean = false,
+        val duration: SnackbarDuration = SnackbarDuration.Short,
+        val onResult: suspend (SnackbarResult) -> Unit
+    ) : UIEvent
 }
 
 enum class ViewType {
@@ -48,7 +63,7 @@ class MainViewModel : ViewModel() {
         MutableStateFlow<EditRecordDialogState>(EditRecordDialogState.Hide)
     val showEditRecordDialogFlow: StateFlow<EditRecordDialogState> = _showEditRecordDialogFlow
 
-    private var _viewTypeFlow = MutableStateFlow<ViewType>(ViewType.CurrMonthRecords)
+    private var _viewTypeFlow = MutableStateFlow(ViewType.CurrMonthRecords)
     val viewTypeFlow: StateFlow<ViewType> = _viewTypeFlow
 
     var prevZoomInViewType: ViewType = viewTypeFlow.value
@@ -56,6 +71,10 @@ class MainViewModel : ViewModel() {
 
     private var _blinkingRecord = MutableStateFlow<MoneyRecord?>(null)
     val blinkingRecord: StateFlow<MoneyRecord?> = _blinkingRecord
+
+    private var _uiEventFlow = MutableSharedFlow<UIEvent>()
+    val uiEventFlow: SharedFlow<UIEvent> get() = _uiEventFlow.asSharedFlow()
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val currMonthMoneyRecordsFlow = selectedTimeFlow
@@ -161,6 +180,24 @@ class MainViewModel : ViewModel() {
         _blinkingRecord.value = record
         delay(duration)
         _blinkingRecord.value = null
+    }
+
+    suspend fun showSnackbar(
+        message: String,
+        actionLabel: String? = null,
+        withDismissAction: Boolean = false,
+        duration: SnackbarDuration = SnackbarDuration.Short,
+        onResult: suspend (SnackbarResult) -> Unit
+    ) {
+        _uiEventFlow.emit(
+            UIEvent.ShowSnackbar(
+                message,
+                actionLabel,
+                withDismissAction,
+                duration,
+                onResult
+            )
+        )
     }
 
 }

@@ -8,11 +8,16 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
@@ -23,6 +28,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.spread.business.main.MainSurface
 import com.spread.business.main.MainViewModel
+import com.spread.business.main.UIEvent
 import com.spread.business.main.ViewType
 import com.spread.business.migrate.MigrateSurface
 import com.spread.business.outside.QuickAddRecordActivity
@@ -53,8 +59,31 @@ fun App() {
     val navController = rememberNavController()
     val viewModel: MainViewModel = viewModel()
     val viewType by viewModel.viewTypeFlow.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(viewModel.uiEventFlow) {
+        viewModel.uiEventFlow.collect { event ->
+            when (event) {
+                is UIEvent.ShowSnackbar -> {
+                    val result = snackbarHostState.showSnackbar(
+                        message = event.message,
+                        actionLabel = event.actionLabel,
+                        withDismissAction = event.withDismissAction,
+                        duration = event.duration
+                    )
+                    event.onResult.invoke(result)
+                }
+            }
+        }
+    }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) {
+                Snackbar(
+                    snackbarData = it
+                )
+            }
+        },
         topBar = {
             TopAppBar(
                 modifier = Modifier.pointerInput(Unit) {
