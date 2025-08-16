@@ -1,6 +1,5 @@
 package com.spread.howmuch_android
 
-import android.util.Log
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import com.spread.business.main.MainSurface
 import com.spread.business.main.MainViewModel
 import com.spread.business.main.ViewType
+import com.spread.business.migrate.MigrateSurface
 import com.spread.business.outside.QuickAddRecordActivity
 import com.spread.debug.DebugSurface
 import kotlinx.serialization.Serializable
@@ -42,6 +42,9 @@ sealed interface Route {
 
     @Serializable
     data object QuickAddRecord : Route
+
+    @Serializable
+    data object Migrate : Route
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,28 +67,48 @@ fun App() {
                 actions = {
                     IconButton(
                         onClick = {
-                            Log.d("SpreaE", "viewModel: ${viewModel.hashCode()}")
-                            viewModel.changeViewType(
-                                if (viewType == ViewType.YearlyStatistics) {
-                                    viewModel.prevZoomInViewType
-                                } else {
-                                    ViewType.YearlyStatistics
-                                }
-                            )
+                            if (viewType == ViewType.YearlyStatistics) {
+                                return@IconButton
+                            }
+                            if (viewType == ViewType.MonthlyStatistics) {
+                                viewModel.changeViewType(ViewType.CurrMonthRecords)
+                            } else {
+                                viewModel.changeViewType(ViewType.MonthlyStatistics)
+                            }
                         }
                     ) {
-                        if (viewType == ViewType.YearlyStatistics) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_expand),
-                                contentDescription = "Expand"
-                            )
-                        } else {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_collapse),
-                                contentDescription = "Collapse"
-                            )
+                        val (id, desc) = when (viewType) {
+                            ViewType.CurrMonthRecords -> R.drawable.ic_records to "Records"
+                            else -> R.drawable.ic_statistics to "Statistics"
                         }
+                        Icon(
+                            painter = painterResource(id = id),
+                            contentDescription = desc
+                        )
                     }
+//                    IconButton(
+//                        onClick = {
+//                            viewModel.changeViewType(
+//                                if (viewType == ViewType.YearlyStatistics) {
+//                                    viewModel.prevZoomInViewType
+//                                } else {
+//                                    ViewType.YearlyStatistics
+//                                }
+//                            )
+//                        }
+//                    ) {
+//                        if (viewType == ViewType.YearlyStatistics) {
+//                            Icon(
+//                                painter = painterResource(id = R.drawable.ic_expand),
+//                                contentDescription = "Expand"
+//                            )
+//                        } else {
+//                            Icon(
+//                                painter = painterResource(id = R.drawable.ic_collapse),
+//                                contentDescription = "Collapse"
+//                            )
+//                        }
+//                    }
                 },
                 title = { Text("HowMuch") }
             )
@@ -98,6 +121,7 @@ fun App() {
             ) {
                 composable<Route.Main> { MainSurface(viewModel) }
                 composable<Route.Debug> { DebugSurface() }
+                composable<Route.Migrate> { MigrateSurface() }
                 activity<Route.QuickAddRecord> {
                     activityClass = QuickAddRecordActivity::class
                 }

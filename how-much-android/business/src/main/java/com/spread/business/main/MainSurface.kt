@@ -9,7 +9,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -119,17 +118,7 @@ fun MainSurface(viewModel: MainViewModel) {
                         .padding(
                             horizontal = 20.dp,
                             vertical = 10.dp
-                        )
-                        .clickable {
-                            if (viewType == ViewType.YearlyStatistics) {
-                                return@clickable
-                            }
-                            if (viewType == ViewType.MonthlyStatistics) {
-                                viewModel.changeViewType(ViewType.CurrMonthRecords)
-                            } else {
-                                viewModel.changeViewType(ViewType.MonthlyStatistics)
-                            }
-                        },
+                        ),
                     records = records
                 )
             }

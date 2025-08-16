@@ -25,3 +25,4 @@
 - [ ] (P1) Feature: Regret snackbar after deleting record
 - [ ] (P1) Opt: Scroll to top after inserting record
 - [ ] (P1) Opt: Split Month and Year Config, only load one in MainSurface
+- [ ] (P1) Feature: No rounded corner!!!
