@@ -27,6 +27,7 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -42,7 +43,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import com.spread.business.R
-import com.spread.business.main.category.CategorySurface
+import com.spread.business.main.category.CategoryPanel
 import com.spread.common.DATE_FORMAT_YEAR_MONTH_DAY_STR
 import com.spread.common.calendar
 import com.spread.common.nowCalendar
@@ -318,9 +319,15 @@ fun Category(modifier: Modifier, state: CategoryState) {
             Spacer(modifier = Modifier.width(10.dp))
             SingleChoiceSegmentedButton(modifier = Modifier.wrapContentWidth(), state = state)
         }
-        CategorySurface(
+        CategoryPanel(
             onCategorySelected = {
                 state.categoryInputText = it.text.value
+            },
+            onViewModelReady = { viewModel ->
+                val index = viewModel.categoryState.value?.itemList?.indexOfFirst {
+                    it.text.value == state.categoryInputText
+                } ?: 0
+                viewModel.select(index)
             }
         )
     }

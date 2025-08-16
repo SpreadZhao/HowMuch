@@ -39,7 +39,7 @@ import com.spread.db.category.CategoryRepository
 import java.io.File
 
 @Composable
-fun CategorySurface(
+fun CategoryPanel(
     onCategorySelected: (categoryItem: CategoryItemModel) -> Unit,
     onViewModelReady: ((CategoryViewModel) -> Unit)? = null
 ) {

@@ -107,14 +107,10 @@ fun App() {
                     }
                     IconButton(
                         onClick = {
-                            if (viewType == ViewType.YearlyStatistics) {
-                                viewModel.changeViewType(viewModel.prevZoomInViewType)
-                                return@IconButton
-                            }
-                            if (viewType == ViewType.MonthlyStatistics) {
-                                viewModel.changeViewType(ViewType.CurrMonthRecords)
-                            } else {
+                            if (viewType == ViewType.CurrMonthRecords) {
                                 viewModel.changeViewType(ViewType.MonthlyStatistics)
+                            } else {
+                                viewModel.changeViewType(ViewType.CurrMonthRecords)
                             }
                         }
                     ) {
