@@ -1,5 +1,6 @@
 package com.spread.business.main
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +25,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,7 +47,8 @@ import java.util.Date
 fun MoneyRecordCardForOneDay(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel,
-    records: List<MoneyRecord>
+    records: List<MoneyRecord>,
+    blinkingRecord: MoneyRecord? = null
 ) {
     Column(
         modifier = modifier
@@ -59,7 +62,12 @@ fun MoneyRecordCardForOneDay(
             fontWeight = FontWeight.Bold
         )
         for (record in records) {
-            RecordItem(modifier = Modifier.padding(10.dp), viewModel = viewModel, record = record)
+            RecordItem(
+                modifier = Modifier.padding(10.dp),
+                viewModel = viewModel,
+                record = record,
+                blink = record.id == blinkingRecord?.id
+            )
         }
     }
 }
@@ -68,7 +76,8 @@ fun MoneyRecordCardForOneDay(
 fun RecordItem(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel,
-    record: MoneyRecord
+    record: MoneyRecord,
+    blink: Boolean = false
 ) {
     val scope = rememberCoroutineScope()
 //    var showDetail by remember { mutableStateOf(false) }
@@ -80,6 +89,7 @@ fun RecordItem(
                 strokeWidth = 0.5.dp,
                 color = MaterialTheme.colorScheme.onSurface
             )
+            .then(if (blink) Modifier.background(Color.Red) else Modifier)
             .combinedClickable(
                 onClick = {
                     viewModel.showEditRecordDialog(record)

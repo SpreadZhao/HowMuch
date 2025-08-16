@@ -21,4 +21,24 @@ data class MoneyRecord internal constructor(
     override fun toString(): String {
         return "MoneyRecord(id=$id, date=${Date(date)}, category='$category', type=${type.name}, value=$value)"
     }
+
+    override fun equals(other: Any?): Boolean {
+        return other is MoneyRecord &&
+                id == other.id &&
+                date == other.date &&
+                category == other.category &&
+                type == other.type &&
+                remark == other.remark &&
+                value == other.value
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + date.hashCode()
+        result = 31 * result + category.hashCode()
+        result = 31 * result + type.hashCode()
+        result = 31 * result + remark.hashCode()
+        result = 31 * result + value.hashCode()
+        return result
+    }
 }

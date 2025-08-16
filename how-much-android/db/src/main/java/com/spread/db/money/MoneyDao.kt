@@ -17,7 +17,7 @@ interface MoneyDao {
     fun listenAllRecords(): Flow<List<MoneyRecord>>
 
     @Insert
-    suspend fun insertRecords(vararg records: MoneyRecord)
+    suspend fun insertRecords(vararg records: MoneyRecord): List<Long>
 
     @Delete
     suspend fun deleteRecords(vararg records: MoneyRecord)

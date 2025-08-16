@@ -5,9 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.spread.db.money.MoneyRecord
 import com.spread.db.service.Money
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -52,10 +54,13 @@ class MainViewModel : ViewModel() {
     var prevZoomInViewType: ViewType = viewTypeFlow.value
         private set
 
+    private var _blinkingRecord = MutableStateFlow<MoneyRecord?>(null)
+    val blinkingRecord: StateFlow<MoneyRecord?> = _blinkingRecord
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val currMonthMoneyRecordsFlow = selectedTimeFlow
         .flatMapLatest { time ->
-            Money.listenRecordsOfMonth(time)
+            Money.listenRecordsOfMonth(time).distinctUntilChanged()
         }
         .stateIn(
             viewModelScope,
@@ -66,7 +71,7 @@ class MainViewModel : ViewModel() {
     @OptIn(ExperimentalCoroutinesApi::class)
     val currYearMoneyRecordsFlow = selectedTimeFlow
         .flatMapLatest { time ->
-            Money.listenRecordsOfYear(time)
+            Money.listenRecordsOfYear(time).distinctUntilChanged()
         }
         .stateIn(
             viewModelScope,
@@ -150,6 +155,12 @@ class MainViewModel : ViewModel() {
         viewTypeFlow.value.takeIf { it != ViewType.YearlyStatistics }
             ?.let { prevZoomInViewType = it }
         _viewTypeFlow.value = viewType
+    }
+
+    suspend fun blinkRecord(record: MoneyRecord, duration: Long) {
+        _blinkingRecord.value = record
+        delay(duration)
+        _blinkingRecord.value = null
     }
 
 }

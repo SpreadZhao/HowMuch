@@ -36,6 +36,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -43,8 +44,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.spread.business.statistics.StatisticsPanel
 import com.spread.business.statistics.StatisticsScreen
+import com.spread.db.money.MoneyRecord
 import com.spread.db.service.Money
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,9 +60,10 @@ fun MainSurface(viewModel: MainViewModel) {
         ViewType.YearlyStatistics -> viewModel.currYearMoneyRecordsFlow.collectAsState()
         else -> viewModel.currMonthMoneyRecordsFlow.collectAsState()
     }
+    val blinkingRecord by viewModel.blinkingRecord.collectAsState()
     val selectedMonth by viewModel.selectedMonthFlow.collectAsState()
     val selectedYear by viewModel.selectedYearFlow.collectAsState()
-    val listState = rememberLazyListState()
+    val recordsListState = rememberLazyListState()
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
@@ -154,14 +159,9 @@ fun MainSurface(viewModel: MainViewModel) {
                     ViewType.CurrMonthRecords -> {
                         LazyColumn(
                             modifier = modifier,
-                            state = listState
+                            state = recordsListState
                         ) {
-                            records.groupBy {
-                                Calendar.getInstance().run {
-                                    timeInMillis = it.date
-                                    get(Calendar.DAY_OF_MONTH)
-                                }
-                            }.values.toList().asReversed().forEach { dailyRecords ->
+                            records.groupByDay().forEach { dailyRecords ->
                                 item(key = dailyRecords.hashCode()) {
                                     MoneyRecordCardForOneDay(
                                         modifier = Modifier.animateItem(
@@ -173,7 +173,8 @@ fun MainSurface(viewModel: MainViewModel) {
                                             )
                                         ),
                                         viewModel = viewModel,
-                                        records = dailyRecords
+                                        records = dailyRecords,
+                                        blinkingRecord = blinkingRecord
                                     )
                                 }
                             }
@@ -191,7 +192,7 @@ fun MainSurface(viewModel: MainViewModel) {
 
         }
         AnimatedVisibility(
-            visible = !listState.isScrollInProgress && editRecordDialogState !is EditRecordDialogState.Show && viewType == ViewType.CurrMonthRecords,
+            visible = !recordsListState.isScrollInProgress && editRecordDialogState !is EditRecordDialogState.Show && viewType == ViewType.CurrMonthRecords,
             enter = scaleIn() + fadeIn(),
             exit = scaleOut() + fadeOut(),
             modifier = Modifier
@@ -228,10 +229,29 @@ fun MainSurface(viewModel: MainViewModel) {
                     onSave = { record, insert ->
                         scope.launch {
                             sheetState.hide()
-                            if (insert && !sheetState.isVisible) {
-                                Money.insertRecords(record)
+                            val id = if (insert && !sheetState.isVisible) {
+                                Money.insertRecords(record).firstOrNull()
                             } else if (!insert && !sheetState.isVisible) {
                                 Money.updateRecords(record)
+                                record.id
+                            } else {
+                                null
+                            }
+                            if (id != null && id > 0) {
+                                val targetGroupIndex = withTimeoutOrNull(300L) {
+                                    snapshotFlow {
+                                        records.groupByDay().indexOfFirst { dailyRecords ->
+                                            dailyRecords.any { it.id == id }
+                                        }
+                                    }.first { it >= 0 }
+                                }
+
+                                if (targetGroupIndex != null) {
+                                    recordsListState.animateScrollToItem(targetGroupIndex)
+                                    records.find { it.id == id }?.let {
+                                        viewModel.blinkRecord(it, 1000L)
+                                    }
+                                }
                             }
                         }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
@@ -252,4 +272,13 @@ fun MainSurface(viewModel: MainViewModel) {
             }
         }
     }
+}
+
+private fun List<MoneyRecord>.groupByDay(): List<List<MoneyRecord>> {
+    return groupBy {
+        Calendar.getInstance().run {
+            timeInMillis = it.date
+            get(Calendar.DAY_OF_MONTH)
+        }
+    }.values.toList().asReversed()
 }

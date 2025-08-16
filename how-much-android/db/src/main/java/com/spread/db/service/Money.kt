@@ -51,9 +51,8 @@ object Money {
         return database.moneyDao().listenAllRecords()
     }
 
-    suspend fun insertRecords(vararg records: MoneyRecord) {
+    suspend fun insertRecords(vararg records: MoneyRecord): List<Long> =
         database.moneyDao().insertRecords(*records)
-    }
 
     suspend fun deleteRecords(vararg records: MoneyRecord) {
         database.moneyDao().deleteRecords(*records)
