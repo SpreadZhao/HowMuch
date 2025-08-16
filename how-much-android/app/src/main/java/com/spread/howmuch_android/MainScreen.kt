@@ -68,6 +68,17 @@ fun App() {
                     IconButton(
                         onClick = {
                             if (viewType == ViewType.YearlyStatistics) {
+                                viewModel.changeViewType(viewModel.prevZoomInViewType)
+                            } else {
+                                viewModel.changeViewType(ViewType.YearlyStatistics)
+                            }
+                        }
+                    ) {
+                        Text(text = if (viewType == ViewType.YearlyStatistics) "年" else "月")
+                    }
+                    IconButton(
+                        onClick = {
+                            if (viewType == ViewType.YearlyStatistics) {
                                 return@IconButton
                             }
                             if (viewType == ViewType.MonthlyStatistics) {
