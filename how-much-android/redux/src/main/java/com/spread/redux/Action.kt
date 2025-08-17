@@ -1,3 +1,3 @@
 package com.spread.redux
 
-sealed interface Action
+interface Action

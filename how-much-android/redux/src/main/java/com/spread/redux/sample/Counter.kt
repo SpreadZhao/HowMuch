@@ -1,4 +1,4 @@
-package com.spread.redux
+package com.spread.redux.sample
 
 import org.reduxkotlin.typedReducer
 
