@@ -1,5 +1,6 @@
 package com.spread.redux
 
+import com.spread.redux.sample.CounterAction
 import org.junit.Test
 
 import org.junit.Assert.*
