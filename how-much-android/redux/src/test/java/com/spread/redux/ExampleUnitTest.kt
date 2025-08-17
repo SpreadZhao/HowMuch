@@ -3,7 +3,6 @@ package com.spread.redux
 import org.junit.Test
 
 import org.junit.Assert.*
-import org.reduxkotlin.threadsafe.createThreadSafeStore
 import java.util.logging.Logger
 
 /**
@@ -24,15 +23,17 @@ class ExampleUnitTest {
 
     @Test
     fun testRedux() {
-        val store = createThreadSafeStore(reducer, CounterState())
-
-        val unsubscribe = store.subscribe { logger.info("state: ${store.state}")}
-        store.dispatch(CounterAction.Increment())
-        store.dispatch(CounterAction.Increment(2))
-        store.dispatch(CounterAction.Decrement(3))
+//        val appStateUnsubscribe = HowMuchStore.subscribe { logger.info("HowMuchState changed: ${HowMuchStore.state.hashCode()}") }
+        val unsubscribe = HowMuchStore.select({ it.counterState }) { logger.info("CounterState changed: $it") }
+        dispatchAction(CounterAction.Increment(0))
+        dispatchAction(CounterAction.Increment(0))
+        dispatchAction(CounterAction.Increment(1))
+        dispatchAction(CounterAction.Increment(2))
+        dispatchAction(CounterAction.Decrement(3))
         unsubscribe()
-        store.dispatch(CounterAction.Increment())
-        store.dispatch(CounterAction.Increment())
-        store.dispatch(CounterAction.Decrement())
+//        appStateUnsubscribe()
+        dispatchAction(CounterAction.Increment())
+        dispatchAction(CounterAction.Increment())
+        dispatchAction(CounterAction.Decrement())
     }
 }
