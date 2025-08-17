@@ -24,15 +24,15 @@ class ExampleUnitTest {
 
     @Test
     fun testRedux() {
-        val store = createThreadSafeStore(reducer, 0)
+        val store = createThreadSafeStore(reducer, CounterState())
 
         val unsubscribe = store.subscribe { logger.info("state: ${store.state}")}
-        store.dispatch(Increment())
-        store.dispatch(Increment())
-        store.dispatch(Decrement())
+        store.dispatch(CounterAction.Increment())
+        store.dispatch(CounterAction.Increment(2))
+        store.dispatch(CounterAction.Decrement(3))
         unsubscribe()
-        store.dispatch(Increment())
-        store.dispatch(Increment())
-        store.dispatch(Decrement())
+        store.dispatch(CounterAction.Increment())
+        store.dispatch(CounterAction.Increment())
+        store.dispatch(CounterAction.Decrement())
     }
 }
