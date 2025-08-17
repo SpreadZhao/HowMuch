@@ -14,7 +14,6 @@ junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 navigationCompose = "2.9.3"
-reduxKotlinThreadsafe = "0.6.1"
 roomRuntime = "2.7.2"
 uiToolingPreviewAndroid = "1.9.0"
 uiUnitAndroid = "1.9.0"
@@ -55,7 +54,6 @@ androidx-ui-tooling-preview-android = { group = "androidx.compose.ui", name = "u
 androidx-ui-unit-android = { group = "androidx.compose.ui", name = "ui-unit-android", version.ref = "uiUnitAndroid" }
 androidx-runtime-android = { group = "androidx.compose.runtime", name = "runtime-android", version.ref = "runtimeAndroid" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
-redux-kotlin-threadsafe = { module = "org.reduxkotlin:redux-kotlin-threadsafe", version.ref = "reduxKotlinThreadsafe" }
 vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 
 [plugins]
