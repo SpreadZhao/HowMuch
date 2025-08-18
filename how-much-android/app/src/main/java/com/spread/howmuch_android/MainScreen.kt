@@ -30,7 +30,7 @@ import com.spread.business.main.MainSurface
 import com.spread.business.main.MainViewModel
 import com.spread.business.main.UIEvent
 import com.spread.business.main.ViewType
-import com.spread.business.migrate.MigrateSurface
+import com.spread.business.migrate.MigrateWizardSurface
 import com.spread.business.outside.QuickAddRecordActivity
 import com.spread.debug.DebugSurface
 import kotlinx.serialization.Serializable
@@ -158,7 +158,7 @@ fun App() {
             ) {
                 composable<Route.Main> { MainSurface(viewModel) }
                 composable<Route.Debug> { DebugSurface() }
-                composable<Route.Migrate> { MigrateSurface() }
+                composable<Route.Migrate> { MigrateWizardSurface() }
                 activity<Route.QuickAddRecord> {
                     activityClass = QuickAddRecordActivity::class
                 }

@@ -24,7 +24,7 @@ import com.spread.business.main.category.CategoryPanel
 import com.spread.business.outside.QuickAddRecordActivity
 import com.spread.db.money.MoneyType
 import com.spread.db.service.Money
-import com.spread.migrate.MigrateButton
+import com.spread.business.migrate.MigrateButton
 import com.spread.ui.InlineDatePicker
 import com.spread.ui.SelectionDropdownMenu
 import kotlinx.coroutines.Dispatchers

@@ -1,4 +1,4 @@
-package com.spread.migrate
+package com.spread.business.migrate
 
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher

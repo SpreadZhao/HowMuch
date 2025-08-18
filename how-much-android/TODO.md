@@ -26,5 +26,5 @@
 - [x] (P1) Opt: Scroll to top after inserting record
 - [x] (P1) Opt: Split Month and Year Config, only load one in MainSurface
 - [ ] (P1) Feature: No rounded corner!!!
-- [ ] (P2) Feature: Search(a big feature~)
+- [ ] (P2) Feature: Search a MoneyRecord (a big feature~)
 - [ ] (P0) Opt: Multiple language support
