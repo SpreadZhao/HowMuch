@@ -22,9 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.activity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.spread.business.main.MainSurface
 import com.spread.business.main.MainViewModel
@@ -60,6 +62,7 @@ fun App() {
     val viewModel: MainViewModel = viewModel()
     val viewType by viewModel.viewTypeFlow.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val backstack by navController.currentBackStackEntryAsState()
     LaunchedEffect(viewModel.uiEventFlow) {
         viewModel.uiEventFlow.collect { event ->
             when (event) {
@@ -94,58 +97,37 @@ fun App() {
                     )
                 },
                 actions = {
-                    IconButton(
-                        onClick = {
-                            if (viewType == ViewType.YearlyStatistics) {
-                                viewModel.changeViewType(viewModel.prevZoomInViewType)
-                            } else {
-                                viewModel.changeViewType(ViewType.YearlyStatistics)
+                    if (backstack?.destination?.hasRoute<Route.Main>() == true) {
+                        IconButton(
+                            onClick = {
+                                if (viewType == ViewType.YearlyStatistics) {
+                                    viewModel.changeViewType(viewModel.prevZoomInViewType)
+                                } else {
+                                    viewModel.changeViewType(ViewType.YearlyStatistics)
+                                }
                             }
+                        ) {
+                            Text(text = if (viewType == ViewType.YearlyStatistics) "年" else "月")
                         }
-                    ) {
-                        Text(text = if (viewType == ViewType.YearlyStatistics) "年" else "月")
-                    }
-                    IconButton(
-                        onClick = {
-                            if (viewType == ViewType.CurrMonthRecords) {
-                                viewModel.changeViewType(ViewType.MonthlyStatistics)
-                            } else {
-                                viewModel.changeViewType(ViewType.CurrMonthRecords)
+                        IconButton(
+                            onClick = {
+                                if (viewType == ViewType.CurrMonthRecords) {
+                                    viewModel.changeViewType(ViewType.MonthlyStatistics)
+                                } else {
+                                    viewModel.changeViewType(ViewType.CurrMonthRecords)
+                                }
                             }
+                        ) {
+                            val (id, desc) = when (viewType) {
+                                ViewType.CurrMonthRecords -> R.drawable.ic_records to "Records"
+                                else -> R.drawable.ic_statistics to "Statistics"
+                            }
+                            Icon(
+                                painter = painterResource(id = id),
+                                contentDescription = desc
+                            )
                         }
-                    ) {
-                        val (id, desc) = when (viewType) {
-                            ViewType.CurrMonthRecords -> R.drawable.ic_records to "Records"
-                            else -> R.drawable.ic_statistics to "Statistics"
-                        }
-                        Icon(
-                            painter = painterResource(id = id),
-                            contentDescription = desc
-                        )
                     }
-//                    IconButton(
-//                        onClick = {
-//                            viewModel.changeViewType(
-//                                if (viewType == ViewType.YearlyStatistics) {
-//                                    viewModel.prevZoomInViewType
-//                                } else {
-//                                    ViewType.YearlyStatistics
-//                                }
-//                            )
-//                        }
-//                    ) {
-//                        if (viewType == ViewType.YearlyStatistics) {
-//                            Icon(
-//                                painter = painterResource(id = R.drawable.ic_expand),
-//                                contentDescription = "Expand"
-//                            )
-//                        } else {
-//                            Icon(
-//                                painter = painterResource(id = R.drawable.ic_collapse),
-//                                contentDescription = "Collapse"
-//                            )
-//                        }
-//                    }
                 },
                 title = { Text("HowMuch") }
             )
