@@ -28,3 +28,4 @@
 - [ ] (P1) Feature: No rounded corner!!!
 - [ ] (P2) Feature: Search a MoneyRecord (a big feature~)
 - [ ] (P0) Opt: Multiple language support
+- [ ] (P0) Feature: Customizable category icon

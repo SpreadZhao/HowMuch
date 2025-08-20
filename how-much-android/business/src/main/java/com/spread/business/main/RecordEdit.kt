@@ -27,7 +27,6 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +52,7 @@ import com.spread.db.money.MoneyType
 import com.spread.db.service.Money
 import com.spread.ui.EasyTextField
 import com.spread.ui.MoneyInput
+import com.spread.ui.MoneyInput2
 import com.spread.ui.YearMonthDayPicker
 import com.spread.ui.toDp
 import java.util.Calendar
@@ -112,6 +112,12 @@ fun RecordEdit(
             onRemarkInputTextChange = { remarkInputText = it },
             valueInput = valueInputText,
             onNewValue = { valueInputText = it }
+        )
+        MoneyInput2(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(top = 20.dp),
         )
     }
 }
