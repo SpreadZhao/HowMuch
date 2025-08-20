@@ -13,6 +13,7 @@ val counterReducer = typedReducer<HowMuchState, CounterAction> { state, action -
                 state.copy(counterState = CounterState(newCount))
             } else state
         }
+
         is CounterAction.Decrement -> {
             val newCount = state.counterState.count - action.value
             if (newCount != state.counterState.count) {

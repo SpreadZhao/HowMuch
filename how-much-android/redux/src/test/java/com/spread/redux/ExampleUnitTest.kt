@@ -1,9 +1,8 @@
 package com.spread.redux
 
 import com.spread.redux.sample.CounterAction
+import org.junit.Assert.assertEquals
 import org.junit.Test
-
-import org.junit.Assert.*
 import java.util.logging.Logger
 
 /**
@@ -25,7 +24,8 @@ class ExampleUnitTest {
     @Test
     fun testRedux() {
 //        val appStateUnsubscribe = HowMuchStore.subscribe { logger.info("HowMuchState changed: ${HowMuchStore.state.hashCode()}") }
-        val unsubscribe = HowMuchStore.select({ it.counterState }) { logger.info("CounterState changed: $it") }
+        val unsubscribe =
+            HowMuchStore.select({ it.counterState }) { logger.info("CounterState changed: $it") }
         dispatchAction(CounterAction.Increment(0))
         dispatchAction(CounterAction.Increment(0))
         dispatchAction(CounterAction.Increment(1))
