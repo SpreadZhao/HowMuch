@@ -23,7 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.spread.common.expression.eval
 import com.spread.common.performHapticFeedback
+import java.math.BigDecimal
 
 @Composable
 fun MoneyInput2(
@@ -77,8 +79,17 @@ class MoneyInputState(
     val inputExpression: String
         get() = _inputExpression
 
+    val expressionValue: BigDecimal?
+        get() {
+            if (!regex.matches(inputExpression)) {
+                return null
+            }
+            val value = eval(inputExpression)
+            return value.takeIf { it > BigDecimal.ZERO }
+        }
+
     val isValid: Boolean
-        get() = regex matches inputExpression
+        get() = regex matches inputExpression && eval(inputExpression) > BigDecimal.ZERO
 
     fun appendStr(str: String) {
         val newImpression = inputExpression + str
@@ -102,7 +113,7 @@ class MoneyInputState(
     }
 
     companion object {
-        private val regex = Regex("""^\d+(\.\d{1,2})?([+-]\d+(\.\d{1,2})?)*$""")
+        private val regex = Regex("""^\d+(\.\d{1,2})?([+\-*]\d+(\.\d{1,2})?)*$""")
         val Saver: Saver<MoneyInputState, String> = Saver(
             save = {
                 it._inputExpression
@@ -130,7 +141,8 @@ private val digitKeyMap = mapOf(
 private const val KEY_INDEX_BACKSPACE = 3
 private const val KEY_INDEX_MINUS = 7
 private const val KEY_INDEX_PLUS = 11
-private const val KEY_INDEX_DOT = 15
+private const val KEY_INDEX_MULTIPLY = 15
+private const val KEY_INDEX_DOT = 14
 
 private fun getKey(index: Int): Key {
     val number = digitKeyMap[index]
@@ -141,13 +153,14 @@ private fun getKey(index: Int): Key {
         KEY_INDEX_BACKSPACE -> Key.Action(KeyAction.Backspace)
         KEY_INDEX_MINUS -> Key.Action(KeyAction.Minus)
         KEY_INDEX_PLUS -> Key.Action(KeyAction.Plus)
+        KEY_INDEX_MULTIPLY -> Key.Action(KeyAction.Multiply)
         KEY_INDEX_DOT -> Key.Dot
         else -> Key.None
     }
 }
 
 enum class KeyAction {
-    Backspace, Plus, Minus
+    Backspace, Plus, Minus, Multiply
 }
 
 sealed interface Key {
@@ -168,6 +181,7 @@ sealed interface Key {
             get() = when (action) {
                 KeyAction.Minus -> "-"
                 KeyAction.Plus -> "+"
+                KeyAction.Multiply -> "*"
                 KeyAction.Backspace -> super.str
             }
     }
@@ -211,7 +225,7 @@ fun Key(
                 when (key) {
                     is Key.Action -> {
                         when (key.action) {
-                            KeyAction.Plus, KeyAction.Minus -> Text(text = key.str)
+                            KeyAction.Plus, KeyAction.Minus, KeyAction.Multiply -> Text(text = key.str)
                             KeyAction.Backspace -> Icon(
                                 painter = painterResource(id = R.drawable.ic_backspace),
                                 contentDescription = "Backspace"

@@ -125,19 +125,19 @@ fun RecordEdit(
                 .padding(top = 20.dp),
         ) {
             val moneyInputState = rememberMoneyInputState()
-            val valid = moneyInputState.isValid
+            val value = moneyInputState.expressionValue
             val expression = moneyInputState.inputExpression
             Row {
                 Text(
                     text = expression,
-                    color = if (valid) Color.Unspecified else Color.Red,
+                    color = if (value != null) Color.Unspecified else Color.Red,
                     maxLines = 1,
                     overflow = TextOverflow.StartEllipsis
                 )
-                if (valid) {
+                if (value != null) {
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
-                        text = "=${eval(expression)}",
+                        text = "=${value}",
                         maxLines = 1,
                         overflow = TextOverflow.StartEllipsis
                     )
