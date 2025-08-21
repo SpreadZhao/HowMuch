@@ -1,6 +1,6 @@
 package com.spread.ui
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -20,8 +20,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.spread.common.performHapticFeedback
 
 @Composable
 fun MoneyInput2(
@@ -51,7 +53,8 @@ fun InputKeys(
         itemsIndexed(listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) { index, _ ->
             Key(
                 modifier = Modifier,
-                index = index
+                index = index,
+                inputState = inputState
             )
         }
     }
@@ -69,12 +72,40 @@ fun rememberMoneyInputState(
 class MoneyInputState(
     inputExpression: String = ""
 ) {
-    var inputExpression by mutableStateOf(inputExpression)
+    private var _inputExpression by mutableStateOf(inputExpression)
+
+    val inputExpression: String
+        get() = _inputExpression
+
+    val isValid: Boolean
+        get() = regex matches inputExpression
+
+    fun appendStr(str: String) {
+        val newImpression = inputExpression + str
+//        if (isValidExpression(newImpression)) {
+        _inputExpression = newImpression
+//        }
+    }
+
+    fun removeLastChar() {
+        if (_inputExpression.isNotEmpty()) {
+            _inputExpression = _inputExpression.dropLast(1)
+        }
+    }
+
+    fun clear() {
+        _inputExpression = ""
+    }
+
+    private fun isValidExpression(expr: String): Boolean {
+        return regex matches expr
+    }
 
     companion object {
+        private val regex = Regex("""^\d+(\.\d{1,2})?([+-]\d+(\.\d{1,2})?)*$""")
         val Saver: Saver<MoneyInputState, String> = Saver(
             save = {
-                it.inputExpression
+                it._inputExpression
             },
             restore = {
                 MoneyInputState(it)
@@ -120,34 +151,67 @@ enum class KeyAction {
 }
 
 sealed interface Key {
+
+    val str: String get() = ""
+
     data object None : Key
-    data class Digit(val num: Int) : Key
-    data object Dot : Key
-    data class Action(val action: KeyAction) : Key
+    data class Digit(val num: Int) : Key {
+        override val str: String get() = num.toString()
+    }
+
+    data object Dot : Key {
+        override val str: String get() = "."
+    }
+
+    data class Action(val action: KeyAction) : Key {
+        override val str: String
+            get() = when (action) {
+                KeyAction.Minus -> "-"
+                KeyAction.Plus -> "+"
+                KeyAction.Backspace -> super.str
+            }
+    }
 }
 
 @Composable
 fun Key(
     modifier: Modifier,
-    index: Int
+    index: Int,
+    inputState: MoneyInputState
 ) {
     val key = getKey(index)
+    val context = LocalContext.current
     Box(
         modifier = modifier
             .height(40.dp)
-            .then(if (key !is Key.None) Modifier.clickable {} else Modifier),
+            .then(
+                if (key !is Key.None) Modifier.combinedClickable(
+                    onClick = {
+                        if (key is Key.Action && key.action == KeyAction.Backspace) {
+                            inputState.removeLastChar()
+                            return@combinedClickable
+                        }
+                        val str = key.str
+                        if (str.isNotBlank()) {
+                            inputState.appendStr(str)
+                        }
+                    },
+                    onLongClick = {
+                        if (key is Key.Action && key.action == KeyAction.Backspace) {
+                            performHapticFeedback(context)
+                            inputState.clear()
+                        }
+                    }
+                ) else Modifier),
         content = {
             Box(
                 modifier = Modifier
                     .align(Alignment.Center)
             ) {
                 when (key) {
-                    is Key.Digit -> Text(text = key.num.toString())
-
                     is Key.Action -> {
                         when (key.action) {
-                            KeyAction.Plus -> Text(text = "+")
-                            KeyAction.Minus -> Text(text = "-")
+                            KeyAction.Plus, KeyAction.Minus -> Text(text = key.str)
                             KeyAction.Backspace -> Icon(
                                 painter = painterResource(id = R.drawable.ic_backspace),
                                 contentDescription = "Backspace"
@@ -155,8 +219,7 @@ fun Key(
                         }
                     }
 
-                    Key.Dot -> Text(text = ".")
-                    Key.None -> Text(text = "")
+                    else -> Text(text = key.str)
                 }
             }
         }

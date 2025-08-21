@@ -1,12 +1,10 @@
 package com.spread.business.statistics
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
@@ -49,7 +47,8 @@ fun StatisticsPanel(
                 .fillMaxWidth()
                 .onGloballyPositioned {
                     minHeight = it.size.height
-                },) {
+                }
+        ) {
             if (expense > BigDecimal.ZERO) {
                 StatisticItem(
                     iconId = R.drawable.ic_expense,

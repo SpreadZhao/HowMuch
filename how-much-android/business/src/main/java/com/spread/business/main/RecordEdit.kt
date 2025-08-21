@@ -37,9 +37,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.spread.business.R
 import com.spread.business.main.category.CategoryPanel
@@ -54,6 +56,7 @@ import com.spread.ui.EasyTextField
 import com.spread.ui.MoneyInput
 import com.spread.ui.MoneyInput2
 import com.spread.ui.YearMonthDayPicker
+import com.spread.ui.rememberMoneyInputState
 import com.spread.ui.toDp
 import java.util.Calendar
 
@@ -113,12 +116,21 @@ fun RecordEdit(
             valueInput = valueInputText,
             onNewValue = { valueInputText = it }
         )
-        MoneyInput2(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(top = 20.dp),
-        )
+        ) {
+            val moneyInputState = rememberMoneyInputState()
+            Text(
+                text = moneyInputState.inputExpression,
+                color = if (moneyInputState.isValid) Color.Unspecified else Color.Red,
+                maxLines = 1,
+                overflow = TextOverflow.StartEllipsis
+            )
+            MoneyInput2(inputState = moneyInputState)
+        }
     }
 }
 
