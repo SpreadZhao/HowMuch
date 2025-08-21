@@ -30,3 +30,4 @@
 - [ ] (P0) Opt: Multiple language support
 - [ ] (P0) Feature: Customizable category icon
 - [ ] (P1) Opt: Shrink category quick selection by 1 line
+- [ ] (P2) Feature: Money input error reason
