@@ -47,6 +47,8 @@ import com.spread.business.R
 import com.spread.business.main.category.CategoryPanel
 import com.spread.common.DATE_FORMAT_YEAR_MONTH_DAY_STR
 import com.spread.common.calendar
+import com.spread.common.expression.Expressions
+import com.spread.common.expression.eval
 import com.spread.common.nowCalendar
 import com.spread.common.timeInMillisToDateStr
 import com.spread.db.money.MoneyRecord
@@ -123,12 +125,24 @@ fun RecordEdit(
                 .padding(top = 20.dp),
         ) {
             val moneyInputState = rememberMoneyInputState()
-            Text(
-                text = moneyInputState.inputExpression,
-                color = if (moneyInputState.isValid) Color.Unspecified else Color.Red,
-                maxLines = 1,
-                overflow = TextOverflow.StartEllipsis
-            )
+            val valid = moneyInputState.isValid
+            val expression = moneyInputState.inputExpression
+            Row {
+                Text(
+                    text = expression,
+                    color = if (valid) Color.Unspecified else Color.Red,
+                    maxLines = 1,
+                    overflow = TextOverflow.StartEllipsis
+                )
+                if (valid) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = "=${eval(expression)}",
+                        maxLines = 1,
+                        overflow = TextOverflow.StartEllipsis
+                    )
+                }
+            }
             MoneyInput2(inputState = moneyInputState)
         }
     }
