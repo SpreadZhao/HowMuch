@@ -42,6 +42,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -145,9 +148,9 @@ fun MoneyExpr(
         if (expression.isBlank()) {
             Spacer(modifier = Modifier.weight(1f))
             if (initial == null) {
-                Text(text = "How much?", fontSize = TextConstants.FONT_SIZE_H3)
+                Text(text = "How much?", fontSize = TextConstants.FONT_SIZE_H3, fontStyle = FontStyle.Italic)
             } else {
-                Text(text = "How much(${initial})?", fontSize = TextConstants.FONT_SIZE_H3)
+                Text(text = "How much(${initial})?", fontSize = TextConstants.FONT_SIZE_H3, fontStyle = FontStyle.Italic)
             }
             Spacer(modifier = Modifier.weight(1f))
         } else {
@@ -156,7 +159,8 @@ fun MoneyExpr(
                 color = if (value != null) Color.Unspecified else Color.Red,
                 maxLines = 1,
                 overflow = TextOverflow.StartEllipsis,
-                fontSize = TextConstants.FONT_SIZE_H3
+                fontSize = TextConstants.FONT_SIZE_H3,
+                fontStyle = FontStyle.Italic
             )
             if (value != null) {
                 Spacer(modifier = Modifier.weight(1f))
@@ -164,7 +168,8 @@ fun MoneyExpr(
                     text = "=${value}",
                     maxLines = 1,
                     overflow = TextOverflow.StartEllipsis,
-                    fontSize = TextConstants.FONT_SIZE_H3
+                    fontSize = TextConstants.FONT_SIZE_H3,
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
