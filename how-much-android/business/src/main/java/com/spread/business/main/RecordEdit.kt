@@ -127,6 +127,7 @@ fun RecordEdit(
                 .fillMaxWidth()
                 .padding(top = 5.dp),
             expression = expression,
+            initial = record?.value,
             value = value
         )
         MoneyInput2(inputState = moneyInputState)
@@ -137,12 +138,17 @@ fun RecordEdit(
 fun MoneyExpr(
     modifier: Modifier = Modifier,
     expression: String,
+    initial: BigDecimal? = null,
     value: BigDecimal?
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         if (expression.isBlank()) {
             Spacer(modifier = Modifier.weight(1f))
-            Text(text = "How much?", fontSize = TextConstants.FONT_SIZE_H3)
+            if (initial == null) {
+                Text(text = "How much?", fontSize = TextConstants.FONT_SIZE_H3)
+            } else {
+                Text(text = "How much(${initial})?", fontSize = TextConstants.FONT_SIZE_H3)
+            }
             Spacer(modifier = Modifier.weight(1f))
         } else {
             Text(

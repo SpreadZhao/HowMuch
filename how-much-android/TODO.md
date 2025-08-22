@@ -33,3 +33,4 @@
 - [ ] (P2) Feature: Money input error reason
 - [ ] (P1) Settings: When inputting remark, using ENTER key to decide saving record or just
   confirming input
+- [ ] (P0) Feature: Clearing icon for EasyTextField
