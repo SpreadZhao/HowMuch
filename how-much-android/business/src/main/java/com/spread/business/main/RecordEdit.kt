@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
@@ -24,6 +25,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SegmentedButtonDefaults.IconSize
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -41,14 +43,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.spread.business.R
 import com.spread.business.main.category.CategoryPanel
 import com.spread.common.DATE_FORMAT_YEAR_MONTH_DAY_STR
 import com.spread.common.calendar
-import com.spread.common.expression.Expressions
-import com.spread.common.expression.eval
 import com.spread.common.nowCalendar
 import com.spread.common.timeInMillisToDateStr
 import com.spread.db.money.MoneyRecord
@@ -57,9 +58,11 @@ import com.spread.db.service.Money
 import com.spread.ui.EasyTextField
 import com.spread.ui.MoneyInput
 import com.spread.ui.MoneyInput2
+import com.spread.ui.TextConstants
 import com.spread.ui.YearMonthDayPicker
 import com.spread.ui.rememberMoneyInputState
 import com.spread.ui.toDp
+import java.math.BigDecimal
 import java.util.Calendar
 
 @Composable
@@ -109,41 +112,120 @@ fun RecordEdit(
                 .fillMaxWidth()
                 .wrapContentHeight(), state = categoryState
         )
-        RemarkAndMoney(
+        Remark(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
             remarkInputText = remarkInputText,
-            onRemarkInputTextChange = { remarkInputText = it },
-            valueInput = valueInputText,
-            onNewValue = { valueInputText = it }
+            onRemarkInputTextChange = { remarkInputText = it }
         )
-        Column(
+        val moneyInputState = rememberMoneyInputState()
+        val (value, err) = moneyInputState.expressionData
+        val expression = moneyInputState.inputExpression
+        MoneyExpr(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(top = 20.dp),
-        ) {
-            val moneyInputState = rememberMoneyInputState()
-            val value = moneyInputState.expressionValue
-            val expression = moneyInputState.inputExpression
-            Row {
+                .padding(top = 5.dp),
+            expression = expression,
+            value = value
+        )
+        MoneyInput2(inputState = moneyInputState)
+    }
+}
+
+@Composable
+fun MoneyExpr(
+    modifier: Modifier = Modifier,
+    expression: String,
+    value: BigDecimal?
+) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        if (expression.isBlank()) {
+            Spacer(modifier = Modifier.weight(1f))
+            Text(text = "How much?", fontSize = TextConstants.FONT_SIZE_H3)
+            Spacer(modifier = Modifier.weight(1f))
+        } else {
+            Text(
+                text = expression,
+                color = if (value != null) Color.Unspecified else Color.Red,
+                maxLines = 1,
+                overflow = TextOverflow.StartEllipsis,
+                fontSize = TextConstants.FONT_SIZE_H3
+            )
+            if (value != null) {
+                Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = expression,
-                    color = if (value != null) Color.Unspecified else Color.Red,
+                    text = "=${value}",
                     maxLines = 1,
-                    overflow = TextOverflow.StartEllipsis
+                    overflow = TextOverflow.StartEllipsis,
+                    fontSize = TextConstants.FONT_SIZE_H3
                 )
-                if (value != null) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        text = "=${value}",
-                        maxLines = 1,
-                        overflow = TextOverflow.StartEllipsis
-                    )
-                }
             }
-            MoneyInput2(inputState = moneyInputState)
+        }
+    }
+}
+
+@Composable
+fun Remark(
+    modifier: Modifier = Modifier,
+    remarkInputText: String,
+    onRemarkInputTextChange: (String) -> Unit
+) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            modifier = Modifier.size(24.dp),
+            painter = painterResource(id = R.drawable.ic_remark),
+            contentDescription = "Remark"
+        )
+        EasyTextField(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 5.dp),
+            value = remarkInputText,
+            onValueChange = onRemarkInputTextChange,
+        )
+        LazyRow(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            item {
+                SuggestionChip(
+                    modifier = Modifier
+                        .fillParentMaxWidth(0.7f)
+                        .padding(end = 5.dp),
+                    onClick = {
+                        onRemarkInputTextChange("suggest 1")
+                    },
+                    label = {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "suggest 1",
+                            maxLines = 1,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                )
+            }
+            item {
+                SuggestionChip(
+                    modifier = Modifier
+                        .fillParentMaxWidth(0.7f)
+                        .padding(end = 5.dp),
+                    onClick = {
+                        onRemarkInputTextChange("suggest 2")
+                    },
+                    label = {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "suggest 2",
+                            maxLines = 1,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                )
+            }
         }
     }
 }

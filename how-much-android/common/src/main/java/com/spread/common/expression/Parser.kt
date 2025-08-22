@@ -1,6 +1,27 @@
 package com.spread.common.expression
 
-import com.spread.common.expression.TokenType.*
+import com.spread.common.expression.TokenType.AMP_AMP
+import com.spread.common.expression.TokenType.ASSIGN
+import com.spread.common.expression.TokenType.BAR_BAR
+import com.spread.common.expression.TokenType.COMMA
+import com.spread.common.expression.TokenType.EOF
+import com.spread.common.expression.TokenType.EQUAL_EQUAL
+import com.spread.common.expression.TokenType.EXPONENT
+import com.spread.common.expression.TokenType.GREATER
+import com.spread.common.expression.TokenType.GREATER_EQUAL
+import com.spread.common.expression.TokenType.IDENTIFIER
+import com.spread.common.expression.TokenType.LEFT_PAREN
+import com.spread.common.expression.TokenType.LESS
+import com.spread.common.expression.TokenType.LESS_EQUAL
+import com.spread.common.expression.TokenType.MINUS
+import com.spread.common.expression.TokenType.MODULO
+import com.spread.common.expression.TokenType.NOT_EQUAL
+import com.spread.common.expression.TokenType.NUMBER
+import com.spread.common.expression.TokenType.PLUS
+import com.spread.common.expression.TokenType.RIGHT_PAREN
+import com.spread.common.expression.TokenType.SLASH
+import com.spread.common.expression.TokenType.SQUARE_ROOT
+import com.spread.common.expression.TokenType.STAR
 import java.math.BigDecimal
 
 internal class Parser(private val tokens: List<Token>) {

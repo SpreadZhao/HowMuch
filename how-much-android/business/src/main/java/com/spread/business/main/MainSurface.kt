@@ -258,6 +258,7 @@ fun RecordBottomSheet(
     ) {
         val keyboardController = LocalSoftwareKeyboardController.current
         RecordEdit(
+            modifier = Modifier.fillMaxWidth(),
             record = editRecordDialogState.record,
             onSave = { record, insert ->
                 scope.launch {

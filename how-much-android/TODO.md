@@ -31,4 +31,5 @@
 - [ ] (P0) Feature: Customizable category icon
 - [ ] (P1) Opt: Shrink category quick selection by 1 line
 - [ ] (P2) Feature: Money input error reason
-- [ ] (P1) Settings: When inputting remark, using ENTER key to decide saving record or just confirming input
+- [ ] (P1) Settings: When inputting remark, using ENTER key to decide saving record or just
+  confirming input

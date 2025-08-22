@@ -79,23 +79,39 @@ class MoneyInputState(
     val inputExpression: String
         get() = _inputExpression
 
-    val expressionValue: BigDecimal?
-        get() {
-            if (!regex.matches(inputExpression)) {
-                return null
-            }
-            val value = eval(inputExpression)
-            return value.takeIf { it > BigDecimal.ZERO }
-        }
+    data class ExpressionData(
+        val value: BigDecimal? = null,
+        val err: String? = null
+    )
 
-    val isValid: Boolean
-        get() = regex matches inputExpression && eval(inputExpression) > BigDecimal.ZERO
+    val expressionData: ExpressionData
+        get() {
+            val expr = inputExpression
+            if (!regex.matches(expr)) {
+                return ExpressionData(err = "Invalid expr")
+            }
+            val addSubParts = expr.split('+', '-')
+            for (part in addSubParts) {
+                if (part.isEmpty()) continue
+                if ("*" in part) {
+                    val factors = part.split('*')
+                    val decimalCount = factors.count { it.contains('.') }
+                    if (decimalCount > 1) return ExpressionData(err = "Only one decimal is allowed in multiplication")
+                }
+            }
+            val value = eval(expr)
+            if (value <= BigDecimal.ZERO) {
+                return ExpressionData(err = "Invalid value: $value")
+            }
+            if (value.stripTrailingZeros().scale() > 2) {
+                return ExpressionData(err = "Invalid value: $value")
+            }
+            return ExpressionData(value)
+        }
 
     fun appendStr(str: String) {
         val newImpression = inputExpression + str
-//        if (isValidExpression(newImpression)) {
         _inputExpression = newImpression
-//        }
     }
 
     fun removeLastChar() {
@@ -106,10 +122,6 @@ class MoneyInputState(
 
     fun clear() {
         _inputExpression = ""
-    }
-
-    private fun isValidExpression(expr: String): Boolean {
-        return regex matches expr
     }
 
     companion object {
@@ -197,7 +209,7 @@ fun Key(
     val context = LocalContext.current
     Box(
         modifier = modifier
-            .height(40.dp)
+            .height(50.dp)
             .then(
                 if (key !is Key.None) Modifier.combinedClickable(
                     onClick = {
@@ -225,7 +237,11 @@ fun Key(
                 when (key) {
                     is Key.Action -> {
                         when (key.action) {
-                            KeyAction.Plus, KeyAction.Minus, KeyAction.Multiply -> Text(text = key.str)
+                            KeyAction.Plus, KeyAction.Minus, KeyAction.Multiply -> Text(
+                                text = key.str,
+                                fontSize = TextConstants.FONT_SIZE_H3
+                            )
+
                             KeyAction.Backspace -> Icon(
                                 painter = painterResource(id = R.drawable.ic_backspace),
                                 contentDescription = "Backspace"
@@ -233,7 +249,7 @@ fun Key(
                         }
                     }
 
-                    else -> Text(text = key.str)
+                    else -> Text(text = key.str, fontSize = TextConstants.FONT_SIZE_H3)
                 }
             }
         }
