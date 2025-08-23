@@ -183,5 +183,5 @@ fun DebugMigrate() {
 
 @Composable
 fun DebugCategory() {
-    CategoryPanel({})
+    CategoryPanel()
 }

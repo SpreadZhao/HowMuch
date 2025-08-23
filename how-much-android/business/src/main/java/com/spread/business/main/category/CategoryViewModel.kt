@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+@Deprecated("Do not use ViewModel for reusable component")
 class CategoryViewModel(
     private val fileRepo: CategoryRepository
 ) : ViewModel() {

@@ -29,20 +29,17 @@ import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.listSaver
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -52,7 +49,6 @@ import androidx.compose.ui.unit.dp
 import com.spread.business.R
 import com.spread.business.main.category.CategoryPanel
 import com.spread.common.DATE_FORMAT_YEAR_MONTH_DAY_STR
-import com.spread.common.calendar
 import com.spread.common.nowCalendar
 import com.spread.common.timeInMillisToDateStr
 import com.spread.db.money.MoneyRecord
@@ -71,28 +67,21 @@ import java.util.Calendar
 @Composable
 fun RecordEdit(
     modifier: Modifier = Modifier,
-    record: MoneyRecord? = null,
+    viewModel: MainViewModel,
     onSave: (MoneyRecord, Boolean) -> Unit,
     onCancel: () -> Unit
 ) {
-    val calendar by remember {
-        mutableStateOf(
-            record?.date?.let(::calendar)
-                ?: nowCalendar
-        )
+    val recordEditState = viewModel.recordEditState
+    val record by recordEditState.recordFlow.collectAsState()
+    val calendar by recordEditState.calendarFlow.collectAsState()
+    val moneyInputState = rememberMoneyInputState()
+    val (value, err) = moneyInputState.expressionData
+    val expression = moneyInputState.inputExpression
+    LaunchedEffect(value) {
+        if (value != null) {
+            viewModel.recordEditState.updateMoney(value)
+        }
     }
-    val categoryState = rememberCategoryState(
-        options = listOf(
-            MoneyType.Expense to R.drawable.ic_expense,
-            MoneyType.Income to R.drawable.ic_income
-        ),
-        initialOptionIndex = if (record != null) {
-            if (record.type == MoneyType.Expense) 0 else 1
-        } else 0,
-        categoryInputText = record?.category ?: ""
-    )
-    var remarkInputText by remember { mutableStateOf(record?.remark ?: "") }
-    var valueInputText by remember { mutableStateOf(record?.value?.toString() ?: "") }
     Column(
         modifier = modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
         horizontalAlignment = Alignment.Start
@@ -102,29 +91,24 @@ fun RecordEdit(
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .align(alignment = Alignment.CenterHorizontally),
+            recordEditState = recordEditState,
             calendar = calendar,
             record = record,
-            categoryState = categoryState,
-            remarkInputText = remarkInputText,
-            valueInputText = valueInputText,
             onSave = onSave,
             onCancel = onCancel,
         )
         Category(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(), state = categoryState
+                .wrapContentHeight(),
+            recordEditState = recordEditState
         )
         Remark(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
-            remarkInputText = remarkInputText,
-            onRemarkInputTextChange = { remarkInputText = it }
+            viewModel = viewModel,
         )
-        val moneyInputState = rememberMoneyInputState()
-        val (value, err) = moneyInputState.expressionData
-        val expression = moneyInputState.inputExpression
         MoneyExpr(
             modifier = Modifier
                 .fillMaxWidth()
@@ -148,9 +132,17 @@ fun MoneyExpr(
         if (expression.isBlank()) {
             Spacer(modifier = Modifier.weight(1f))
             if (initial == null) {
-                Text(text = "How much?", fontSize = TextConstants.FONT_SIZE_H3, fontStyle = FontStyle.Italic)
+                Text(
+                    text = "How much?",
+                    fontSize = TextConstants.FONT_SIZE_H3,
+                    fontStyle = FontStyle.Italic
+                )
             } else {
-                Text(text = "How much(${initial})?", fontSize = TextConstants.FONT_SIZE_H3, fontStyle = FontStyle.Italic)
+                Text(
+                    text = "How much(${initial})?",
+                    fontSize = TextConstants.FONT_SIZE_H3,
+                    fontStyle = FontStyle.Italic
+                )
             }
             Spacer(modifier = Modifier.weight(1f))
         } else {
@@ -179,9 +171,9 @@ fun MoneyExpr(
 @Composable
 fun Remark(
     modifier: Modifier = Modifier,
-    remarkInputText: String,
-    onRemarkInputTextChange: (String) -> Unit
+    viewModel: MainViewModel,
 ) {
+    val remark by viewModel.recordEditState.remarkInputFlow.collectAsState()
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         Icon(
             modifier = Modifier.size(24.dp),
@@ -192,51 +184,48 @@ fun Remark(
             modifier = Modifier
                 .weight(1f)
                 .padding(end = 5.dp),
-            value = remarkInputText,
-            onValueChange = onRemarkInputTextChange,
+            value = remark,
+            onValueChange = {
+                viewModel.recordEditState.updateRemark(it)
+            },
         )
-        LazyRow(
+        Suggestions(
             modifier = Modifier
                 .weight(1f)
                 .padding(start = 5.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            item {
-                SuggestionChip(
-                    modifier = Modifier
-                        .fillParentMaxWidth(0.7f)
-                        .padding(end = 5.dp),
-                    onClick = {
-                        onRemarkInputTextChange("suggest 1")
-                    },
-                    label = {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = "suggest 1",
-                            maxLines = 1,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                )
-            }
-            item {
-                SuggestionChip(
-                    modifier = Modifier
-                        .fillParentMaxWidth(0.7f)
-                        .padding(end = 5.dp),
-                    onClick = {
-                        onRemarkInputTextChange("suggest 2")
-                    },
-                    label = {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = "suggest 2",
-                            maxLines = 1,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                )
-            }
+            viewModel = viewModel
+        )
+    }
+}
+
+@Composable
+private fun Suggestions(
+    modifier: Modifier = Modifier,
+    viewModel: MainViewModel
+) {
+    LazyRow(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        item {
+            SuggestionChip(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(end = 5.dp),
+                onClick = {
+                    viewModel.recordEditState.updateRemark("asdf")
+                },
+                label = {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "suggest 1",
+                        maxLines = 1,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            )
+        }
+        item {
         }
     }
 }
@@ -303,11 +292,9 @@ fun RemarkAndMoney(
 @Composable
 fun Header(
     modifier: Modifier,
+    recordEditState: MainViewModel.RecordEditState,
     calendar: Calendar,
     record: MoneyRecord? = null,
-    categoryState: CategoryState,
-    remarkInputText: String,
-    valueInputText: String,
     onSave: (MoneyRecord, Boolean) -> Unit,
     onCancel: () -> Unit,
 ) {
@@ -347,10 +334,14 @@ fun Header(
             onClick = {
                 val moneyRecord = Money.buildMoneyRecord(record) {
                     date = calendar.timeInMillis
-                    type = categoryState.selectedOption.first
-                    remark = remarkInputText
-                    value = valueInputText
-                    category = categoryState.categoryInputText
+                    type = recordEditState.moneyTypeFlow.value
+                    remark = recordEditState.remarkInputFlow.value
+                    value = recordEditState.moneyInputFlow.value
+                    category = recordEditState.categoryInputFlow.value
+                }
+                if (record == moneyRecord) {
+                    onCancel()
+                    return@TextButton
                 }
                 // TODO: need more precise check whether record is new or not
                 onSave(moneyRecord, record == null)
@@ -424,7 +415,8 @@ fun Header(
 }
 
 @Composable
-fun Category(modifier: Modifier, state: CategoryState) {
+fun Category(modifier: Modifier, recordEditState: MainViewModel.RecordEditState) {
+    val category by recordEditState.categoryInputFlow.collectAsState()
     Column(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
@@ -436,81 +428,43 @@ fun Category(modifier: Modifier, state: CategoryState) {
             )
             EasyTextField(
                 modifier = Modifier.weight(2f),
-                value = state.categoryInputText,
+                value = category,
                 onValueChange = {
-                    state.categoryInputText = it
+                    recordEditState.updateCategory(it)
                 }
             )
             Spacer(modifier = Modifier.width(10.dp))
-            SingleChoiceSegmentedButton(modifier = Modifier.wrapContentWidth(), state = state)
+            SingleChoiceSegmentedButton(
+                modifier = Modifier.wrapContentWidth(),
+                recordEditState = recordEditState
+            )
         }
-        CategoryPanel(
-            onCategorySelected = {
-                state.categoryInputText = it.text.value
-            },
-            onViewModelReady = { viewModel ->
-                val index = viewModel.categoryState.value?.itemList?.indexOfFirst {
-                    it.text.value == state.categoryInputText
-                } ?: 0
-                viewModel.select(index)
-            }
-        )
-    }
-}
-
-@Composable
-fun rememberCategoryState(
-    options: List<Pair<MoneyType, Int>>,
-    initialOptionIndex: Int,
-    categoryInputText: String,
-): CategoryState {
-    return rememberSaveable(saver = CategoryState.Saver) {
-        CategoryState(
-            options = options,
-            selectedIndex = initialOptionIndex,
-            categoryInputText = categoryInputText
-        )
-    }
-}
-
-class CategoryState(
-    val options: List<Pair<MoneyType, Int>>,
-    selectedIndex: Int = 0,
-    categoryInputText: String = ""
-) {
-    var selectedIndex by mutableIntStateOf(selectedIndex)
-    var categoryInputText by mutableStateOf(categoryInputText)
-    val selectedOption: Pair<MoneyType, Int>
-        get() = options[selectedIndex]
-
-    companion object {
-        val Saver: Saver<CategoryState, *> = listSaver(
-            save = { listOf(it.options, it.selectedIndex, it.categoryInputText) },
-            restore = {
-                @Suppress("UNCHECKED_CAST")
-                CategoryState(it[0] as List<Pair<MoneyType, Int>>, it[1] as Int, it[2] as String)
-            }
-        )
+        CategoryPanel()
     }
 }
 
 @Composable
 fun SingleChoiceSegmentedButton(
     modifier: Modifier = Modifier,
-    state: CategoryState
+    recordEditState: MainViewModel.RecordEditState
 ) {
+    val options = listOf(
+        MoneyType.Expense to R.drawable.ic_expense,
+        MoneyType.Income to R.drawable.ic_income
+    )
+    val moneyType by recordEditState.moneyTypeFlow.collectAsState()
     SingleChoiceSegmentedButtonRow(modifier = modifier) {
-        state.options.forEachIndexed { index, item ->
+        options.forEachIndexed { index, item ->
             SegmentedButton(
                 modifier = Modifier.wrapContentSize(),
                 shape = SegmentedButtonDefaults.itemShape(
                     index = index,
-                    count = state.options.size
+                    count = 2
                 ),
                 icon = {
                 },
-                onClick = { state.selectedIndex = index },
-                selected = index == state.selectedIndex,
+                onClick = { recordEditState.updateMoneyType(options[index].first) },
+                selected = options[index].first == moneyType,
                 label = {
                     Icon(
                         painter = painterResource(id = item.second),

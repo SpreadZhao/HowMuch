@@ -6,7 +6,6 @@ import com.spread.redux.ReduxState
 import org.reduxkotlin.TypedReducer
 import org.reduxkotlin.TypedStore
 import org.reduxkotlin.threadsafe.createTypedThreadSafeStore
-import kotlin.let
 import kotlin.reflect.KClass
 
 

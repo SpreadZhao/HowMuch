@@ -34,3 +34,4 @@
 - [ ] (P1) Settings: When inputting remark, using ENTER key to decide saving record or just
   confirming input
 - [ ] (P0) Feature: Clearing icon for EasyTextField
+- [ ] (P1) Feature: Using last input as new record hint

@@ -33,6 +33,7 @@ object Money {
     ): MoneyRecord {
         val builder = MoneyRecordBuilder()
         builder.action()
+        // TODO: Exception check
         return MoneyRecord(
             id = from?.id ?: 0L,
             date = builder.date,

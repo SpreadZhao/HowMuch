@@ -40,7 +40,6 @@ import java.io.File
 
 @Composable
 fun CategoryPanel(
-    onCategorySelected: (categoryItem: CategoryItemModel) -> Unit,
     onViewModelReady: ((CategoryViewModel) -> Unit)? = null
 ) {
     val context = LocalContext.current
@@ -61,10 +60,6 @@ fun CategoryPanel(
 
     LaunchedEffect(viewModel) {
         onViewModelReady?.invoke(viewModel)
-    }
-
-    LaunchedEffect(selectedIdx) {
-        viewModel.getSelected()?.let(onCategorySelected)
     }
 
     Column {

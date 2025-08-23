@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
 
 typealias View = @Composable () -> Unit
 
-abstract class Component<out VM: ViewModel, out S: ReduxState> {
+abstract class Component<out VM : ViewModel, out S : ReduxState> {
 
     private var mViewModel: VM? = null
 

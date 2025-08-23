@@ -6,7 +6,10 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.spread.common.calendar
+import com.spread.common.nowCalendar
 import com.spread.db.money.MoneyRecord
+import com.spread.db.money.MoneyType
 import com.spread.db.service.Money
 import com.spread.db.service.groupByDay
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +29,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import java.math.BigDecimal
 import java.util.Calendar
 
 sealed interface EditRecordDialogState {
@@ -242,5 +246,85 @@ class MainViewModel : ViewModel() {
             }
         }
     }
+
+    inner class RecordEditState {
+
+        val recordFlow: StateFlow<MoneyRecord?> = showEditRecordDialogFlow
+            .map { state ->
+                when (state) {
+                    is EditRecordDialogState.Show -> state.record
+                    else -> null
+                }
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Lazily,
+                initialValue = null
+            )
+
+        val calendarFlow: StateFlow<Calendar> = recordFlow
+            .map { record ->
+                record?.date?.let { calendar(it) } ?: nowCalendar
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Lazily,
+                initialValue = nowCalendar
+            )
+
+        private var _remarkInputFlow = MutableStateFlow("")
+        val remarkInputFlow: StateFlow<String> = _remarkInputFlow
+
+        private var _moneyInputFlow = MutableStateFlow("")
+        val moneyInputFlow: StateFlow<String> = _moneyInputFlow
+
+        private var _categoryInputFlow = MutableStateFlow("")
+        val categoryInputFlow: StateFlow<String> = _categoryInputFlow
+
+        private var _moneyTypeFlow = MutableStateFlow(MoneyType.Expense)
+        val moneyTypeFlow: StateFlow<MoneyType> = _moneyTypeFlow
+
+        init {
+            // collect info every time when record changed
+            refreshOnDialogShow {
+                add { updateRemark(it?.remark ?: "") }
+                add { updateMoney(it?.value) }
+                add { updateCategory(it?.category ?: "") }
+                add { updateMoneyType(it?.type ?: MoneyType.Expense) }
+            }
+        }
+
+        fun updateRemark(remark: String) {
+            _remarkInputFlow.value = remark
+        }
+
+        fun updateMoney(value: BigDecimal?) {
+            _moneyInputFlow.value = value?.toString() ?: ""
+        }
+
+        fun updateCategory(category: String) {
+            _categoryInputFlow.value = category
+        }
+
+        fun updateMoneyType(moneyType: MoneyType) {
+            _moneyTypeFlow.value = moneyType
+        }
+
+        private fun refreshOnDialogShow(refreshActionBuilder: MutableList<(MoneyRecord?) -> Unit>.() -> Unit) {
+            buildList(refreshActionBuilder).forEach { action ->
+                viewModelScope.launch {
+                    showEditRecordDialogFlow.collect {
+                        if (it is EditRecordDialogState.Show) {
+                            action(it.record)
+                        } else {
+                            action(null)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    val recordEditState = RecordEditState()
 
 }
