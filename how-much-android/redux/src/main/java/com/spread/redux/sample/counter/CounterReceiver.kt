@@ -14,7 +14,6 @@ class CounterReceiver : ComponentReceiver<CounterComponent, CounterState, Counte
     private var viewModel: CounterViewModel? = null
 
     override fun onBindComponent(component: CounterComponent) {
-        // 绑定时获取 Component 内的 ViewModel
         viewModel = component.getViewModel()
     }
 
@@ -32,8 +31,8 @@ class CounterReceiver : ComponentReceiver<CounterComponent, CounterState, Counte
     }
 
     override fun onBindStore() {
-        observe(CounterState::count) { newValue ->
-            logger.info("CounterReceiver observed new count = $newValue")
+        observe(CounterState::count) { oldValue, newValue ->
+            logger.info("CounterReceiver observed new count = $newValue, last count = $oldValue")
         }
     }
 }

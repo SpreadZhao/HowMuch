@@ -73,7 +73,7 @@ object ComponentCenter {
      */
     inline fun <reified S : ReduxState, R> useSelector(
         crossinline selector: (S) -> R,
-        noinline onChange: (R) -> Unit
+        noinline onChange: (R, R) -> Unit
     ): () -> Unit {
         val currentStore = store
 
@@ -88,8 +88,8 @@ object ComponentCenter {
                 ?: error("State not found for ${S::class.simpleName}")
             val newValue = selector(state)
             if (newValue != lastValue) {
+                onChange(lastValue, newValue)
                 lastValue = newValue
-                onChange(newValue)
             }
         }
 

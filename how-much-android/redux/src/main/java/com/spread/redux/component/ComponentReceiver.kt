@@ -33,25 +33,18 @@ abstract class ComponentReceiver<C : Component<VM, S>, S : ReduxState, VM : View
     }
 
     /**
-     * 监听某个 State 的字段（函数方式）
-     */
-    protected inline fun <reified T : ReduxState, R> observe(
-        crossinline selector: (T) -> R,
-        noinline onChange: (R) -> Unit
-    ): () -> Unit {
-        return ComponentCenter.useSelector(selector, onChange)
-    }
-
-    /**
      * 监听某个 State 的字段（属性方式）
-     * 用法: observe(CounterState::count) { newCount -> ... }
      */
     protected inline fun <reified T : ReduxState, R> observe(
         prop: KProperty1<T, R>,
-        noinline onChange: (R) -> Unit
+        crossinline onChange: (R, R) -> Unit
     ): () -> Unit {
-        return observe<T, R>({ state -> prop.get(state) }, onChange)
+        return ComponentCenter.useSelector<T, R>(
+            selector = { state -> prop.get(state) },
+            onChange = { old, new -> onChange(old, new) }
+        )
     }
+
 }
 
 @Suppress("UNCHECKED_CAST")
