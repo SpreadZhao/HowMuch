@@ -1,8 +1,9 @@
 package com.spread.redux.sample.counter
 
+import androidx.lifecycle.viewModelScope
 import com.spread.redux.Action
 import com.spread.redux.component.ComponentReceiver
-import com.spread.redux.sample.counter.CounterState
+import kotlinx.coroutines.launch
 import java.util.logging.Logger
 
 class CounterReceiver : ComponentReceiver<CounterComponent, CounterState, CounterViewModel>() {
@@ -14,8 +15,15 @@ class CounterReceiver : ComponentReceiver<CounterComponent, CounterState, Counte
     private var viewModel: CounterViewModel? = null
 
     override fun onBindComponent(component: CounterComponent) {
-        // 绑定时获取 Component 内的 ViewModel
         viewModel = component.getViewModel()
+        val viewModelScope = viewModel?.viewModelScope
+
+        // Flow -> Redux State 同步
+        viewModelScope?.launch {
+            viewModel?.counterState?.collect { counterState ->
+                dispatchAction(CounterAction.InternalStateUpdated(counterState))
+            }
+        }
     }
 
     override fun onReceiveAction(prevState: CounterState, action: Action): CounterState {
@@ -24,16 +32,15 @@ class CounterReceiver : ComponentReceiver<CounterComponent, CounterState, Counte
         when (action) {
             is CounterAction.Increment -> vm.increment(action.value)
             is CounterAction.Decrement -> vm.decrement(action.value)
+            is CounterAction.InternalStateUpdated -> return action.state
         }
 
-        // 返回最新 State
-        // todo 这里看看能不能支持下 flow.collect 自动同步
-        return vm.counterState.value
+        return prevState
     }
 
     override fun onBindStore() {
-        observe(CounterState::count) { newValue ->
-            logger.info("CounterReceiver observed new count = $newValue")
+        observe(CounterState::count) { oldValue, newValue ->
+            logger.info("CounterReceiver observed new count = $newValue, last count = $oldValue")
         }
     }
 }
