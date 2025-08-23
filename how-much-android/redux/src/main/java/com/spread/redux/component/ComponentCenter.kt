@@ -38,6 +38,20 @@ object ComponentCenter {
         }
     }
 
+    fun <C : Component<VM, S>, S : ReduxState, VM : ViewModel> addAll(
+        vararg entries: Pair<C, ComponentReceiver<C, S, VM>?>
+    ) {
+        entries.forEach { (component, receiver) ->
+            val clazz = component::class
+            components[clazz] = component
+            receiver?.let {
+                receivers[clazz] = it
+                it.onBindComponent(component)
+            }
+        }
+    }
+
+
     /**
      * 构建全局 Store，必须在使用前调用
      */
