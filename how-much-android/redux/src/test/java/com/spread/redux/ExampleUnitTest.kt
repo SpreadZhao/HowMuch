@@ -42,7 +42,7 @@ class ExampleUnitTest {
 
     @Test
     fun testRedux() {
-        ComponentCenter.add(CounterComponent(), CounterReceiver())
+        ComponentCenter.addAll(CounterComponent() to CounterReceiver())
         ComponentCenter.build()
 
         // 这里如果不等待，那么多次action的修改会被合并
