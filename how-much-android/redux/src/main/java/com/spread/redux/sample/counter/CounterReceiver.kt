@@ -2,7 +2,6 @@ package com.spread.redux.sample.counter
 
 import com.spread.redux.Action
 import com.spread.redux.component.ComponentReceiver
-import com.spread.redux.sample.counter.CounterState
 import java.util.logging.Logger
 
 class CounterReceiver : ComponentReceiver<CounterComponent, CounterState, CounterViewModel>() {
