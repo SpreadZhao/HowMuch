@@ -15,7 +15,7 @@ How much did you cost on each thing?
 ---
 
 ## Component Framework
-Component Framework 旨在通过 Redux 的单向数据流管理，实现业务模块的解耦与状态一致性，避免 ViewModel 之间的直接依赖。
+**Component Framework** 旨在通过 Redux 的单向数据流管理，实现业务模块的解耦与状态一致性，避免业务数据之间的直接依赖。
 
 ### Component
 
@@ -78,8 +78,8 @@ observe(CounterState::count) { oldValue, newValue ->
 
 ---
 
-### Flow 与 State 同步策略
+### Flow 与 ReduxState 同步建议
 
 1. **外部 Action** → Receiver → ViewModel 修改 → ReduxState 更新。
-2. **内部 ViewModel 更新**（StateFlow emit） → Receiver 派发 `InternalStateUpdated` Action 同步 ReduxState。
-3. 避免重复触发：Receiver 对 Increment/Decrement **不直接修改 ReduxState**，而由 Flow emit 更新。
+2. **内部 ViewModel 更新**（StateFlow emit） → Receiver dispatch `InternalStateUpdated` Action 同步 ReduxState。
+3. 避免重复触发：Receiver 对 Action **不直接修改 ReduxState**，而由 Flow collect 统一更新。
