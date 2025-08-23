@@ -4,6 +4,7 @@ import com.spread.redux.component.ComponentCenter
 import com.spread.redux.sample.counter.CounterAction
 import com.spread.redux.sample.counter.CounterComponent
 import com.spread.redux.sample.counter.CounterReceiver
+import junit.framework.TestCase.assertEquals
 import org.junit.Test
 import java.util.logging.Logger
 
