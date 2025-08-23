@@ -1,4 +1,4 @@
-package com.spread.redux.sample
+package com.spread.redux.sample.counter
 
 import com.spread.redux.Action
 

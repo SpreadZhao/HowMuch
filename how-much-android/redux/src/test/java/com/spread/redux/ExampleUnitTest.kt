@@ -1,6 +1,9 @@
 package com.spread.redux
 
-import com.spread.redux.sample.CounterAction
+import com.spread.redux.component.ComponentCenter
+import com.spread.redux.sample.counter.CounterAction
+import com.spread.redux.sample.counter.CounterComponent
+import com.spread.redux.sample.counter.CounterReceiver
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -24,17 +27,12 @@ class ExampleUnitTest {
 
     @Test
     fun testRedux() {
-//        val appStateUnsubscribe = HowMuchStore.subscribe { logger.info("HowMuchState changed: ${HowMuchStore.state.hashCode()}") }
-        val unsubscribe = HowMuchStore.select({ it.counterState }) { logger.info("CounterState changed: $it") }
-        dispatchAction(CounterAction.Increment(0))
-        dispatchAction(CounterAction.Increment(0))
-        dispatchAction(CounterAction.Increment(1))
-        dispatchAction(CounterAction.Increment(2))
-        dispatchAction(CounterAction.Decrement(3))
-        unsubscribe()
-//        appStateUnsubscribe()
-        dispatchAction(CounterAction.Increment())
-        dispatchAction(CounterAction.Increment())
-        dispatchAction(CounterAction.Decrement())
+        ComponentCenter.add(CounterComponent(), CounterReceiver())
+        ComponentCenter.build()
+
+        ComponentCenter.dispatch(CounterAction.Increment(1))
+        ComponentCenter.dispatch(CounterAction.Increment(2))
+        ComponentCenter.dispatch(CounterAction.Increment(3))
+        ComponentCenter.dispatch(CounterAction.Increment(0))
     }
 }
