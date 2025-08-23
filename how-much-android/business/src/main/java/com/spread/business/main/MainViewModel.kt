@@ -285,7 +285,7 @@ class MainViewModel : ViewModel() {
         val moneyTypeFlow: StateFlow<MoneyType> = _moneyTypeFlow
 
         init {
-            // collect info every time when record changed
+            // refresh UI state every time when dialog show
             refreshOnDialogShow {
                 add { updateRemark(it?.remark ?: "") }
                 add { updateMoney(it?.value) }
@@ -316,8 +316,6 @@ class MainViewModel : ViewModel() {
                     showEditRecordDialogFlow.collect {
                         if (it is EditRecordDialogState.Show) {
                             action(it.record)
-                        } else {
-                            action(null)
                         }
                     }
                 }
