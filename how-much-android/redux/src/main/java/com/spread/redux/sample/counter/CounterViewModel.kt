@@ -1,9 +1,11 @@
 package com.spread.redux.sample.counter
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.spread.redux.sample.counter.CounterState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 class CounterViewModel : ViewModel() {
 
@@ -11,10 +13,14 @@ class CounterViewModel : ViewModel() {
     val counterState: StateFlow<CounterState> = _counterState
 
     fun increment(value: Int) {
-        _counterState.value = _counterState.value.copy(count = _counterState.value.count + value)
+        viewModelScope.launch {
+            _counterState.emit(_counterState.value.copy(count = _counterState.value.count + value))
+        }
     }
 
     fun decrement(value: Int) {
-        _counterState.value = _counterState.value.copy(count = _counterState.value.count - value)
+        viewModelScope.launch {
+            _counterState.emit(_counterState.value.copy(count = _counterState.value.count - value))
+        }
     }
 }
