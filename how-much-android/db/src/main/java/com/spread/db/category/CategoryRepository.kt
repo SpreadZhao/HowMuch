@@ -23,11 +23,11 @@ class CategoryRepository(val context: Context) {
                 CategoryItem("娱乐", "ic_entertainment"),
                 CategoryItem("医疗", "ic_medical"),
                 CategoryItem("教育", "ic_education"),
-                CategoryItem("旅行", "ic_transport"),
-                CategoryItem("人情", "ic_gift"),
-                CategoryItem("工资", "ic_salary"),
-                CategoryItem("奖金", "ic_bonus"),
-                CategoryItem("投资", "ic_investment")
+                CategoryItem("旅行", "ic_transport")
+//                CategoryItem("人情", "ic_gift"),
+//                CategoryItem("工资", "ic_salary"),
+//                CategoryItem("奖金", "ic_bonus"),
+//                CategoryItem("投资", "ic_investment")
             )
         )
     }

@@ -37,7 +37,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import com.spread.common.performHapticFeedback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNot
@@ -252,9 +251,9 @@ fun PickerList(
           index ->
             items.getOrNull(index)?.let { target ->
                 if (target != currentSelected) {
-                    if (!scrollAnim && currentSelected != -1) {
-                        performHapticFeedback(context)
-                    }
+//                    if (!scrollAnim && currentSelected != -1) {
+//                        performHapticFeedback(context)
+//                    }
                     currentSelected = target
                     onSelectedItemChanged(target)
                 }

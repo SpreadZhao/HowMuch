@@ -1,4 +1,4 @@
-package com.spread.migrate
+package com.spread.business.migrate
 
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult

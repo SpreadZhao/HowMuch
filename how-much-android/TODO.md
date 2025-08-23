@@ -26,5 +26,11 @@
 - [x] (P1) Opt: Scroll to top after inserting record
 - [x] (P1) Opt: Split Month and Year Config, only load one in MainSurface
 - [ ] (P1) Feature: No rounded corner!!!
-- [ ] (P2) Feature: Search(a big feature~)
+- [ ] (P2) Feature: Search a MoneyRecord (a big feature~)
 - [ ] (P0) Opt: Multiple language support
+- [ ] (P0) Feature: Customizable category icon
+- [ ] (P1) Opt: Shrink category quick selection by 1 line
+- [ ] (P2) Feature: Money input error reason
+- [ ] (P1) Settings: When inputting remark, using ENTER key to decide saving record or just
+  confirming input
+- [ ] (P0) Feature: Clearing icon for EasyTextField

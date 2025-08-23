@@ -49,6 +49,5 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(project(":ui"))
     implementation(project(":db"))
-    implementation(project(":migrate"))
     implementation(project(":business"))
 }

@@ -2,9 +2,9 @@ package com.spread.business.statistics
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
@@ -30,12 +30,12 @@ fun StatisticsPanel(
     modifier: Modifier = Modifier,
     records: List<MoneyRecord>
 ) {
-    val monthlyExpense = records.filter {
+    val expense = records.filter {
         it.type == MoneyType.Expense
     }.sumOf {
         it.value
     }
-    val monthlyIncome = records.filter {
+    val income = records.filter {
         it.type == MoneyType.Income
     }.sumOf {
         it.value
@@ -44,25 +44,32 @@ fun StatisticsPanel(
     Row(modifier = modifier) {
         Column(
             modifier = Modifier
-                .wrapContentSize()
+                .fillMaxWidth()
                 .onGloballyPositioned {
                     minHeight = it.size.height
-                }) {
-            StatisticItem(
-                iconId = R.drawable.ic_expense,
-                description = "Current Month Expense",
-                text = "-$monthlyExpense"
-            )
-            StatisticItem(
-                iconId = R.drawable.ic_income,
-                description = "Current Month Income",
-                text = "+$monthlyIncome"
-            )
-            StatisticItem(
-                iconId = R.drawable.ic_balance,
-                description = "Current Month Balance",
-                text = balance(income = monthlyIncome, expense = monthlyExpense)
-            )
+                }
+        ) {
+            if (expense > BigDecimal.ZERO) {
+                StatisticItem(
+                    iconId = R.drawable.ic_expense,
+                    description = "Current Month Expense",
+                    text = "-$expense"
+                )
+            }
+            if (income > BigDecimal.ZERO) {
+                StatisticItem(
+                    iconId = R.drawable.ic_income,
+                    description = "Current Month Income",
+                    text = "+$income"
+                )
+            }
+            if (income > BigDecimal.ZERO && expense > BigDecimal.ZERO) {
+                StatisticItem(
+                    iconId = R.drawable.ic_balance,
+                    description = "Current Month Balance",
+                    text = balance(income = income, expense = expense)
+                )
+            }
         }
 //        ColumnChart(
 //            modifier = Modifier
@@ -82,7 +89,7 @@ fun StatisticItem(
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         Icon(
-            modifier = Modifier.size(TextConstants.FONT_SIZE_H2.toDp()),
+            modifier = Modifier.size(TextConstants.FONT_SIZE_H4.toDp()),
             painter = painterResource(id = iconId),
             contentDescription = description
         )
@@ -90,7 +97,7 @@ fun StatisticItem(
             modifier = Modifier.padding(start = 8.dp),
             text = text,
             style = LocalTextStyle.current.copy(
-                fontSize = TextConstants.FONT_SIZE_H3
+                fontSize = TextConstants.FONT_SIZE_H4
             )
         )
     }

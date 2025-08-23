@@ -5,8 +5,6 @@ import com.spread.redux.sample.counter.CounterAction
 import com.spread.redux.sample.counter.CounterComponent
 import com.spread.redux.sample.counter.CounterReceiver
 import org.junit.Test
-
-import org.junit.Assert.*
 import java.util.logging.Logger
 
 /**
