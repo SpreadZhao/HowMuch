@@ -16,5 +16,5 @@ abstract class Component<out VM: ViewModel, out S: ReduxState> {
 
     open fun getViewModel(): VM? = mViewModel
 
-    abstract fun getStateType(): KClass<out S>
+    abstract fun getInitialState(): S
 }

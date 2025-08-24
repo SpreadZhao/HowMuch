@@ -57,10 +57,7 @@ object ComponentCenter {
      */
     fun build() {
         val initialState = components.mapValues { (_, comp) ->
-            val stateType = comp.getStateType()
-            val constructor = stateType.constructors.firstOrNull()
-                ?: error("State class must have at least one constructor")
-            constructor.callBy(emptyMap())
+            comp.getInitialState()
         }
 
         val rootReducer: TypedReducer<Map<KClass<out Component<*, *>>, ReduxState>, Action> =

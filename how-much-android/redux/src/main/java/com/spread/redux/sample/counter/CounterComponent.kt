@@ -10,5 +10,7 @@ class CounterComponent : Component<CounterViewModel, CounterState>() {
 
     override fun getViewModel(): CounterViewModel = viewModel
 
-    override fun getStateType(): KClass<out CounterState> = CounterState::class
+    override fun getInitialState(): CounterState {
+        return CounterState()
+    }
 }
