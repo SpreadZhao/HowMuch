@@ -1,9 +1,7 @@
 package com.spread.business.main
 
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.spread.common.calendar
@@ -14,7 +12,6 @@ import com.spread.db.service.Money
 import com.spread.db.service.groupByDay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -81,8 +78,8 @@ class MainViewModel : ViewModel() {
     var prevZoomInViewType: ViewType = viewTypeFlow.value
         private set
 
-    private var _blinkingRecord = MutableStateFlow<MoneyRecord?>(null)
-    val blinkingRecord: StateFlow<MoneyRecord?> = _blinkingRecord
+    private var _saveSuccessActionFlow = MutableStateFlow<Pair<Int?, MoneyRecord?>?>(null)
+    val saveSuccessActionFlow: StateFlow<Pair<Int?, MoneyRecord?>?> = _saveSuccessActionFlow
 
     private var _uiEventFlow = MutableSharedFlow<UIEvent>()
     val uiEventFlow: SharedFlow<UIEvent> get() = _uiEventFlow.asSharedFlow()
@@ -188,12 +185,6 @@ class MainViewModel : ViewModel() {
         _viewTypeFlow.value = viewType
     }
 
-    private suspend fun blinkRecord(record: MoneyRecord, duration: Long) {
-        _blinkingRecord.value = record
-        delay(duration)
-        _blinkingRecord.value = null
-    }
-
     suspend fun showSnackbar(
         message: String,
         actionLabel: String? = null,
@@ -214,9 +205,7 @@ class MainViewModel : ViewModel() {
 
     fun handleRecordEdit(
         insert: Boolean,
-        record: MoneyRecord,
-        records: List<MoneyRecord>,
-        recordsListState: LazyListState
+        record: MoneyRecord
     ) {
         viewModelScope.launch(Dispatchers.Main) {
             val id = withContext(Dispatchers.IO) {
@@ -231,19 +220,17 @@ class MainViewModel : ViewModel() {
             val targetGroupIndex =
                 if (!insert || id == null || id <= 0) null
                 else withTimeoutOrNull(300L) {
-                    snapshotFlow {
-                        records.groupByDay()
-                            .indexOfFirst { dailyRecords -> dailyRecords.any { it.id == id } }
-                    }.first { it >= 0 }
+                    currMonthMoneyRecordsFlow
+                        .map { records ->
+                            records.groupByDay().indexOfFirst { dailyRecords ->
+                                dailyRecords.any { it.id == id }
+                            }
+                        }
+                        .first { it >= 0 }
                 }
 
-            if (targetGroupIndex != null) {
-                recordsListState.animateScrollToItem(targetGroupIndex)
-            }
-
-            records.find { it.id == id }?.let {
-                blinkRecord(it, 1000L)
-            }
+            val blinkRecord = currMonthMoneyRecordsFlow.value.find { it.id == id }
+            _saveSuccessActionFlow.value = targetGroupIndex to blinkRecord
         }
     }
 

@@ -30,9 +30,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -46,6 +48,7 @@ import com.spread.business.statistics.StatisticsScreen
 import com.spread.db.money.MoneyRecord
 import com.spread.db.service.groupByDay
 import com.spread.ui.detectZoomGesture
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -125,8 +128,6 @@ fun MainSurface(viewModel: MainViewModel) {
     }
     RecordBottomSheet(
         viewModel = viewModel,
-        records = records,
-        recordsListState = recordsListState,
         editRecordDialogState = editRecordDialogState
     )
 }
@@ -165,7 +166,26 @@ fun MainContent(
     records: List<MoneyRecord>,
     recordsListState: LazyListState
 ) {
-    val blinkingRecord by viewModel.blinkingRecord.collectAsState()
+    var blinkingRecord: MoneyRecord? by remember { mutableStateOf(null) }
+    LaunchedEffect(viewModel.saveSuccessActionFlow) {
+        viewModel.saveSuccessActionFlow.collect {
+            // scroll & blink
+            val targetIndex = it?.first
+            if (targetIndex != null) {
+                recordsListState.animateScrollToItem(targetIndex)
+            }
+            val br = it?.second
+            if (br != null) {
+                blinkingRecord = br
+                delay(400L)
+                blinkingRecord = null
+                delay(400L)
+                blinkingRecord = br
+                delay(400L)
+                blinkingRecord = null
+            }
+        }
+    }
     Crossfade(
         modifier = Modifier.fillMaxSize(),
         targetState = viewType,
@@ -235,8 +255,6 @@ fun MainContent(
 @Composable
 fun RecordBottomSheet(
     viewModel: MainViewModel,
-    records: List<MoneyRecord>,
-    recordsListState: LazyListState,
     editRecordDialogState: EditRecordDialogState
 ) {
     if (editRecordDialogState !is EditRecordDialogState.Show) {
@@ -271,9 +289,7 @@ fun RecordBottomSheet(
                     if (t == null) {
                         viewModel.handleRecordEdit(
                             insert = insert,
-                            record = record,
-                            records = records,
-                            recordsListState = recordsListState
+                            record = record
                         )
                     }
                 }
