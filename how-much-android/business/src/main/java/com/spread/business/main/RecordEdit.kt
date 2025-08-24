@@ -46,17 +46,18 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.spread.business.R
 import com.spread.business.main.category.CategoryPanel
 import com.spread.common.DATE_FORMAT_YEAR_MONTH_DAY_STR
 import com.spread.common.nowCalendar
 import com.spread.common.timeInMillisToDateStr
+import com.spread.db.category.CategoryItem
 import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
 import com.spread.db.service.Money
 import com.spread.ui.EasyTextField
 import com.spread.ui.MoneyInput
 import com.spread.ui.MoneyInput2
+import com.spread.ui.R
 import com.spread.ui.TextConstants
 import com.spread.ui.YearMonthDayPicker
 import com.spread.ui.rememberMoneyInputState
@@ -101,7 +102,8 @@ fun RecordEdit(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
-            recordEditState = recordEditState
+            recordEditState = recordEditState,
+            categories = viewModel.categoryRepository.categories
         )
         Remark(
             modifier = Modifier
@@ -415,7 +417,11 @@ fun Header(
 }
 
 @Composable
-fun Category(modifier: Modifier, recordEditState: MainViewModel.RecordEditState) {
+fun Category(
+    modifier: Modifier,
+    recordEditState: MainViewModel.RecordEditState,
+    categories: List<CategoryItem>
+) {
     val category by recordEditState.categoryInputFlow.collectAsState()
     Column(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -439,7 +445,12 @@ fun Category(modifier: Modifier, recordEditState: MainViewModel.RecordEditState)
                 recordEditState = recordEditState
             )
         }
-        CategoryPanel()
+        CategoryPanel(
+            categories = categories,
+            initialCategoryName = category,
+        ) {
+            recordEditState.updateCategory(it.text)
+        }
     }
 }
 

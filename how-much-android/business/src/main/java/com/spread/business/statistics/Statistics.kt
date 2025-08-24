@@ -18,9 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.spread.business.R
 import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
+import com.spread.ui.R
 import com.spread.ui.TextConstants
 import com.spread.ui.toDp
 import java.math.BigDecimal

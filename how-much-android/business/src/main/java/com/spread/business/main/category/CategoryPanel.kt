@@ -1,6 +1,5 @@
 package com.spread.business.main.category
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -18,50 +17,39 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import com.spread.db.category.CategoryRepository
-import java.io.File
+import com.spread.db.category.CategoryItem
 
 @Composable
 fun CategoryPanel(
-    onViewModelReady: ((CategoryViewModel) -> Unit)? = null
+    categories: List<CategoryItem>,
+    initialCategoryName: String? = null,
+    maxCount: Int = 8,
+    onCategorySelected: (categoryItem: CategoryItem) -> Unit
 ) {
-    val context = LocalContext.current
-    val fileRepo = remember {
-        CategoryRepository(context.applicationContext).apply {
-            initSync()
+    var selectedIdx by remember {
+        mutableIntStateOf(-1)
+    }
+    LaunchedEffect(Unit) {
+        if (initialCategoryName != null) {
+            val index = categories.indexOfFirst { it.text == initialCategoryName }
+            if (index >= 0) {
+                selectedIdx = index
+            }
         }
     }
-    val viewModel: CategoryViewModel = viewModel(
-        factory = CategoryViewModelFactory(fileRepo)
-    )
-    val category by viewModel.categoryState.collectAsState()
-    val selectedIdx by viewModel.selectedIdx.collectAsState(-1)
-
-    LaunchedEffect(Unit) {
-        viewModel.loadCategory()
-    }
-
-    LaunchedEffect(viewModel) {
-        onViewModelReady?.invoke(viewModel)
-    }
-
     Column {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 80.dp),
@@ -69,52 +57,17 @@ fun CategoryPanel(
             verticalArrangement = Arrangement.spacedBy(0.dp),
             horizontalArrangement = Arrangement.spacedBy(0.dp)
         ) {
-            category?.itemList?.withIndex()?.forEach { (index, categoryItem) ->
-                item(key = index) {
-                    val isActive = remember(selectedIdx) {
-                        derivedStateOf { selectedIdx == index }
-                    }
-                    CategoryTag(categoryItem, isActive) {
-                        viewModel.select(index)
-                    }
+            for (i in 0 until maxCount) {
+                if (i >= categories.size) {
+                    break
                 }
-            }
-        }
-    }
-}
-
-
-@Composable
-fun TopNCategorySurface(n: Int, onViewModelReady: ((TopNCategoryViewModel) -> Unit)? = null) {
-    val context = LocalContext.current
-    val fileRepo = remember {
-        CategoryRepository(context.applicationContext).apply {
-            initSync()
-        }
-    }
-    val viewModel: TopNCategoryViewModel = viewModel(
-        factory = TopNCategoryViewModelFactory(fileRepo, n)
-    )
-    val category by viewModel.categoryState.collectAsState()
-    val selectedIdx by viewModel.selectedIdx.collectAsState(-1)
-    LaunchedEffect(Unit) {
-        viewModel.loadCategory()
-    }
-    LaunchedEffect(viewModel) {
-        onViewModelReady?.invoke(viewModel)
-    }
-    Column {
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 100.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) {
-            category?.itemList?.withIndex()?.forEach { (index, categoryItem) ->
-                item(key = index) {
+                item(key = i) {
                     val isActive = remember(selectedIdx) {
-                        derivedStateOf { selectedIdx == index }
+                        derivedStateOf { selectedIdx == i }
                     }
-                    CategoryTag(categoryItem, isActive) {
-                        viewModel.select(index)
+                    CategoryTag(categories[i], isActive.value) {
+                        selectedIdx = i
+                        onCategorySelected(categories[i])
                     }
                 }
             }
@@ -123,7 +76,11 @@ fun TopNCategorySurface(n: Int, onViewModelReady: ((TopNCategoryViewModel) -> Un
 }
 
 @Composable
-fun CategoryTag(item: CategoryItemModel, isActive: State<Boolean>, onClickAction: () -> Unit) {
+fun CategoryTag(
+    item: CategoryItem,
+    isActive: Boolean,
+    onClick: () -> Unit
+) {
     val scheme = MaterialTheme.colorScheme
     val interactionSource = remember { MutableInteractionSource() }
     Box(
@@ -131,7 +88,7 @@ fun CategoryTag(item: CategoryItemModel, isActive: State<Boolean>, onClickAction
             .clickable(
                 interactionSource = interactionSource,
                 indication = ripple(),  // 点击时的水波效果
-                onClick = onClickAction,
+                onClick = onClick,
                 enabled = true,
                 role = null
             )
@@ -143,14 +100,14 @@ fun CategoryTag(item: CategoryItemModel, isActive: State<Boolean>, onClickAction
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically)
         ) {
-            val color = if (isActive.value) {
+            val color = if (isActive) {
                 scheme.primary
             } else {
                 scheme.onSurface
             }
             CategoryItemIcon(item, color)
             Text(
-                text = item.text.value,
+                text = item.text,
                 fontWeight = FontWeight.Bold,
                 color = color,
                 maxLines = 1,
@@ -161,37 +118,17 @@ fun CategoryTag(item: CategoryItemModel, isActive: State<Boolean>, onClickAction
 }
 
 @Composable
-fun CategoryItemIcon(categoryItem: CategoryItemModel, color: Color) {
-    val context = LocalContext.current
-    val drawableResId = getDrawableResId(context, categoryItem.icon.value)
+fun CategoryItemIcon(categoryItem: CategoryItem, color: Color) {
+    // TODO: default icon
+    val drawableResId = iconOf(categoryItem.id) ?: return
 
     if (drawableResId != 0) {
         // 使用项目内置图标
         Image(
             painter = painterResource(id = drawableResId),
-            contentDescription = categoryItem.text.value,
+            contentDescription = categoryItem.text,
             modifier = Modifier.size(24.dp),
             colorFilter = ColorFilter.tint(color)
         )
-    } else {
-        // 使用导入到应用沙箱的图标
-        val file = File(context.filesDir, categoryItem.icon.value)
-        if (file.exists()) {
-            AsyncImage(
-                model = ImageRequest.Builder(context)
-                    .data(file)
-                    .build(),
-                contentDescription = categoryItem.text.value,
-                modifier = Modifier.size(20.dp)
-            )
-        }
     }
-}
-
-private fun getDrawableResId(context: Context, iconName: String): Int {
-    return context.resources.getIdentifier(
-        iconName,
-        "drawable",
-        context.packageName
-    )
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.spread.common.calendar
 import com.spread.common.nowCalendar
+import com.spread.db.category.CategoryRepository
 import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
 import com.spread.db.service.Money
@@ -311,5 +312,9 @@ class MainViewModel : ViewModel() {
     }
 
     val recordEditState = RecordEditState()
+
+    val categoryRepository by lazy {
+        CategoryRepository().apply { loadCategory() }
+    }
 
 }

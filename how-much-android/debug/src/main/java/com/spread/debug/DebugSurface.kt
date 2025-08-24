@@ -20,7 +20,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.spread.business.main.MainSurface
-import com.spread.business.main.category.CategoryPanel
 import com.spread.business.migrate.MigrateButton
 import com.spread.business.outside.QuickAddRecordActivity
 import com.spread.db.money.MoneyType
@@ -183,5 +182,4 @@ fun DebugMigrate() {
 
 @Composable
 fun DebugCategory() {
-    CategoryPanel()
 }
