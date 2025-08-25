@@ -250,9 +250,15 @@ class MainViewModel : ViewModel() {
                 initialValue = null
             )
 
-        val calendarFlow: StateFlow<Calendar> = recordFlow
-            .map { record ->
-                record?.date?.let { calendar(it) } ?: nowCalendar
+        val calendarFlow: StateFlow<Calendar> = showEditRecordDialogFlow
+            .map { state ->
+                when (state) {
+                    is EditRecordDialogState.Show -> state.record?.date?.let {
+                        calendar(it)
+                    } ?: nowCalendar
+
+                    else -> nowCalendar
+                }
             }
             .stateIn(
                 scope = viewModelScope,
