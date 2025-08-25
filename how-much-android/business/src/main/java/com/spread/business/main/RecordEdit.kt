@@ -80,7 +80,7 @@ fun RecordEdit(
     val expression = moneyInputState.inputExpression
     LaunchedEffect(value) {
         if (value != null) {
-            viewModel.recordEditState.updateMoney(value)
+            recordEditState.updateMoney(value)
         }
     }
     Column(
@@ -109,7 +109,7 @@ fun RecordEdit(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
-            viewModel = viewModel,
+            recordEditState = recordEditState
         )
         MoneyExpr(
             modifier = Modifier
@@ -173,9 +173,9 @@ fun MoneyExpr(
 @Composable
 fun Remark(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel,
+    recordEditState: MainViewModel.RecordEditState
 ) {
-    val remark by viewModel.recordEditState.remarkInputFlow.collectAsState()
+    val remark by recordEditState.remarkInputFlow.collectAsState()
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         Icon(
             modifier = Modifier.size(24.dp),
@@ -188,48 +188,63 @@ fun Remark(
                 .padding(end = 5.dp),
             value = remark,
             onValueChange = {
-                viewModel.recordEditState.updateRemark(it)
+                recordEditState.updateRemark(it)
             },
         )
-        Suggestions(
+        RemarkSuggestions(
             modifier = Modifier
                 .weight(1f)
                 .padding(start = 5.dp),
-            viewModel = viewModel
+            recordEditState = recordEditState
         )
     }
 }
 
 @Composable
-private fun Suggestions(
+private fun RemarkSuggestions(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel
+    recordEditState: MainViewModel.RecordEditState
 ) {
     LazyRow(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         item {
-            SuggestionChip(
-                modifier = Modifier
-                    .wrapContentSize()
-                    .padding(end = 5.dp),
-                onClick = {
-                    viewModel.recordEditState.updateRemark("asdf")
-                },
-                label = {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = "suggest 1",
-                        maxLines = 1,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            )
+            SuggestionItem(text = "suggest 1", recordEditState = recordEditState)
         }
         item {
+            SuggestionItem(text = "suggest 2", recordEditState = recordEditState)
+        }
+        item {
+            SuggestionItem(text = "suggest 3", recordEditState = recordEditState)
+        }
+        item {
+            SuggestionItem(text = "suggest 4", recordEditState = recordEditState)
         }
     }
+}
+
+@Composable
+private fun SuggestionItem(
+    text: String,
+    recordEditState: MainViewModel.RecordEditState
+) {
+    SuggestionChip(
+        modifier = Modifier
+            .wrapContentSize()
+            .padding(end = 5.dp),
+        onClick = {
+            recordEditState.updateRemark(text)
+        },
+        label = {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = text,
+                maxLines = 1,
+                textAlign = TextAlign.Center
+            )
+        }
+    )
 }
 
 @Composable
