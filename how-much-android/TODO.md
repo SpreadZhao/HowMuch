@@ -35,3 +35,12 @@
   confirming input
 - [ ] (P0) Feature: Clearing icon for EasyTextField
 - [ ] (P1) Feature: Using last input as new record hint
+- [ ] (P0) Feature: Menu button on right top
+    - [ ] Edit multiple records
+    - [ ] Settings
+    - [ ] About
+    - [ ] Budget
+    - [ ] Ledger Management
+    - [ ] Search
+    - [ ] ...
+- [ ] (P1) Opt: String res
