@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
@@ -22,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,12 +33,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.spread.db.category.CategoryItem
+import kotlinx.coroutines.flow.first
+
+private const val MAX_ROWS = 2
 
 @Composable
 fun CategoryPanel(
     categories: List<CategoryItem>,
     initialCategoryName: String? = null,
-    maxCount: Int = 8,
+    maxCount: Int = categories.size,
     onCategorySelected: (categoryItem: CategoryItem) -> Unit
 ) {
     var selectedIdx by remember {
@@ -51,13 +56,25 @@ fun CategoryPanel(
         }
     }
     Column {
+        val gridState = rememberLazyGridState()
+        var realMaxCount by remember { mutableIntStateOf(maxCount) }
+        LaunchedEffect(gridState) {
+            val columns = snapshotFlow { gridState.layoutInfo.maxSpan }.first { it > 0 }
+            val maxRows = (maxCount + columns - 1) / columns
+            if (maxRows > MAX_ROWS) {
+                // TODO: make this configurable
+                realMaxCount = MAX_ROWS * columns
+            }
+        }
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 80.dp),
+            state = gridState,
             contentPadding = PaddingValues(0.dp),
             verticalArrangement = Arrangement.spacedBy(0.dp),
+            userScrollEnabled = false,
             horizontalArrangement = Arrangement.spacedBy(0.dp)
         ) {
-            for (i in 0 until maxCount) {
+            for (i in 0 until realMaxCount) {
                 if (i >= categories.size) {
                     break
                 }

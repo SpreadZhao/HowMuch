@@ -22,7 +22,6 @@
 - [ ] (P0) Opt: Crash detection
 - [ ] (P0) Feature: Multiple language support
   - [ ] String res
-- [/] (P0) Feature: Customizable category icon
 - [x] (P0) Feature: Clearing icon for EasyTextField
 - [ ] (P0) Feature: Menu button on right top
   - [ ] Edit multiple records
@@ -47,9 +46,10 @@
 - [x] (P1) Feature: Regret snackbar after deleting record
 - [x] (P1) Opt: Scroll to top after inserting record
 - [x] (P1) Opt: Split Month and Year Config, only load one in MainSurface
-- [/] (P1) Opt: Shrink category quick selection by 1 line
-  - [ ] Do not set a maxCount merely!
+- [x] (P1) Opt: Shrink category quick selection by 1 line
+  - [x] Do not set a maxCount merely!
 - [ ] (P1) Feature: Using last input (or other configured thing) as new record hint
+- [ ] (P1) Feature: Category quick selection can be paged
 
 # P2
 
@@ -58,6 +58,7 @@
 - [ ] (P2) Opt: Measure.sh
 - [ ] (P2) Opt: Hint tag after date select when insert record, which contains: [Today, Yesterday]
 - [ ] (P2) Feature: Custom date range statistics and records
+- [/] (P0) Feature: Customizable category icon
 - [/] (P2) Feature: Remark hint
 - [ ] (P2) Feature: Search a MoneyRecord (a big feature~)
 - [ ] (P2) Feature: Money input error reason

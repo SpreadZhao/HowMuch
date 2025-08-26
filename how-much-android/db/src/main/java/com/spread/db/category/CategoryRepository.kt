@@ -18,7 +18,11 @@ class CategoryRepository {
             CategoryItem("娱乐", ICON_ID_4),
             CategoryItem("医疗", ICON_ID_5),
             CategoryItem("教育", ICON_ID_6),
-            CategoryItem("旅行", ICON_ID_7)
+            CategoryItem("旅行", ICON_ID_2),
+            CategoryItem("人情", ICON_ID_7),
+            CategoryItem("工资", ICON_ID_8),
+            CategoryItem("奖金", ICON_ID_9),
+            CategoryItem("投资", ICON_ID_10)
         )
     }
 
