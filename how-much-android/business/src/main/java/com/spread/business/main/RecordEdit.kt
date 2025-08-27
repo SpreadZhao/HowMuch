@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -37,7 +38,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
@@ -48,6 +48,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.spread.business.main.category.CategoryPanel
 import com.spread.common.DATE_FORMAT_YEAR_MONTH_DAY_STR
+import com.spread.common.expression.isDigitsOnly
 import com.spread.common.nowCalendar
 import com.spread.common.timeInMillisToDateStr
 import com.spread.db.category.CategoryItem
@@ -151,13 +152,13 @@ fun MoneyExpr(
         } else {
             Text(
                 text = expression,
-                color = if (value != null) Color.Unspecified else Color.Red,
+                color = if (value != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error,
                 maxLines = 1,
                 overflow = TextOverflow.StartEllipsis,
                 fontSize = TextConstants.FONT_SIZE_H3,
                 fontStyle = FontStyle.Italic
             )
-            if (value != null) {
+            if (value != null && !expression.isDigitsOnly()) {
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = "=${value}",
@@ -192,9 +193,11 @@ fun Remark(
                 recordEditState.updateRemark(it)
             },
         )
-        VerticalDivider(modifier = Modifier
-            .height(20.dp)
-            .padding(horizontal = 5.dp))
+        VerticalDivider(
+            modifier = Modifier
+                .height(20.dp)
+                .padding(horizontal = 5.dp)
+        )
         RemarkSuggestions(
             modifier = Modifier
                 .weight(1f)
