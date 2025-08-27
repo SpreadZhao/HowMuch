@@ -2,6 +2,7 @@ package com.spread.ui
 
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -44,4 +45,8 @@ fun Modifier.detectZoomGesture(
         } while (event.changes.any { it.pressed })
         zoomAction?.invoke()
     }
+}
+
+fun Modifier.disableDrag(): Modifier = pointerInput(Unit) {
+    detectDragGestures(onDrag = { _, _ -> })
 }
