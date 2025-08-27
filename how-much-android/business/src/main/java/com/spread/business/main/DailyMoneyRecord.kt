@@ -2,6 +2,7 @@ package com.spread.business.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -89,7 +90,18 @@ fun RecordItem(
                 strokeWidth = 0.5.dp,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            .then(if (blink) Modifier.background(MaterialTheme.colorScheme.surfaceBright) else Modifier)
+            .then(
+                other =
+                    if (blink)
+                        Modifier.background(
+                            color =
+                                if (isSystemInDarkTheme())
+                                    MaterialTheme.colorScheme.surfaceBright
+                                else
+                                    MaterialTheme.colorScheme.surfaceDim
+                        )
+                    else Modifier
+            )
             .combinedClickable(
                 onClick = {
                     viewModel.showEditRecordDialog(record)

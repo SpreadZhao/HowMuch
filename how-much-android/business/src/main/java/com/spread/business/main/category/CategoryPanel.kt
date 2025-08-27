@@ -126,7 +126,7 @@ fun CategoryTag(
             CategoryItemIcon(item, color)
             Text(
                 text = item.text,
-                fontWeight = FontWeight.Bold,
+                fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
                 color = color,
                 maxLines = 1,
                 textAlign = TextAlign.Center
