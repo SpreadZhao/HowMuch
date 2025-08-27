@@ -70,11 +70,10 @@ import java.util.Calendar
 @Composable
 fun RecordEdit(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel,
+    recordEditState: MainViewModel.RecordEditState,
     onSave: (MoneyRecord, Boolean) -> Unit,
     onCancel: () -> Unit
 ) {
-    val recordEditState = viewModel.recordEditState
     val record by recordEditState.recordFlow.collectAsState()
     val calendar by recordEditState.calendarFlow.collectAsState()
     val moneyInputState = rememberMoneyInputState()
@@ -105,7 +104,7 @@ fun RecordEdit(
                 .fillMaxWidth()
                 .wrapContentHeight(),
             recordEditState = recordEditState,
-            categories = viewModel.categoryRepository.categories
+            categories = recordEditState.categoryRepository.categories
         )
         Remark(
             modifier = Modifier

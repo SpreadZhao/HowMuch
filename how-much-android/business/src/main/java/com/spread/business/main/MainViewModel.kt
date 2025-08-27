@@ -237,6 +237,11 @@ class MainViewModel : ViewModel() {
 
     inner class RecordEditState {
 
+        val categoryRepository by lazy {
+            // TODO: here's a performance issue
+            CategoryRepository().apply { loadCategory() }
+        }
+
         val recordFlow: StateFlow<MoneyRecord?> = showEditRecordDialogFlow
             .map { state ->
                 when (state) {
@@ -319,8 +324,5 @@ class MainViewModel : ViewModel() {
 
     val recordEditState = RecordEditState()
 
-    val categoryRepository by lazy {
-        CategoryRepository().apply { loadCategory() }
-    }
 
 }
