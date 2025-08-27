@@ -26,7 +26,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -90,7 +89,7 @@ fun RecordItem(
                 strokeWidth = 0.5.dp,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            .then(if (blink) Modifier.background(Color.Red) else Modifier)
+            .then(if (blink) Modifier.background(MaterialTheme.colorScheme.surfaceBright) else Modifier)
             .combinedClickable(
                 onClick = {
                     viewModel.showEditRecordDialog(record)

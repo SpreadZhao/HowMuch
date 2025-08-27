@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.ExperimentalMaterial3Api
-import com.spread.ui.theme.HowMuchAndroidTheme
+import com.spread.ui.theme.HowMuchTheme1
 
 class MainActivity : ComponentActivity() {
 
@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            HowMuchAndroidTheme {
+            HowMuchTheme1(dynamicColor = false) {
                 App()
             }
         }

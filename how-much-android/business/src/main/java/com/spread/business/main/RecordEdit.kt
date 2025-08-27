@@ -23,11 +23,11 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SegmentedButtonDefaults.IconSize
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -55,6 +55,7 @@ import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
 import com.spread.db.service.Money
 import com.spread.ui.EasyTextField
+import com.spread.ui.IconConstants
 import com.spread.ui.MoneyInput
 import com.spread.ui.MoneyInput2
 import com.spread.ui.R
@@ -178,7 +179,7 @@ fun Remark(
     val remark by recordEditState.remarkInputFlow.collectAsState()
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         Icon(
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(IconConstants.ICON_SIZE_NORMAL),
             painter = painterResource(id = R.drawable.ic_remark),
             contentDescription = "Remark"
         )
@@ -191,6 +192,9 @@ fun Remark(
                 recordEditState.updateRemark(it)
             },
         )
+        VerticalDivider(modifier = Modifier
+            .height(20.dp)
+            .padding(horizontal = 5.dp))
         RemarkSuggestions(
             modifier = Modifier
                 .weight(1f)
@@ -330,6 +334,7 @@ fun Header(
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
+                modifier = Modifier.size(IconConstants.ICON_SIZE_NORMAL),
                 imageVector = Icons.Default.DateRange,
                 contentDescription = "Date",
             )
@@ -442,7 +447,7 @@ fun Category(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 modifier = Modifier
-                    .size(24.dp)
+                    .size(IconConstants.ICON_SIZE_NORMAL)
                     .padding(end = 4.dp),
                 painter = painterResource(id = R.drawable.ic_categories),
                 contentDescription = null,
@@ -488,15 +493,16 @@ fun SingleChoiceSegmentedButton(
                     count = 2
                 ),
                 icon = {
+                    Icon(
+                        painter = painterResource(id = item.second),
+                        contentDescription = null,
+                        modifier = Modifier.size(SegmentedButtonDefaults.IconSize)
+                    )
                 },
                 onClick = { recordEditState.updateMoneyType(options[index].first) },
                 selected = options[index].first == moneyType,
                 label = {
-                    Icon(
-                        painter = painterResource(id = item.second),
-                        contentDescription = null,
-                        modifier = Modifier.size(IconSize)
-                    )
+                    Text(text = options[index].first.name)
                 }
             )
         }

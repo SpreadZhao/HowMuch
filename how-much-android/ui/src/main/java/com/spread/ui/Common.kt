@@ -1,5 +1,6 @@
 package com.spread.ui
 
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 object TextConstants {
@@ -8,4 +9,8 @@ object TextConstants {
     val FONT_SIZE_H3 = 18.sp
     val FONT_SIZE_H4 = 16.sp
     val FONT_SIZE_H5 = 12.sp
+}
+
+object IconConstants {
+    val ICON_SIZE_NORMAL = 24.dp
 }

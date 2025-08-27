@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.spread.db.category.CategoryItem
+import com.spread.ui.IconConstants
 import kotlinx.coroutines.flow.first
 
 private const val MAX_ROWS = 2
@@ -144,7 +145,7 @@ fun CategoryItemIcon(categoryItem: CategoryItem, color: Color) {
         Image(
             painter = painterResource(id = drawableResId),
             contentDescription = categoryItem.text,
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(IconConstants.ICON_SIZE_NORMAL),
             colorFilter = ColorFilter.tint(color)
         )
     }

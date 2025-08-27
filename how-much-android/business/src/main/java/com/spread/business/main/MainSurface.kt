@@ -176,12 +176,13 @@ fun MainContent(
             }
             val br = it?.second
             if (br != null) {
-                blinkingRecord = br
                 delay(400L)
+                blinkingRecord = br
+                delay(200L)
                 blinkingRecord = null
-                delay(400L)
+                delay(200L)
                 blinkingRecord = br
-                delay(400L)
+                delay(200L)
                 blinkingRecord = null
             }
         }

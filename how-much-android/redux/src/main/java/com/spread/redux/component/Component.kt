@@ -3,7 +3,6 @@ package com.spread.redux.component
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import com.spread.redux.ReduxState
-import kotlin.reflect.KClass
 
 
 typealias View = @Composable () -> Unit

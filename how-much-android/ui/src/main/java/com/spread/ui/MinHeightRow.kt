@@ -1,4 +1,4 @@
-package com.spread.ui.theme
+package com.spread.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

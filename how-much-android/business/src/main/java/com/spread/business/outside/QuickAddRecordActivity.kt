@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.spread.ui.theme.HowMuchAndroidTheme
+import com.spread.ui.theme.HowMuchTheme1
 
 class QuickAddRecordActivity : ComponentActivity() {
 
@@ -18,7 +18,7 @@ class QuickAddRecordActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            HowMuchAndroidTheme {
+            HowMuchTheme1(dynamicColor = false) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         QuickAddRecordSurface(

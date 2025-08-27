@@ -5,32 +5,33 @@
 - [x] (P0) Feature: Import plain json text
 - [ ] (P0) Feature: Migrate: UI
 - [ ] (P0) Feature: App color scheme
-- [ ] (P0) Feature: Move InsertRecord to a independent page, users can launch it directly from outside
+- [ ] (P0) Feature: Move InsertRecord to a independent page, users can launch it directly from
+  outside
 - [ ] (P0) Feature: Recent 7 days statistics chart
 - [ ] (P0) Feature: App Settings Framework
-  - [ ] Long press MoneyRecord action, delete or edit
-  - [ ] Enable gestures
-  - [ ] Theme setting
-  - [ ] Language
-  - [ ] Category management
-    - [ ] Customize icons
-  - [ ] Remark suggestions management
-    - [ ] suggest ranking method: freq/custom/latest
-  - [ ] Widget
-  - [ ] When inputting remark, using ENTER key to decide saving record or just confirming input
-  - [ ] ...
+    - [ ] Long press MoneyRecord action, delete or edit
+    - [ ] Enable gestures
+    - [ ] Theme setting
+    - [ ] Language
+    - [ ] Category management
+        - [ ] Customize icons
+    - [ ] Remark suggestions management
+        - [ ] suggest ranking method: freq/custom/latest
+    - [ ] Widget
+    - [ ] When inputting remark, using ENTER key to decide saving record or just confirming input
+    - [ ] ...
 - [ ] (P0) Opt: Crash detection
 - [ ] (P0) Feature: Multiple language support
-  - [ ] String res
+    - [ ] String res
 - [x] (P0) Feature: Clearing icon for EasyTextField
 - [ ] (P0) Feature: Menu button on right top
-  - [ ] Edit multiple records
-  - [ ] Settings
-  - [ ] About
-  - [ ] Budget
-  - [ ] Ledger Management
-  - [ ] Search
-  - [ ] ...
+    - [ ] Edit multiple records
+    - [ ] Settings
+    - [ ] About
+    - [ ] Budget
+    - [ ] Ledger Management
+    - [ ] Search
+    - [ ] ...
 - [ ] (P0) Fix: Check each where Calendar or Date was created
 - [ ] (P0) Feature: Hint dropdown menu for category
 
@@ -47,7 +48,7 @@
 - [x] (P1) Opt: Scroll to top after inserting record
 - [x] (P1) Opt: Split Month and Year Config, only load one in MainSurface
 - [x] (P1) Opt: Shrink category quick selection by 1 line
-  - [x] Do not set a maxCount merely!
+    - [x] Do not set a maxCount merely!
 - [ ] (P1) Feature: Using last input (or other configured thing) as new record hint
 - [ ] (P1) Feature: Category quick selection can be paged
 
