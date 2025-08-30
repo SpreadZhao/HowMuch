@@ -145,7 +145,9 @@ fun DebugAll() {
                         type = typeInput
                         value = valueInput
                     }
-                    Money.insertRecords(record)
+                    if (record != null) {
+                        Money.insertRecords(record)
+                    }
                 }
             }) {
                 Text("Add Record")

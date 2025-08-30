@@ -80,9 +80,19 @@ fun RecordEdit(
     val (value, err) = moneyInputState.expressionData
     val expression = moneyInputState.inputExpression
     LaunchedEffect(value) {
-        if (value != null) {
-            recordEditState.updateMoney(value)
+        if (value == null) {
+            record?.value?.let {
+                // no input, or a invalid expression
+                recordEditState.updateMoney(it)
+                return@LaunchedEffect
+            }
         }
+        recordEditState.updateMoney(value)
+    }
+    LaunchedEffect(record) {
+        recordEditState.updateCategory(record?.category ?: "")
+        recordEditState.updateMoneyType(record?.type ?: MoneyType.Expense)
+        recordEditState.updateRemark(record?.remark ?: "")
     }
     Column(
         modifier = modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
@@ -362,7 +372,7 @@ fun Header(
                     remark = recordEditState.remarkInputFlow.value
                     value = recordEditState.moneyInputFlow.value
                     category = recordEditState.categoryInputFlow.value
-                }
+                } ?: return@TextButton
                 if (record == moneyRecord) {
                     onCancel()
                     return@TextButton

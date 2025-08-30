@@ -50,8 +50,10 @@
 - [x] Opt: Shrink category quick selection by 1 line
     - [x] Do not set a maxCount merely!
 - [ ] Feature: Using last input (or other configured thing) as new record hint
+    - [ ] With hint, when user clear text, result should also be set to the last input
 - [ ] Feature: Category quick selection can be paged
 - [ ] Feature: Highlight records which value above a threshold
+- [ ] Opt: Baseline Profile
 
 # P2
 

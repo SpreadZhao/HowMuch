@@ -1,5 +1,6 @@
 package com.spread.business.main
 
+import android.util.Log
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarResult
 import androidx.lifecycle.ViewModel
@@ -285,28 +286,32 @@ class MainViewModel : ViewModel() {
 
         init {
             // refresh UI state every time when dialog show
-            refreshOnDialogShow {
-                add { updateRemark(it?.remark ?: "") }
-                add { updateMoney(it?.value) }
-                add { updateCategory(it?.category ?: "") }
-                add { updateMoneyType(it?.type ?: MoneyType.Expense) }
-            }
+//            refreshOnDialogShow {
+//                add { updateRemark(it?.remark ?: "") }
+//                add { updateMoney(it?.value) }
+//                add { updateCategory(it?.category ?: "") }
+//                add { updateMoneyType(it?.type ?: MoneyType.Expense) }
+//            }
         }
 
         fun updateRemark(remark: String) {
             _remarkInputFlow.value = remark
+            Log.d("Spread", "update remark: $remark")
         }
 
         fun updateMoney(value: BigDecimal?) {
             _moneyInputFlow.value = value?.toString() ?: ""
+            Log.d("Spread", "update value: $value")
         }
 
         fun updateCategory(category: String) {
             _categoryInputFlow.value = category
+            Log.d("Spread", "update category: $category")
         }
 
         fun updateMoneyType(moneyType: MoneyType) {
             _moneyTypeFlow.value = moneyType
+            Log.d("Spread", "update moneyType: $moneyType")
         }
 
         private fun refreshOnDialogShow(refreshActionBuilder: MutableList<(MoneyRecord?) -> Unit>.() -> Unit) {

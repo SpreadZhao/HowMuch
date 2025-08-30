@@ -25,15 +25,20 @@ object Money {
         var type = MoneyType.Expense
         var remark = ""
         var value = ""
+
+        internal val valid: Boolean
+            get() = category.isNotBlank() && value.isNotBlank()
     }
 
     fun buildMoneyRecord(
         from: MoneyRecord? = null,
         action: MoneyRecordBuilder.() -> Unit
-    ): MoneyRecord {
+    ): MoneyRecord? {
         val builder = MoneyRecordBuilder()
         builder.action()
-        // TODO: Exception check
+        if (!builder.valid) {
+            return null
+        }
         return MoneyRecord(
             id = from?.id ?: 0L,
             date = builder.date,

@@ -280,9 +280,11 @@ fun RecordBottomSheet(
         sheetState = sheetState
     ) {
         val keyboardController = LocalSoftwareKeyboardController.current
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .disableDrag()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .disableDrag()
+        ) {
             Spacer(modifier = Modifier.height(15.dp))
             RecordEdit(
                 recordEditState = viewModel.recordEditState,
