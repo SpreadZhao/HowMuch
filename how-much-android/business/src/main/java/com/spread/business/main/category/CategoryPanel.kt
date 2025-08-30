@@ -48,11 +48,13 @@ fun CategoryPanel(
     var selectedIdx by remember {
         mutableIntStateOf(-1)
     }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(initialCategoryName) {
         if (initialCategoryName != null) {
             val index = categories.indexOfFirst { it.text == initialCategoryName }
-            if (index >= 0) {
-                selectedIdx = index
+            selectedIdx = if (index >= 0) {
+                index
+            } else {
+                -1
             }
         }
     }
