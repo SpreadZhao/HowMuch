@@ -1,4 +1,5 @@
 [versions]
+acraCore = "5.12.0"
 agp = "8.12.0"
 kotlin = "2.2.10"
 kotlin-ksp = "2.2.10-2.0.2"
@@ -31,6 +32,7 @@ targetSdk = "36"
 minSdk = "24"
 
 [libraries]
+acra-core = { module = "ch.acra:acra-core", version.ref = "acraCore" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
