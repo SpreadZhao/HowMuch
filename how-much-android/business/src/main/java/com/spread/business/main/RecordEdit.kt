@@ -514,7 +514,7 @@ fun SingleChoiceSegmentedButton(
                 onClick = { recordEditState.updateMoneyType(options[index].first) },
                 selected = options[index].first == moneyType,
                 label = {
-                    Text(text = options[index].first.name)
+                    Text(text = options[index].first.name.substring(0..2))
                 }
             )
         }
