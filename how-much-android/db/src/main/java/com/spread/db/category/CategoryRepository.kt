@@ -1,10 +1,8 @@
 package com.spread.db.category
 
-import com.spread.common.HowMuch
-import com.spread.common.json
-import java.io.File
+import com.spread.db.file.JsonRepository
 
-class CategoryRepository {
+class CategoryRepository : JsonRepository<CategoryItem>(FILE_PATH, CategoryItem.serializer()) {
 
     companion object {
         private const val FILE_PATH: String = "category.json"
@@ -26,20 +24,7 @@ class CategoryRepository {
         )
     }
 
-    private val _categories = mutableListOf<CategoryItem>()
-    val categories: List<CategoryItem>
-        get() = _categories
-
-    fun loadCategory() {
-        val file = File(HowMuch.application.filesDir, FILE_PATH)
-        if (!file.exists()) {
-            file.createNewFile()
-            file.writeText(json.encodeToString(defaultCategories))
-            _categories.addAll(defaultCategories)
-            return
-        }
-        val text = file.readText()
-        _categories.addAll(json.decodeFromString<List<CategoryItem>>(text))
-    }
+    override val defaultData: List<CategoryItem>
+        get() = defaultCategories
 
 }

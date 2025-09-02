@@ -23,7 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.spread.ui.theme.HowMuchAndroidTheme
+import com.spread.ui.theme.HowMuchTheme1
 
 class CrashActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -33,7 +33,7 @@ class CrashActivity : ComponentActivity() {
         val error = intent.getStringExtra("error") ?: "Unknown Error"
 
         setContent {
-            HowMuchAndroidTheme {
+            HowMuchTheme1 {
                 Scaffold(
                     topBar = {
                         TopAppBar(

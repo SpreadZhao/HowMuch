@@ -55,6 +55,7 @@ import com.spread.db.category.CategoryItem
 import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
 import com.spread.db.service.Money
+import com.spread.db.suggestion.SuggestionItem
 import com.spread.ui.EasyTextField
 import com.spread.ui.IconConstants
 import com.spread.ui.MoneyInput
@@ -114,7 +115,7 @@ fun RecordEdit(
                 .fillMaxWidth()
                 .wrapContentHeight(),
             recordEditState = recordEditState,
-            categories = recordEditState.categoryRepository.categories
+            categories = recordEditState.categoryRepository.data
         )
         Remark(
             modifier = Modifier
@@ -202,40 +203,46 @@ fun Remark(
                 recordEditState.updateRemark(it)
             },
         )
-        VerticalDivider(
-            modifier = Modifier
-                .height(20.dp)
-                .padding(horizontal = 5.dp)
-        )
-        RemarkSuggestions(
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 5.dp),
-            recordEditState = recordEditState
-        )
+        val suggestions = recordEditState.suggestionRepository.data
+        if (suggestions.isNotEmpty()) {
+            VerticalDivider(
+                modifier = Modifier
+                    .height(20.dp)
+                    .padding(horizontal = 5.dp)
+            )
+            RemarkSuggestions(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 5.dp),
+                recordEditState = recordEditState,
+                suggestions = suggestions
+            )
+        }
     }
 }
 
 @Composable
 private fun RemarkSuggestions(
     modifier: Modifier = Modifier,
-    recordEditState: MainViewModel.RecordEditState
+    recordEditState: MainViewModel.RecordEditState,
+    suggestions: List<SuggestionItem>
 ) {
     LazyRow(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        item {
-            SuggestionItem(text = "suggest 1", recordEditState = recordEditState)
-        }
-        item {
-            SuggestionItem(text = "suggest 2", recordEditState = recordEditState)
-        }
-        item {
-            SuggestionItem(text = "suggest 3", recordEditState = recordEditState)
-        }
-        item {
-            SuggestionItem(text = "suggest 4", recordEditState = recordEditState)
+        suggestions.sortedByDescending { it.useCount }.forEach { suggestion ->
+            if (suggestion.text.isBlank()) {
+                return@forEach
+            }
+            item {
+                SuggestionItem(
+                    text = suggestion.text,
+                    onClick = {
+                        recordEditState.updateRemark(suggestion.text)
+                    }
+                )
+            }
         }
     }
 }
@@ -243,15 +250,13 @@ private fun RemarkSuggestions(
 @Composable
 private fun SuggestionItem(
     text: String,
-    recordEditState: MainViewModel.RecordEditState
+    onClick: () -> Unit
 ) {
     SuggestionChip(
         modifier = Modifier
             .wrapContentSize()
             .padding(end = 5.dp),
-        onClick = {
-            recordEditState.updateRemark(text)
-        },
+        onClick = onClick,
         label = {
             Text(
                 modifier = Modifier.fillMaxWidth(),
@@ -377,6 +382,7 @@ fun Header(
                     onCancel()
                     return@TextButton
                 }
+                recordEditState.suggestionRepository.markSuggestionUsed(moneyRecord.remark)
                 // TODO: need more precise check whether record is new or not
                 onSave(moneyRecord, record == null)
             }

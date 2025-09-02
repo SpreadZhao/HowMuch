@@ -12,6 +12,7 @@ import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
 import com.spread.db.service.Money
 import com.spread.db.service.groupByDay
+import com.spread.db.suggestion.SuggestionRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -240,7 +241,11 @@ class MainViewModel : ViewModel() {
 
         val categoryRepository by lazy {
             // TODO: here's a performance issue
-            CategoryRepository().apply { loadCategory() }
+            CategoryRepository().apply { loadRepository() }
+        }
+
+        val suggestionRepository by lazy {
+            SuggestionRepository().apply { loadRepository() }
         }
 
         val recordFlow: StateFlow<MoneyRecord?> = showEditRecordDialogFlow
@@ -284,16 +289,6 @@ class MainViewModel : ViewModel() {
         private var _moneyTypeFlow = MutableStateFlow(MoneyType.Expense)
         val moneyTypeFlow: StateFlow<MoneyType> = _moneyTypeFlow
 
-        init {
-            // refresh UI state every time when dialog show
-//            refreshOnDialogShow {
-//                add { updateRemark(it?.remark ?: "") }
-//                add { updateMoney(it?.value) }
-//                add { updateCategory(it?.category ?: "") }
-//                add { updateMoneyType(it?.type ?: MoneyType.Expense) }
-//            }
-        }
-
         fun updateRemark(remark: String) {
             _remarkInputFlow.value = remark
             Log.d("Spread", "update remark: $remark")
@@ -327,7 +322,7 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    val recordEditState = RecordEditState()
+    val recordEditState by lazy { RecordEditState() }
 
 
 }
