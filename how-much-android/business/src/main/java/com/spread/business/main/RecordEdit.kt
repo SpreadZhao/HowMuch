@@ -1,6 +1,7 @@
 package com.spread.business.main
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -240,6 +241,7 @@ private fun RemarkSuggestions(
             item {
                 SuggestionItem(
                     text = suggestion.text,
+                    freq = suggestion.useCount,
                     onClick = {
                         recordEditState.updateRemark(suggestion.text)
                     }
@@ -252,22 +254,34 @@ private fun RemarkSuggestions(
 @Composable
 private fun SuggestionItem(
     text: String,
+    freq: Int,
     onClick: () -> Unit
 ) {
-    SuggestionChip(
-        modifier = Modifier
-            .wrapContentSize()
-            .padding(end = 5.dp),
-        onClick = onClick,
-        label = {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = text,
-                maxLines = 1,
-                textAlign = TextAlign.Center
-            )
-        }
-    )
+    Box(modifier = Modifier.wrapContentSize()) {
+        SuggestionChip(
+            modifier = Modifier
+                .wrapContentSize()
+                .padding(end = 5.dp),
+            onClick = onClick,
+            label = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = text,
+                        maxLines = 1,
+                        textAlign = TextAlign.Center
+                    )
+                    VerticalDivider(modifier = Modifier.height(10.dp).padding(horizontal = 5.dp))
+                    Text(
+                        text = "x$freq",
+                        maxLines = 1,
+                        textAlign = TextAlign.Center,
+                        fontSize = TextConstants.FONT_SIZE_H5
+                    )
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -394,6 +408,7 @@ fun Header(
     }
     if (showPicker) {
         AlertDialog(
+            modifier = Modifier.padding(horizontal = 20.dp),
             onDismissRequest = {
                 showPicker = false
             },

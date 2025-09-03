@@ -68,9 +68,9 @@ fun InlineDatePicker(
 
 @Composable
 fun YearPicker(
+    modifier: Modifier = Modifier,
     year: Int,
-    onConfirm: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    onConfirm: (Int) -> Unit
 ) {
     val years = (2000..2100).toList()
 

@@ -68,6 +68,7 @@ fun YearSelector(
 
     if (showPicker) {
         AlertDialog(
+            modifier = Modifier.padding(vertical = 20.dp),
             onDismissRequest = { showPicker = false },
             title = {
                 Row {

@@ -40,7 +40,7 @@ abstract class JsonRepository<T>(
             if (!file.exists()) {
                 val dd = defaultData
                 file.createNewFile()
-                file.writeText(json.encodeToString(dd))
+                file.writeText(json.encodeToString(ListSerializer(serializer), dd))
                 _dataFlow.value = dd
                 return@launch
             }
