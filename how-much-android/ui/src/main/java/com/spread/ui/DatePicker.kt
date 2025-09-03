@@ -169,8 +169,7 @@ fun YearMonthDayPicker(
     year: Int,
     month: Int,
     day: Int,
-    onConfirm: (Int, Int, Int) -> Unit,
-    modifier: Modifier = Modifier
+    onConfirm: (Int, Int, Int) -> Unit
 ) {
     val years = (2000..2100).toList()
     val months = (1..12).toList()
@@ -192,10 +191,10 @@ fun YearMonthDayPicker(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
+        modifier = Modifier.width(300.dp)
     ) {
         Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxWidth()
         ) {
             PickerList(
@@ -237,7 +236,6 @@ fun PickerList(
     label: String,
     onSelectedItemChanged: (Int) -> Unit
 ) {
-    val context = LocalContext.current
     val itemHeight = 40.dp
     val visibleItemsCount = 5
     val paddingVertical = itemHeight * (visibleItemsCount / 2)

@@ -20,12 +20,12 @@ abstract class JsonRepository<T>(
 ) {
 
     companion object {
+        private val filesDir = HowMuch.application.filesDir
+
         private val repoScope by lazy {
             CoroutineScope(SupervisorJob() + Dispatchers.IO)
         }
     }
-
-    private val filesDir = HowMuch.application.filesDir
 
     abstract val defaultData: List<T>
 

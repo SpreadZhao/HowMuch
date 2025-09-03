@@ -410,7 +410,7 @@ fun Header(
     }
     if (showPicker) {
         AlertDialog(
-            modifier = Modifier.padding(horizontal = 20.dp),
+            modifier = Modifier.width(320.dp),
             onDismissRequest = {
                 showPicker = false
             },
