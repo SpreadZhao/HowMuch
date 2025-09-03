@@ -48,7 +48,9 @@ fun CategoryPanel(
     var selectedIdx by remember {
         mutableIntStateOf(-1)
     }
-    LaunchedEffect(initialCategoryName) {
+    // because categories come from flow
+    // this func will be called twice
+    LaunchedEffect(categories, initialCategoryName) {
         if (initialCategoryName != null) {
             val index = categories.indexOfFirst { it.text == initialCategoryName }
             selectedIdx = if (index >= 0) {
@@ -61,7 +63,7 @@ fun CategoryPanel(
     Column {
         val gridState = rememberLazyGridState()
         var realMaxCount by remember { mutableIntStateOf(maxCount) }
-        LaunchedEffect(gridState) {
+        LaunchedEffect(categories, gridState) {
             val columns = snapshotFlow { gridState.layoutInfo.maxSpan }.first { it > 0 }
             val maxRows = (maxCount + columns - 1) / columns
             if (maxRows > MAX_ROWS) {

@@ -110,12 +110,13 @@ fun RecordEdit(
             onSave = onSave,
             onCancel = onCancel,
         )
+        val categories by recordEditState.categoryRepository.dataFlow.collectAsState()
         Category(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
             recordEditState = recordEditState,
-            categories = recordEditState.categoryRepository.data
+            categories = categories
         )
         Remark(
             modifier = Modifier
@@ -203,7 +204,7 @@ fun Remark(
                 recordEditState.updateRemark(it)
             },
         )
-        val suggestions = recordEditState.suggestionRepository.data
+        val suggestions by recordEditState.suggestionRepository.dataFlow.collectAsState()
         if (suggestions.isNotEmpty()) {
             VerticalDivider(
                 modifier = Modifier
@@ -231,6 +232,7 @@ private fun RemarkSuggestions(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // TODO: sort by freq/time in settings
         suggestions.sortedByDescending { it.useCount }.forEach { suggestion ->
             if (suggestion.text.isBlank()) {
                 return@forEach
