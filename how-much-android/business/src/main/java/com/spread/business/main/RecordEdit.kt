@@ -271,7 +271,9 @@ private fun SuggestionItem(
                         maxLines = 1,
                         textAlign = TextAlign.Center
                     )
-                    VerticalDivider(modifier = Modifier.height(10.dp).padding(horizontal = 5.dp))
+                    VerticalDivider(modifier = Modifier
+                        .height(10.dp)
+                        .padding(horizontal = 5.dp))
                     Text(
                         text = "x$freq",
                         maxLines = 1,

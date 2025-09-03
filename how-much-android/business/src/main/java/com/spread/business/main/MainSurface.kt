@@ -30,6 +30,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,14 +44,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import com.spread.business.statistics.StatisticsPanel
 import com.spread.business.statistics.StatisticsScreen
 import com.spread.db.money.MoneyRecord
 import com.spread.db.service.groupByDay
 import com.spread.ui.detectZoomGesture
-import com.spread.ui.disableDrag
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -264,9 +263,11 @@ fun RecordBottomSheet(
     if (editRecordDialogState !is EditRecordDialogState.Show) {
         return
     }
-    val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
+        skipPartiallyExpanded = true,
+        confirmValueChange = {
+            it != SheetValue.Hidden
+        }
     )
     ModalBottomSheet(
         modifier = Modifier
@@ -279,39 +280,28 @@ fun RecordBottomSheet(
         dragHandle = null,
         sheetState = sheetState
     ) {
-        val keyboardController = LocalSoftwareKeyboardController.current
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .disableDrag()
         ) {
             Spacer(modifier = Modifier.height(15.dp))
+            val scope = rememberCoroutineScope()
             RecordEdit(
                 recordEditState = viewModel.recordEditState,
                 onSave = { record, insert ->
                     scope.launch {
-                        keyboardController?.hide()
                         sheetState.hide()
-                    }.invokeOnCompletion { t ->
-                        if (!sheetState.isVisible) {
-                            viewModel.hideEditRecordDialog()
-                        }
-                        if (t == null) {
-                            viewModel.handleRecordEdit(
-                                insert = insert,
-                                record = record
-                            )
-                        }
+                        viewModel.hideEditRecordDialog()
+                        viewModel.handleRecordEdit(
+                            insert = insert,
+                            record = record
+                        )
                     }
                 },
                 onCancel = {
                     scope.launch {
-                        keyboardController?.hide()
                         sheetState.hide()
-                    }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            viewModel.hideEditRecordDialog()
-                        }
+                        viewModel.hideEditRecordDialog()
                     }
                 }
             )

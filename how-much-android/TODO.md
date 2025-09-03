@@ -54,7 +54,8 @@
 - [ ] Feature: Category quick selection can be paged
 - [ ] Feature: Highlight records which value above a threshold
 - [ ] Opt: Baseline Profile
-- [ ] Feature: Smart Suggestions: using freq and last time to produce a suggestion rank, sort with rank
+- [ ] Feature: Smart Suggestions: using freq and last time to produce a suggestion rank, sort with
+  rank
 
 # P2
 
