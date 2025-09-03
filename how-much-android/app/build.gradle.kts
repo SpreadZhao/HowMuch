@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.baselineprofile)
 }
 
 android {
@@ -31,7 +32,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -57,4 +59,6 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":business"))
     implementation(project(":debug"))
+    implementation(libs.androidx.profileinstaller)
+    "baselineProfile"(project(":howmuch-baselineprofile"))
 }

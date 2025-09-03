@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -64,32 +65,39 @@ fun CategoryPercentList(
                 )
             }
         }
-        val records = if (option == 0) expenseRecords else incomeRecords
-        if (records.isEmpty()) {
-            Nothing(modifier = Modifier.fillMaxSize(), iconSize = 100.dp)
-        } else {
-            records.groupBy { it.category }
-                .map { (category, recordsOfCat) ->
-                    val sumValue = recordsOfCat.sumOf { it.value }
-                    val percent = sumValue
-                        .divide(
-                            records.sumOf { it.value },
-                            4,
-                            RoundingMode.HALF_UP
-                        )
-                    Triple(category, sumValue, percent)
+        LazyColumn {
+            val records = if (option == 0) expenseRecords else incomeRecords
+            if (records.isEmpty()) {
+                item {
+                    Nothing(modifier = Modifier.fillMaxSize(), iconSize = 100.dp)
                 }
-                .sortedByDescending { it.second } // 根据 sumValue 排序
-                .forEach { (category, sumValue, percent) ->
-                    CategoryPercentItem(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        category = category,
-                        sumValue = sumValue,
-                        percent = percent
-                    )
-                }
+            } else {
+                records.groupBy { it.category }
+                    .map { (category, recordsOfCat) ->
+                        val sumValue = recordsOfCat.sumOf { it.value }
+                        val percent = sumValue
+                            .divide(
+                                records.sumOf { it.value },
+                                4,
+                                RoundingMode.HALF_UP
+                            )
+                        Triple(category, sumValue, percent)
+                    }
+                    .sortedByDescending { it.second } // 根据 sumValue 排序
+                    .forEach { (category, sumValue, percent) ->
+                        item {
+                            CategoryPercentItem(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight()
+                                    .padding(bottom = 2.dp),
+                                category = category,
+                                sumValue = sumValue,
+                                percent = percent
+                            )
+                        }
+                    }
+            }
         }
     }
 }
