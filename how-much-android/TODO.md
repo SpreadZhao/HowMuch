@@ -4,10 +4,10 @@
 - [x] Feature: Current month records data layer
 - [x] Feature: Import plain json text
 - [ ] Feature: Migrate: UI
-- [ ] Feature: App color scheme
+- [/] Feature: App color scheme
 - [ ] Feature: Move InsertRecord to a independent page, users can launch it directly from
   outside
-- [ ] Feature: Recent 7 days statistics chart
+- [x] Feature: Recent 7 days statistics chart
 - [ ] Feature: App Settings Framework
     - [ ] Long press MoneyRecord action, delete or edit
     - [ ] Enable gestures
@@ -34,6 +34,7 @@
     - [ ] ...
 - [ ] Fix: Check each where Calendar or Date was created
 - [ ] Feature: Hint dropdown menu for category
+- [ ] Feature: Remark -> tags
 
 # P1
 
@@ -64,6 +65,7 @@
 - [ ] Opt: Measure.sh
 - [ ] Opt: Hint tag after date select when insert record, which contains: [Today, Yesterday]
 - [ ] Feature: Custom date range statistics and records
+- [ ] Feature: Custom widget for statistics in StatisticsPanel
 - [/] Feature: Customizable category icon
 - [/] Feature: Remark hint
 - [ ] Feature: Search a MoneyRecord (a big feature~)

@@ -65,6 +65,7 @@ fun MainSurface(viewModel: MainViewModel) {
     val selectedYear by viewModel.selectedYearFlow.collectAsState()
     val recordsListState = rememberLazyListState()
     val editRecordDialogState by viewModel.showEditRecordDialogFlow.collectAsState()
+    val recentRecords by viewModel.recentRecordsFlow.collectAsState()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -96,7 +97,8 @@ fun MainSurface(viewModel: MainViewModel) {
                             horizontal = 20.dp,
                             vertical = 10.dp
                         ),
-                    records = records
+                    records = records,
+                    recentRecords = recentRecords
                 )
             }
             MainContent(

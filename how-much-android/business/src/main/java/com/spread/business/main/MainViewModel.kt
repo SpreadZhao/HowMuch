@@ -146,6 +146,13 @@ class MainViewModel : ViewModel() {
             calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
         )
 
+    val recentRecordsFlow: StateFlow<List<MoneyRecord>> = Money.listenRecentRecords(7)
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            emptyList()
+        )
+
     fun select(year: Int, month: Int) {
         selectedTimeFlow.value = calendar.run {
             clear()

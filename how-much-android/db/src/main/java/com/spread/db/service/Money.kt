@@ -85,6 +85,14 @@ object Money {
         return database.moneyDao().listenRecordsByDateRange(start, end)
     }
 
+    fun listenRecentRecords(days: Int): Flow<List<MoneyRecord>> {
+        val calendar = Calendar.getInstance()
+        val now = calendar.timeInMillis
+        calendar.add(Calendar.DAY_OF_YEAR, -days)
+        val startTime = calendar.timeInMillis
+        return database.moneyDao().listenRecordsByDateRange(startTime, now)
+    }
+
     private fun getYearRangeFromTime(time: Long): Pair<Long, Long> {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = time
