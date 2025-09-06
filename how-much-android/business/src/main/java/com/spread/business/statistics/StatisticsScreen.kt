@@ -11,6 +11,6 @@ fun StatisticsScreen(
 ) {
     CategoryPercentList(
         modifier = modifier,
-        allRecords = records
+        records = records
     )
 }

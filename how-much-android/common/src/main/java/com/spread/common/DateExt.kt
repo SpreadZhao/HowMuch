@@ -14,7 +14,7 @@ fun dateStrToDate(dateStr: String?, format: String): Date? {
         return null
     }
     val dateFormat = SimpleDateFormat(format, Locale.getDefault())
-    return dateFormat.parse(dateStr) ?: null
+    return runCatching { dateFormat.parse(dateStr) }.getOrNull()
 }
 
 fun Date.dateStr(format: String): String {
@@ -26,7 +26,7 @@ fun nowStr(format: String): String {
     return Date().dateStr(format)
 }
 
-fun timeInMillisToDateStr(timeInMillis: Long, format: String): String {
+fun timeInMillisToDateStr(timeInMillis: Long, format: String = DATE_FORMAT_YEAR_MONTH_DAY_STR): String {
     val date = Date(timeInMillis)
     return date.dateStr(format)
 }
