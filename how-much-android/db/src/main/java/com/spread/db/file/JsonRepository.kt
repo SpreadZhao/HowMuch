@@ -63,9 +63,11 @@ abstract class JsonRepository<T>(
     }
 
     protected fun flush(current: List<T> = _dataFlow.value) {
-        val file = File(filesDir, path)
-        if (file.exists()) {
-            file.writeText(json.encodeToString(ListSerializer(serializer), current))
+        repoScope.launch {
+            val file = File(filesDir, path)
+            if (file.exists()) {
+                file.writeText(json.encodeToString(ListSerializer(serializer), current))
+            }
         }
     }
 }
