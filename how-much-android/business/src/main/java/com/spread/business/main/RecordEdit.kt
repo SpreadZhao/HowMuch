@@ -164,7 +164,7 @@ fun MoneyExpr(
         } else {
             Text(
                 text = expression,
-                color = if (value != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error,
+                color = if (value != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onError,
                 maxLines = 1,
                 overflow = TextOverflow.StartEllipsis,
                 fontSize = TextConstants.FONT_SIZE_H3,
