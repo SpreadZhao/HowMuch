@@ -39,3 +39,13 @@ fun calendar(timeInMillis: Long): Calendar {
     calendar.timeInMillis = timeInMillis
     return calendar
 }
+fun dayOfWeekStr(dayOfWeek: Int): String = when (dayOfWeek) {
+    Calendar.SUNDAY -> "SUN"
+    Calendar.MONDAY -> "MON"
+    Calendar.TUESDAY -> "TUE"
+    Calendar.WEDNESDAY -> "WED"
+    Calendar.THURSDAY -> "THU"
+    Calendar.FRIDAY -> "FRI"
+    Calendar.SATURDAY -> "SAT"
+    else -> ""
+}
