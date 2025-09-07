@@ -2,6 +2,7 @@ package com.spread.db.service
 
 import androidx.room.Room
 import com.spread.common.HowMuch
+import com.spread.common.expression.isMoneyDigitsOnly
 import com.spread.db.money.MoneyDatabase
 import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
@@ -28,7 +29,7 @@ object Money {
         var value = ""
 
         internal val valid: Boolean
-            get() = category.isNotBlank() && value.isNotBlank()
+            get() = category.isNotBlank() && value.isMoneyDigitsOnly()
     }
 
     fun buildMoneyRecord(

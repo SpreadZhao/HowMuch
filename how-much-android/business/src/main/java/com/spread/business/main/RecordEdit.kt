@@ -31,7 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,7 +48,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.spread.business.main.category.CategoryPanel
 import com.spread.common.DATE_FORMAT_YEAR_MONTH_DAY_STR
-import com.spread.common.expression.isDigitsOnly
+import com.spread.common.expression.isMoneyDigitsOnly
 import com.spread.common.nowCalendar
 import com.spread.common.timeInMillisToDateStr
 import com.spread.db.category.CategoryItem
@@ -64,7 +63,6 @@ import com.spread.ui.MoneyInput2
 import com.spread.ui.R
 import com.spread.ui.TextConstants
 import com.spread.ui.YearMonthDayPicker
-import com.spread.ui.rememberMoneyInputState
 import com.spread.ui.toDp
 import java.math.BigDecimal
 import java.util.Calendar
@@ -78,24 +76,10 @@ fun RecordEdit(
 ) {
     val record by recordEditState.recordFlow.collectAsState()
     val calendar by recordEditState.calendarFlow.collectAsState()
-    val moneyInputState = rememberMoneyInputState()
-    val (value, err) = moneyInputState.expressionData
-    val expression = moneyInputState.inputExpression
-    LaunchedEffect(value) {
-        if (value == null) {
-            record?.value?.let {
-                // no input, or a invalid expression
-                recordEditState.updateMoney(it)
-                return@LaunchedEffect
-            }
-        }
-        recordEditState.updateMoney(value)
-    }
-    LaunchedEffect(record) {
-        recordEditState.updateCategory(record?.category ?: "")
-        recordEditState.updateMoneyType(record?.type ?: MoneyType.Expense)
-        recordEditState.updateRemark(record?.remark ?: "")
-    }
+    val expressionData by recordEditState.moneyInputFlow.collectAsState()
+    val expr = expressionData.expr
+    val value = expressionData.value
+    val err = expressionData.err
     Column(
         modifier = modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
         horizontalAlignment = Alignment.Start
@@ -129,11 +113,11 @@ fun RecordEdit(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 5.dp),
-            expression = expression,
+            expression = expr,
             initial = record?.value,
             value = value
         )
-        MoneyInput2(inputState = moneyInputState)
+        MoneyInput2(inputState = recordEditState.moneyInputState)
     }
 }
 
@@ -170,7 +154,7 @@ fun MoneyExpr(
                 fontSize = TextConstants.FONT_SIZE_H3,
                 fontStyle = FontStyle.Italic
             )
-            if (value != null && !expression.isDigitsOnly()) {
+            if (value != null && !expression.isMoneyDigitsOnly()) {
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = "=${value}",
@@ -202,7 +186,7 @@ fun Remark(
                 .padding(end = 5.dp),
             value = remark,
             onValueChange = {
-                recordEditState.updateRemark(it)
+                recordEditState.updateInputRemark(it)
             },
         )
         val suggestions by recordEditState.suggestionRepository.dataFlow.collectAsState()
@@ -243,7 +227,7 @@ private fun RemarkSuggestions(
                     text = suggestion.text,
                     freq = suggestion.useCount,
                     onClick = {
-                        recordEditState.updateRemark(suggestion.text)
+                        recordEditState.updateInputRemark(suggestion.text)
                     }
                 )
             }
@@ -357,6 +341,10 @@ fun Header(
     onCancel: () -> Unit,
 ) {
     var showPicker by remember { mutableStateOf(false) }
+    val inputType by recordEditState.moneyTypeFlow.collectAsState()
+    val inputCategory by recordEditState.categoryInputFlow.collectAsState()
+    val inputRemark by recordEditState.remarkInputFlow.collectAsState()
+    val inputMoneyState by recordEditState.moneyInputFlow.collectAsState()
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -393,10 +381,10 @@ fun Header(
             onClick = {
                 val moneyRecord = Money.buildMoneyRecord(record) {
                     date = calendar.timeInMillis
-                    type = recordEditState.moneyTypeFlow.value
-                    remark = recordEditState.remarkInputFlow.value
-                    value = recordEditState.moneyInputFlow.value
-                    category = recordEditState.categoryInputFlow.value
+                    type = inputType
+                    remark = inputRemark
+                    value = inputMoneyState.value.toString()
+                    category = inputCategory
                 } ?: return@TextButton
                 if (record == moneyRecord) {
                     onCancel()
@@ -495,7 +483,7 @@ fun Category(
                 modifier = Modifier.weight(2f),
                 value = category,
                 onValueChange = {
-                    recordEditState.updateCategory(it)
+                    recordEditState.updateInputCategory(it)
                 }
             )
             Spacer(modifier = Modifier.width(10.dp))
@@ -508,7 +496,7 @@ fun Category(
             categories = categories,
             initialCategoryName = category,
         ) {
-            recordEditState.updateCategory(it.text)
+            recordEditState.updateInputCategory(it.text)
         }
     }
 }
@@ -538,7 +526,7 @@ fun SingleChoiceSegmentedButton(
                         modifier = Modifier.size(SegmentedButtonDefaults.IconSize)
                     )
                 },
-                onClick = { recordEditState.updateMoneyType(options[index].first) },
+                onClick = { recordEditState.updateInputMoneyType(options[index].first) },
                 selected = options[index].first == moneyType,
                 label = {
                     Text(text = options[index].first.name.substring(0..2))

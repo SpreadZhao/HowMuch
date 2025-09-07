@@ -13,11 +13,6 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,12 +20,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.spread.common.expression.eval
 import com.spread.common.performHapticFeedback
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
 
 @Composable
 fun MoneyInput2(
     modifier: Modifier = Modifier,
-    inputState: MoneyInputState = rememberMoneyInputState()
+    inputState: MoneyInputState
 ) {
     Row(modifier = modifier) {
         InputKeys(
@@ -62,78 +60,71 @@ fun InputKeys(
     }
 }
 
-@Composable
-fun rememberMoneyInputState(
-    inputExpression: String = ""
-): MoneyInputState {
-    return rememberSaveable(saver = MoneyInputState.Saver) {
-        MoneyInputState(inputExpression)
-    }
-}
-
 class MoneyInputState(
     inputExpression: String = ""
 ) {
-    private var _inputExpression by mutableStateOf(inputExpression)
-
-    val inputExpression: String
-        get() = _inputExpression
+    private val inputExpressionFlow: MutableStateFlow<String> = MutableStateFlow(inputExpression)
 
     data class ExpressionData(
+        val expr: String = "",
         val value: BigDecimal? = null,
         val err: String? = null
-    )
-
-    val expressionData: ExpressionData
-        get() {
-            val expr = inputExpression
-            if (!regex.matches(expr)) {
-                return ExpressionData(err = "Invalid expr")
-            }
-            val addSubParts = expr.split('+', '-')
-            for (part in addSubParts) {
-                if (part.isEmpty()) continue
-                if ("*" in part) {
-                    val factors = part.split('*')
-                    val decimalCount = factors.count { it.contains('.') }
-                    if (decimalCount > 1) return ExpressionData(err = "Only one decimal is allowed in multiplication")
-                }
-            }
-            val value = eval(expr)
-            if (value <= BigDecimal.ZERO) {
-                return ExpressionData(err = "Invalid value: $value")
-            }
-            if (value.stripTrailingZeros().scale() > 2) {
-                return ExpressionData(err = "Invalid value: $value")
-            }
-            return ExpressionData(value)
+    ) {
+        override fun equals(other: Any?): Boolean {
+            return other is ExpressionData && this.expr == other.expr
         }
 
+        override fun hashCode(): Int {
+            var result = expr.hashCode()
+            result = 31 * result + (value?.hashCode() ?: 0)
+            result = 31 * result + (err?.hashCode() ?: 0)
+            return result
+        }
+    }
+
+    val expressionDataFlow: Flow<ExpressionData> = inputExpressionFlow.map { expr ->
+        if (!regex.matches(expr)) {
+            return@map ExpressionData(expr = expr, err = "Invalid expr")
+        }
+        val addSubParts = expr.split('+', '-')
+        for (part in addSubParts) {
+            if (part.isEmpty()) continue
+            if ("*" in part) {
+                val factors = part.split('*')
+                val decimalCount = factors.count { it.contains('.') }
+                if (decimalCount > 1) return@map ExpressionData(
+                    expr = expr,
+                    err = "Only one decimal is allowed in multiplication"
+                )
+            }
+        }
+        val value = eval(expr)
+        if (value <= BigDecimal.ZERO) {
+            return@map ExpressionData(expr = expr, err = "Invalid value: $value")
+        }
+        if (value.stripTrailingZeros().scale() > 2) {
+            return@map ExpressionData(expr = expr, err = "Invalid value: $value")
+        }
+        return@map ExpressionData(expr = expr, value = value)
+    }
+
     fun appendStr(str: String) {
-        val newImpression = inputExpression + str
-        _inputExpression = newImpression
+        val newImpression = inputExpressionFlow.value + str
+        inputExpressionFlow.value = newImpression
     }
 
     fun removeLastChar() {
-        if (_inputExpression.isNotEmpty()) {
-            _inputExpression = _inputExpression.dropLast(1)
+        if (inputExpressionFlow.value.isNotEmpty()) {
+            inputExpressionFlow.value = inputExpressionFlow.value.dropLast(1)
         }
     }
 
     fun clear() {
-        _inputExpression = ""
+        inputExpressionFlow.value = ""
     }
 
     companion object {
         private val regex = Regex("""^\d+(\.\d{1,2})?([+\-*]\d+(\.\d{1,2})?)*$""")
-        val Saver: Saver<MoneyInputState, String> = Saver(
-            save = {
-                it._inputExpression
-            },
-            restore = {
-                MoneyInputState(it)
-            }
-        )
     }
 }
 

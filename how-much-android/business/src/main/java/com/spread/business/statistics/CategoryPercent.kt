@@ -78,6 +78,7 @@ fun CategoryPercentList(
                 val sumValue: BigDecimal,
                 val percent: BigDecimal
             )
+
             val displayRecords = if (option == 0) expenseRecords else incomeRecords
             if (displayRecords.isEmpty()) {
                 item {

@@ -26,7 +26,10 @@ fun nowStr(format: String): String {
     return Date().dateStr(format)
 }
 
-fun timeInMillisToDateStr(timeInMillis: Long, format: String = DATE_FORMAT_YEAR_MONTH_DAY_STR): String {
+fun timeInMillisToDateStr(
+    timeInMillis: Long,
+    format: String = DATE_FORMAT_YEAR_MONTH_DAY_STR
+): String {
     val date = Date(timeInMillis)
     return date.dateStr(format)
 }
@@ -39,6 +42,7 @@ fun calendar(timeInMillis: Long): Calendar {
     calendar.timeInMillis = timeInMillis
     return calendar
 }
+
 fun dayOfWeekStr(dayOfWeek: Int): String = when (dayOfWeek) {
     Calendar.SUNDAY -> "SUN"
     Calendar.MONDAY -> "MON"

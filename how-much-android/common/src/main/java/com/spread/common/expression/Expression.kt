@@ -12,7 +12,7 @@ fun eval(expression: String): BigDecimal {
     return expressions.eval(expression)
 }
 
-fun String.isDigitsOnly(): Boolean {
+fun String.isMoneyDigitsOnly(): Boolean {
     return matches(digitsRegex)
 }
 

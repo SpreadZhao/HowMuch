@@ -13,6 +13,7 @@ import com.spread.db.money.MoneyType
 import com.spread.db.service.Money
 import com.spread.db.service.groupByDay
 import com.spread.db.suggestion.SuggestionRepository
+import com.spread.ui.MoneyInputState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -29,7 +30,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
-import java.math.BigDecimal
 import java.util.Calendar
 
 sealed interface EditRecordDialogState {
@@ -255,12 +255,23 @@ class MainViewModel : ViewModel() {
             SuggestionRepository().apply { loadRepository() }
         }
 
+        val moneyInputState by lazy {
+            MoneyInputState()
+        }
+
         val recordFlow: StateFlow<MoneyRecord?> = showEditRecordDialogFlow
             .map { state ->
-                when (state) {
+                val record = when (state) {
                     is EditRecordDialogState.Show -> state.record
                     else -> null
                 }
+                updateInputCategory(
+                    record?.category ?: categoryRepository.data.firstOrNull()?.text ?: ""
+                )
+                updateInputRemark(record?.remark ?: "")
+                updateInputMoneyType(record?.type ?: MoneyType.Expense)
+                moneyInputState.clear()
+                record
             }
             .stateIn(
                 scope = viewModelScope,
@@ -287,8 +298,12 @@ class MainViewModel : ViewModel() {
         private var _remarkInputFlow = MutableStateFlow("")
         val remarkInputFlow: StateFlow<String> = _remarkInputFlow
 
-        private var _moneyInputFlow = MutableStateFlow("")
-        val moneyInputFlow: StateFlow<String> = _moneyInputFlow
+        val moneyInputFlow: StateFlow<MoneyInputState.ExpressionData> =
+            moneyInputState.expressionDataFlow.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Lazily,
+                initialValue = MoneyInputState.ExpressionData()
+            )
 
         private var _categoryInputFlow = MutableStateFlow("")
         val categoryInputFlow: StateFlow<String> = _categoryInputFlow
@@ -296,22 +311,17 @@ class MainViewModel : ViewModel() {
         private var _moneyTypeFlow = MutableStateFlow(MoneyType.Expense)
         val moneyTypeFlow: StateFlow<MoneyType> = _moneyTypeFlow
 
-        fun updateRemark(remark: String) {
+        fun updateInputRemark(remark: String) {
             _remarkInputFlow.value = remark
             Log.d("Spread", "update remark: $remark")
         }
 
-        fun updateMoney(value: BigDecimal?) {
-            _moneyInputFlow.value = value?.toString() ?: ""
-            Log.d("Spread", "update value: $value")
-        }
-
-        fun updateCategory(category: String) {
+        fun updateInputCategory(category: String) {
             _categoryInputFlow.value = category
             Log.d("Spread", "update category: $category")
         }
 
-        fun updateMoneyType(moneyType: MoneyType) {
+        fun updateInputMoneyType(moneyType: MoneyType) {
             _moneyTypeFlow.value = moneyType
             Log.d("Spread", "update moneyType: $moneyType")
         }
