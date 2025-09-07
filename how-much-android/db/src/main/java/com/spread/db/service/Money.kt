@@ -6,6 +6,7 @@ import com.spread.db.money.MoneyDatabase
 import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import java.math.BigDecimal
 import java.util.Calendar
 import java.util.Date
@@ -85,10 +86,16 @@ object Money {
         return database.moneyDao().listenRecordsByDateRange(start, end)
     }
 
+    /**
+     * Today and the previous ([days] - 1) days
+     */
     fun listenRecentRecords(days: Int): Flow<List<MoneyRecord>> {
+        if (days < 1) {
+            return emptyFlow()
+        }
         val calendar = Calendar.getInstance()
         val now = calendar.timeInMillis
-        calendar.add(Calendar.DAY_OF_YEAR, -days)
+        calendar.add(Calendar.DAY_OF_YEAR, -(days - 1))
         val startTime = calendar.timeInMillis
         return database.moneyDao().listenRecordsByDateRange(startTime, now)
     }

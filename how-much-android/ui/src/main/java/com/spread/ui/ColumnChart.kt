@@ -32,7 +32,7 @@ import com.spread.common.dayOfWeekStr
 @Composable
 fun ColumnChart(modifier: Modifier = Modifier, data: Map<out Number, Number>) {
     val producer = remember { CartesianChartModelProducer() }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(data) {
         producer.runTransaction {
             columnSeries {
                 series(data.map { it.key }, data.map { it.value })
