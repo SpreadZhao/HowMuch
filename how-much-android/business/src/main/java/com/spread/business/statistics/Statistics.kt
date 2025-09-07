@@ -146,13 +146,9 @@ private fun sumForRecentRecords(records: List<MoneyRecord>): Map<Int, BigDecimal
 
         ((dayStart - today) / (24 * 60 * 60 * 1000)).toInt()
     }.mapValues { (_, dailyRecords) ->
-        dailyRecords.sumOf {
-            if (it.type == MoneyType.Income) {
-                it.value
-            } else {
-                it.value.negate()
-            }
-        }
+        dailyRecords
+            .filter { it.type == MoneyType.Expense }
+            .sumOf { it.value }
     }
 
     // 补齐最近 7 天
