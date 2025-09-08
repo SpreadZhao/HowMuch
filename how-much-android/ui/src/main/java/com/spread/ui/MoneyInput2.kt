@@ -20,9 +20,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.spread.common.expression.eval
 import com.spread.common.performHapticFeedback
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import java.math.BigDecimal
 
 @Composable
@@ -60,53 +62,60 @@ fun InputKeys(
     }
 }
 
-class MoneyInputState(
-    inputExpression: String = ""
-) {
-    private val inputExpressionFlow: MutableStateFlow<String> = MutableStateFlow(inputExpression)
+class MoneyInputState {
+
+    private val inputExpressionFlow: MutableStateFlow<String> = MutableStateFlow("")
+
+    private val defaultValueFlow = MutableStateFlow(BigDecimal.ZERO)
 
     data class ExpressionData(
+        val value: BigDecimal = BigDecimal.ZERO,
         val expr: String = "",
-        val value: BigDecimal? = null,
         val err: String? = null
-    ) {
-        override fun equals(other: Any?): Boolean {
-            return other is ExpressionData && this.expr == other.expr
-        }
+    )
 
-        override fun hashCode(): Int {
-            var result = expr.hashCode()
-            result = 31 * result + (value?.hashCode() ?: 0)
-            result = 31 * result + (err?.hashCode() ?: 0)
-            return result
-        }
-    }
-
-    val expressionDataFlow: Flow<ExpressionData> = inputExpressionFlow.map { expr ->
-        if (!regex.matches(expr)) {
-            return@map ExpressionData(expr = expr, err = "Invalid expr")
-        }
-        val addSubParts = expr.split('+', '-')
-        for (part in addSubParts) {
-            if (part.isEmpty()) continue
-            if ("*" in part) {
-                val factors = part.split('*')
-                val decimalCount = factors.count { it.contains('.') }
-                if (decimalCount > 1) return@map ExpressionData(
+    val expressionDataFlow: Flow<ExpressionData> =
+        combine(inputExpressionFlow, defaultValueFlow) { expr, defaultValue ->
+            if (expr.isBlank()) {
+                return@combine ExpressionData(value = defaultValue)
+            }
+            if (!regex.matches(expr)) {
+                return@combine ExpressionData(
+                    value = defaultValue,
                     expr = expr,
-                    err = "Only one decimal is allowed in multiplication"
+                    err = "Invalid expr"
                 )
             }
-        }
-        val value = eval(expr)
-        if (value <= BigDecimal.ZERO) {
-            return@map ExpressionData(expr = expr, err = "Invalid value: $value")
-        }
-        if (value.stripTrailingZeros().scale() > 2) {
-            return@map ExpressionData(expr = expr, err = "Invalid value: $value")
-        }
-        return@map ExpressionData(expr = expr, value = value)
-    }
+            val addSubParts = expr.split('+', '-')
+            for (part in addSubParts) {
+                if (part.isEmpty()) continue
+                if ("*" in part) {
+                    val factors = part.split('*')
+                    val decimalCount = factors.count { it.contains('.') }
+                    if (decimalCount > 1) return@combine ExpressionData(
+                        value = defaultValue,
+                        expr = expr,
+                        err = "Only one decimal is allowed in multiplication"
+                    )
+                }
+            }
+            val value = eval(expr)
+            if (value <= BigDecimal.ZERO) {
+                return@combine ExpressionData(
+                    value = defaultValue,
+                    expr = expr,
+                    err = "Invalid value: $value"
+                )
+            }
+            if (value.stripTrailingZeros().scale() > 2) {
+                return@combine ExpressionData(
+                    value = defaultValue,
+                    expr = expr,
+                    err = "Invalid value: $value"
+                )
+            }
+            return@combine ExpressionData(value = value, expr = expr)
+        }.flowOn(Dispatchers.IO)
 
     fun appendStr(str: String) {
         val newImpression = inputExpressionFlow.value + str
@@ -119,8 +128,11 @@ class MoneyInputState(
         }
     }
 
-    fun clear() {
+    fun clear(default: BigDecimal? = null) {
         inputExpressionFlow.value = ""
+        if (default != null) {
+            defaultValueFlow.value = default
+        }
     }
 
     companion object {

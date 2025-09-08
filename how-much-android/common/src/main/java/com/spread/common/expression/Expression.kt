@@ -6,14 +6,16 @@ import java.math.RoundingMode
 
 private val expressions = Expressions()
 
-private val digitsRegex = Regex("^-?\\d+(\\.\\d+)?$")
+private val positiveNumberRegex = Regex("^(?:[1-9]\\d*(?:\\.\\d+)?|0\\.\\d*[1-9]\\d*)$")
 
 fun eval(expression: String): BigDecimal {
-    return expressions.eval(expression)
+    return expressions.runCatching {
+        eval(expression)
+    }.getOrDefault(BigDecimal.ZERO)
 }
 
 fun String.isMoneyDigitsOnly(): Boolean {
-    return matches(digitsRegex)
+    return matches(positiveNumberRegex)
 }
 
 class ExpressionException(message: String) : RuntimeException(message)

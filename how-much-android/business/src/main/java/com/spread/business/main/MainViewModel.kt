@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import java.math.BigDecimal
 import java.util.Calendar
 
 sealed interface EditRecordDialogState {
@@ -246,18 +247,11 @@ class MainViewModel : ViewModel() {
 
     inner class RecordEditState {
 
-        val categoryRepository by lazy {
-            // TODO: here's a performance issue
-            CategoryRepository().apply { loadRepository() }
-        }
+        val categoryRepository = CategoryRepository().apply { loadRepository() }
 
-        val suggestionRepository by lazy {
-            SuggestionRepository().apply { loadRepository() }
-        }
+        val suggestionRepository = SuggestionRepository().apply { loadRepository() }
 
-        val moneyInputState by lazy {
-            MoneyInputState()
-        }
+        val moneyInputState: MoneyInputState = MoneyInputState()
 
         val recordFlow: StateFlow<MoneyRecord?> = showEditRecordDialogFlow
             .map { state ->
@@ -270,7 +264,7 @@ class MainViewModel : ViewModel() {
                 )
                 updateInputRemark(record?.remark ?: "")
                 updateInputMoneyType(record?.type ?: MoneyType.Expense)
-                moneyInputState.clear()
+                moneyInputState.clear(record?.value ?: BigDecimal.ZERO)
                 record
             }
             .stateIn(
@@ -301,7 +295,7 @@ class MainViewModel : ViewModel() {
         val moneyInputFlow: StateFlow<MoneyInputState.ExpressionData> =
             moneyInputState.expressionDataFlow.stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.Lazily,
+                started = SharingStarted.Eagerly,
                 initialValue = MoneyInputState.ExpressionData()
             )
 
@@ -326,17 +320,6 @@ class MainViewModel : ViewModel() {
             Log.d("Spread", "update moneyType: $moneyType")
         }
 
-        private fun refreshOnDialogShow(refreshActionBuilder: MutableList<(MoneyRecord?) -> Unit>.() -> Unit) {
-            buildList(refreshActionBuilder).forEach { action ->
-                viewModelScope.launch {
-                    showEditRecordDialogFlow.collect {
-                        if (it is EditRecordDialogState.Show) {
-                            action(it.record)
-                        }
-                    }
-                }
-            }
-        }
     }
 
     val recordEditState by lazy { RecordEditState() }

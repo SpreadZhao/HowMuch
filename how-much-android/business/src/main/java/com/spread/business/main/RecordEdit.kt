@@ -1,5 +1,6 @@
 package com.spread.business.main
 
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -115,7 +116,8 @@ fun RecordEdit(
                 .padding(top = 5.dp),
             expression = expr,
             initial = record?.value,
-            value = value
+            value = value,
+            err = err
         )
         MoneyInput2(inputState = recordEditState.moneyInputState)
     }
@@ -126,7 +128,8 @@ fun MoneyExpr(
     modifier: Modifier = Modifier,
     expression: String,
     initial: BigDecimal? = null,
-    value: BigDecimal?
+    value: BigDecimal?,
+    err: String? = null
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         if (expression.isBlank()) {
@@ -146,20 +149,31 @@ fun MoneyExpr(
             }
             Spacer(modifier = Modifier.weight(1f))
         } else {
+            val fontColor =
+                if (err == null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onError
             Text(
                 text = expression,
-                color = if (value != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onError,
+                color = fontColor,
                 maxLines = 1,
                 overflow = TextOverflow.StartEllipsis,
                 fontSize = TextConstants.FONT_SIZE_H3,
                 fontStyle = FontStyle.Italic
             )
-            if (value != null && !expression.isMoneyDigitsOnly()) {
+            if ((value != null && !expression.isMoneyDigitsOnly()) || err != null) {
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = "=${value}",
+                    modifier = Modifier
+                        .basicMarquee(
+                            iterations = Int.MAX_VALUE,
+                            repeatDelayMillis = 500,
+                            initialDelayMillis = 500,
+                            velocity = 50.dp
+                        )
+                        .padding(start = 10.dp),
+                    text = err ?: "=${value}",
+                    color = fontColor,
                     maxLines = 1,
-                    overflow = TextOverflow.StartEllipsis,
+                    overflow = TextOverflow.Visible,
                     fontSize = TextConstants.FONT_SIZE_H3,
                     fontWeight = FontWeight.Bold
                 )
@@ -379,6 +393,9 @@ fun Header(
 
         TextButton(
             onClick = {
+                if (inputMoneyState.err != null) {
+                    return@TextButton
+                }
                 val moneyRecord = Money.buildMoneyRecord(record) {
                     date = calendar.timeInMillis
                     type = inputType
