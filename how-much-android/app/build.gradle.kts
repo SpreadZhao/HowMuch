@@ -53,7 +53,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.acra.core)
     implementation(libs.androidx.navigation.compose)
     implementation(project(":ui"))
     implementation(project(":common"))
