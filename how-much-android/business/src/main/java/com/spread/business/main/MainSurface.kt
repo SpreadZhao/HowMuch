@@ -252,6 +252,7 @@ fun MainContent(
             ViewType.MonthlyStatistics, ViewType.YearlyStatistics -> {
                 StatisticsScreen(
                     modifier = modifier,
+                    viewModel = viewModel,
                     records = records
                 )
             }

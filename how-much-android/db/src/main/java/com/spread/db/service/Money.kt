@@ -94,11 +94,26 @@ object Money {
         if (days < 1) {
             return emptyFlow()
         }
+
         val calendar = Calendar.getInstance()
-        val now = calendar.timeInMillis
+
+        // 结束时间：今天 23:59:59.999
+        calendar.timeInMillis = System.currentTimeMillis()
+        calendar.set(Calendar.HOUR_OF_DAY, 23)
+        calendar.set(Calendar.MINUTE, 59)
+        calendar.set(Calendar.SECOND, 59)
+        calendar.set(Calendar.MILLISECOND, 999)
+        val endTime = calendar.timeInMillis
+
+        // 开始时间：days-1 天前的 0:00:00.000
         calendar.add(Calendar.DAY_OF_YEAR, -(days - 1))
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
         val startTime = calendar.timeInMillis
-        return database.moneyDao().listenRecordsByDateRange(startTime, now)
+
+        return database.moneyDao().listenRecordsByDateRange(startTime, endTime)
     }
 
     private fun getYearRangeFromTime(time: Long): Pair<Long, Long> {

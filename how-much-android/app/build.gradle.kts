@@ -59,5 +59,5 @@ dependencies {
     implementation(project(":business"))
     implementation(project(":debug"))
     implementation(libs.androidx.profileinstaller)
-    "baselineProfile"(project(":howmuch-baselineprofile"))
+//    "baselineProfile"(project(":howmuch-baselineprofile"))
 }

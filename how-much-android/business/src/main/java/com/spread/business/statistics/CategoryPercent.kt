@@ -29,6 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
+import com.spread.business.main.MainViewModel
+import com.spread.business.main.RecordItem
 import com.spread.common.timeInMillisToDateStr
 import com.spread.db.money.MoneyRecord
 import com.spread.db.money.MoneyType
@@ -39,6 +41,7 @@ import java.math.RoundingMode
 @Composable
 fun CategoryPercentList(
     modifier: Modifier = Modifier,
+    viewModel: MainViewModel,
     records: List<MoneyRecord>
 ) {
 
@@ -109,6 +112,7 @@ fun CategoryPercentList(
                                     .fillMaxWidth()
                                     .wrapContentHeight()
                                     .padding(bottom = 2.dp),
+                                viewModel = viewModel,
                                 records = records,
                                 category = category,
                                 sumValue = sumValue,
@@ -125,6 +129,7 @@ fun CategoryPercentList(
 @Composable
 private fun CategoryPercentItem(
     modifier: Modifier = Modifier,
+    viewModel: MainViewModel,
     records: List<MoneyRecord>,
     category: String,
     sumValue: BigDecimal,
@@ -163,7 +168,12 @@ private fun CategoryPercentItem(
         ) {
             LazyColumn {
                 items(records) { record ->
-                    Text(text = "${timeInMillisToDateStr(record.date)} ${record.category} ${record.remark} ${record.value}")
+                    RecordItem(
+                        modifier = Modifier.padding(10.dp),
+                        viewModel = viewModel,
+                        record = record,
+                        blink = false
+                    )
                 }
             }
         }
